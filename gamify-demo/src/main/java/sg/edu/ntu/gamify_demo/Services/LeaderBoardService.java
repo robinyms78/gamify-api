@@ -4,7 +4,7 @@
 package sg.edu.ntu.gamify_demo.Services;
 
 public class LeaderBoardService {
-    // COnstructor
+    // Constructor
     public LeaderBoardService() {
     }
 
