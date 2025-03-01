@@ -1,5 +1,6 @@
 package sg.edu.ntu.gamify_demo.Services;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * The User class represents a user in the system.
@@ -8,7 +9,8 @@ import java.time.LocalDateTime;
 public class User 
 {
     //Instance variables
-    private int userId, points;
+    private int points;
+    protected String userId; 
     private String userName, email, passwordHash, role, department;
     private LocalDateTime createdAt, updatedAt;
     
@@ -25,9 +27,13 @@ public class User
      * @param createdAt The timestamp of when the user was created.
      * @param updatedAt The timestamp of when the user was last updated.
      */
-    public User(int userId, int points, String userName, String email, String passwordHash, String role, String department, LocalDateTime createdAt, LocalDateTime updatedAt) 
+
+    public User() {
+    }
+
+    public User(String userId, int points, String userName, String email, String passwordHash, String role, String department, LocalDateTime createdAt, LocalDateTime updatedAt) 
     {
-        this.userId = userId;
+        this.userId = UUID.randomUUID().toString();
         this.points = points;
         this.userName = userName;
         this.email = email;
@@ -43,19 +49,9 @@ public class User
      * 
      * @return The user ID.
      */
-    public int getUserId() 
+    public String getUserId() 
     {
         return userId;
-    }
-
-    /**
-     * Sets the unique identifier of the user.
-     * 
-     * @param userId The new user ID.
-     */
-    public void setUserId(int userId) 
-    {
-        this.userId = userId;
     }
 
     /**
