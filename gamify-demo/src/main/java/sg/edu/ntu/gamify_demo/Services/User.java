@@ -29,9 +29,10 @@ public class User
      */
 
     public User() {
+        this.userId = "";
     }
 
-    public User(String userId, int points, String userName, String email, String passwordHash, String role, String department, LocalDateTime createdAt, LocalDateTime updatedAt) 
+    public User(int points, String userName, String email, String passwordHash, String role, String department) 
     {
         this.userId = UUID.randomUUID().toString();
         this.points = points;
@@ -40,8 +41,8 @@ public class User
         this.passwordHash = passwordHash;
         this.role = role;
         this.department = department;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
     
     /**

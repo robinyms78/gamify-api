@@ -13,7 +13,7 @@ public class Reward {
 
     // Instance variables
     private int costInPoints;
-    protected String rewardId;
+    protected final String rewardId;
     private String name;
     private String description;
     private boolean available;
@@ -34,18 +34,19 @@ public class Reward {
      */
 
     public Reward() {
+        this.rewardId = "";
     }
 
-    public Reward(String userId, int rewardId, int costInPoints, String name, String description, boolean available, LocalDateTime createdAt, LocalDateTime updatedAt) 
+    public Reward(String name, String description, int costInPoints,  boolean available) 
     {
-        user.userId = userId;
+        user.userId = UUID.randomUUID().toString();
         this.rewardId = UUID.randomUUID().toString();
-        this.costInPoints = costInPoints;
         this.name = name;
         this.description = description;
+        this.costInPoints = costInPoints;
         this.available = available;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     /**
