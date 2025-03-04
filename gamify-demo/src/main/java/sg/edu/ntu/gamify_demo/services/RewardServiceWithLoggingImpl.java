@@ -10,41 +10,50 @@ import sg.edu.ntu.gamify_demo.exceptions.RewardNotFoundException;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.models.Reward;
 import sg.edu.ntu.gamify_demo.repositories.RewardRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @Component
-public class RewardServiceImpl implements RewardService {
+public class RewardServiceWithLoggingImpl implements RewardService {
 
     private RewardRepository rewardRepository;
+    private final Logger logger = LoggerFactory.getLogger(RewardService.class);
 
     // Constructor
-    public RewardServiceImpl(RewardRepository rewardRepository) {
+    public RewardServiceWithLoggingImpl(RewardRepository rewardRepository) {
         this.rewardRepository = rewardRepository;
     }
 
     // Method
     // Create
+    @Override
     public Reward createReward(Reward reward) {
+        logger.info("🟢 RewardServiceImpl.createReward() called");
         return rewardRepository.createReward(reward);
     }
 
     // Get One
     public Reward getReward(String id) {
+        logger.info("🟢 RewardServiceImpl.getReward() called");
         return rewardRepository.getReward(getRewardIndex(id));
     }
 
     // Get All
     public ArrayList<Reward> getAllRewards() {
+        logger.info("🟢 RewardServiceImpl.getAllReward() called");
         return rewardRepository.getAllRewards();
     }
 
     // Update
     public Reward updateReward(String id, Reward reward) {
+        logger.info("🟢 RewardServiceImpl.updateReward() called");
         return rewardRepository.updatReward(getRewardIndex(id), reward);
     }
 
     // Delete
     public void deleteReward(String id) {
+        logger.info("🟢 RewardServiceImpl.deleteReward() called");
         rewardRepository.deleteReward(getRewardIndex(id));
     }
 

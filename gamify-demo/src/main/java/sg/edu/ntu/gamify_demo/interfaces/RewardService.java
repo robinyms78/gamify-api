@@ -1,3 +1,6 @@
+// Java interface for RewardService
+// RewardService
+
 package sg.edu.ntu.gamify_demo.interfaces;
 
 import java.util.ArrayList;

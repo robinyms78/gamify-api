@@ -1,3 +1,6 @@
+// Java class for RewardRepository
+// RewardRepository.java
+
 package sg.edu.ntu.gamify_demo.repositories;
 
 import java.util.ArrayList;

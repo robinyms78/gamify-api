@@ -1,3 +1,6 @@
+// Java class for RewardControllerWithLoggingImpl
+// RewardControllerWithLoggingImpl.java
+
 package sg.edu.ntu.gamify_demo.controllers;
 
 import java.util.ArrayList;
@@ -12,17 +15,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sg.edu.ntu.gamify_demo.exceptions.RewardNotFoundException;
+import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.models.Reward;
-import sg.edu.ntu.gamify_demo.services.RewardServiceImpl;
+import sg.edu.ntu.gamify_demo.services.RewardServiceWithLoggingImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/rewards")
-public class RewardController {
+public class RewardControllerWithLoggingImpl {
     
-    private RewardServiceImpl rewardService;
+    private RewardServiceWithLoggingImpl rewardService;
+    private final Logger logger = LoggerFactory.getLogger(RewardService.class);
 
     // Constructor
-    public RewardController(RewardServiceImpl rewardService) {
+    public RewardControllerWithLoggingImpl(RewardServiceWithLoggingImpl rewardService) {
         this.rewardService = rewardService;
     }
 
@@ -51,6 +58,7 @@ public class RewardController {
             Reward foundReward = rewardService.getReward(id);
             return new ResponseEntity<>(foundReward, HttpStatus.OK);
         } catch (RewardNotFoundException e) {
+            logger.error("🔴 " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.OK);
         }
     }
@@ -64,6 +72,7 @@ public class RewardController {
             Reward updateReward = rewardService.updateReward(id, reward);
             return new ResponseEntity<>(updateReward, HttpStatus.OK);
         } catch (RewardNotFoundException e) {
+            logger.error("🔴 " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
@@ -77,6 +86,7 @@ public class RewardController {
             rewardService.deleteReward(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (RewardNotFoundException e) {
+            logger.error("🔴 " + e.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
