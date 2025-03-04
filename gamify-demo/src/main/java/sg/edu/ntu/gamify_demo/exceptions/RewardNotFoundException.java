@@ -1,7 +1,7 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.exceptions;
 
 public class RewardNotFoundException extends RuntimeException {
-    RewardNotFoundException(String id) {
+    public RewardNotFoundException(String id) {
         super("Could not find reward with id: " + id);
     }
 }

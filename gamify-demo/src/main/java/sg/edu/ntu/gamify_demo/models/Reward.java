@@ -1,4 +1,4 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.models;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
