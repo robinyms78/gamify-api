@@ -4,6 +4,8 @@
 package sg.edu.ntu.gamify_demo.models;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,18 +16,20 @@ import lombok.Setter;
 
 @Setter 
 @Getter
-
+@AllArgsConstructor
+@NoArgsConstructor
 public class Reward {
     // Create instance of user class 
     User user = new User();
 
     // Instance variables
     private int costInPoints;
-    protected final String rewardId;
+    protected String rewardId;
     private String name;
     private String description;
     private boolean available;
-    private LocalDateTime createdAt, updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     /**
      * Constructs a Reward object with the provided details.

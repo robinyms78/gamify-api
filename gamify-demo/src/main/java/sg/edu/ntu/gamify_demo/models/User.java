@@ -4,8 +4,9 @@
 package sg.edu.ntu.gamify_demo.models;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -15,7 +16,8 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 public class User 
 {
     //Instance variables
