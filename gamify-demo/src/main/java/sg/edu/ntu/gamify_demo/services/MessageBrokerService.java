@@ -1,7 +1,7 @@
 // Java class for MessageBrokerService.java
 // MessageBrokerService.java
 
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
 public class MessageBrokerService {
     private int pointsAwarded;

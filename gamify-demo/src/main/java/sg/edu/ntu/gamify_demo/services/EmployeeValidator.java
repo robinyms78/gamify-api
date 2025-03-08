@@ -1,4 +1,4 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 import sg.edu.ntu.gamify_demo.models.Employee;
 import sg.edu.ntu.gamify_demo.exceptions.EmployeeValidationException;
 

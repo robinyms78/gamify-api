@@ -1,7 +1,7 @@
 // Java class for RewardService
 // RewardService.java
 
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
 import java.util.ArrayList;
 
