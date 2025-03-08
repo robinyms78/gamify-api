@@ -1,7 +1,7 @@
 // Java class for AuthenticationService
 // AuthenticationService.java
 
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
 public class AuthenticationService {
     private String userName;

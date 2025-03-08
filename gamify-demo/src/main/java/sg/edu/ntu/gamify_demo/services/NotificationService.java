@@ -1,7 +1,7 @@
 // Java class for NotificationService
 // NotificationService.java
 
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
 public class NotificationService {
     private String email;
