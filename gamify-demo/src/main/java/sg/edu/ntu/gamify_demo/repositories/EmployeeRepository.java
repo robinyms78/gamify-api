@@ -1,10 +1,8 @@
 package sg.edu.ntu.gamify_demo.repositories;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import sg.edu.ntu.gamify_demo.models.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> 
