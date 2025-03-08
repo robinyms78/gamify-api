@@ -1,7 +1,7 @@
 // Java class for GamificationService
 // GamificationService.java
 
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
 public class GamificationService {
     private String userId;
