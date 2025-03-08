@@ -1,7 +1,7 @@
 // Java class for LadderService
 // LadderService.java
 
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
 import java.util.HashMap;
 
