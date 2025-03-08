@@ -1,0 +1,9 @@
+{
+  "userId": "user123",
+  "taskId": "task-high-123",
+  "event_type": "TASK_COMPLETED",
+  "data": {
+    "priority": "HIGH",
+    "description": "Test task completion"
+  }
+}

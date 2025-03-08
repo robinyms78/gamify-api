@@ -157,48 +157,84 @@
                 <p>Integrate our gamification platform with your existing systems using our comprehensive API.</p>
                 
                 <div class="endpoint">
-                    <h3>Employees</h3>
-                    <div class="endpoint-url"><span class="method get">GET</span>/api/employees</div>
-                    <p>Retrieve a list of all employees</p>
-                    
-                    <div class="endpoint-url"><span class="method get">GET</span>/api/employees/{id}</div>
-                    <p>Retrieve a specific employee by ID</p>
-                    
-                    <div class="endpoint-url"><span class="method post">POST</span>/api/employees</div>
-                    <p>Create a new employee</p>
-                    
-                    <div class="endpoint-url"><span class="method put">PUT</span>/api/employees/{id}</div>
-                    <p>Update an existing employee</p>
-                    
-                    <div class="endpoint-url"><span class="method delete">DELETE</span>/api/employees/{id}</div>
-                    <p>Delete an employee</p>
+                    <h3>Users</h3>
+                    <div class="endpoint-url"><span class="method get">GET</span>/api/users</div>
+                    <p>Retrieve a list of all users</p>
+
+                    <div class="endpoint-url"><span class="method get">GET</span>/api/users/{id}</div>
+                    <p>Retrieve a specific user by ID</p>
+
+                    <div class="endpoint-url"><span class="method post">POST</span>/api/users</div>
+                    <p>Create a new user</p>
+
+                    <div class="endpoint-url"><span class="method put">PUT</span>/api/users/{id}</div>
+                    <p>Update an existing user</p>
+
+                    <div class="endpoint-url"><span class="method delete">DELETE</span>/api/users/{id}</div>
+                    <p>Delete a user</p>
                 </div>
-                
+
                 <div class="endpoint">
                     <h3>Rewards</h3>
                     <div class="endpoint-url"><span class="method get">GET</span>/api/rewards</div>
                     <p>Retrieve a list of all rewards</p>
-                    
+
                     <div class="endpoint-url"><span class="method get">GET</span>/api/rewards/{id}</div>
                     <p>Retrieve a specific reward by ID</p>
-                    
+
                     <div class="endpoint-url"><span class="method post">POST</span>/api/rewards</div>
                     <p>Create a new reward</p>
-                    
+
                     <div class="endpoint-url"><span class="method put">PUT</span>/api/rewards/{id}</div>
                     <p>Update an existing reward</p>
-                    
+
                     <div class="endpoint-url"><span class="method delete">DELETE</span>/api/rewards/{id}</div>
                     <p>Delete a reward</p>
                 </div>
-                
+
                 <div class="endpoint">
                     <h3>Redemptions</h3>
                     <div class="endpoint-url"><span class="method post">POST</span>/api/redemptions</div>
                     <p>Redeem a reward for an employee</p>
-                    
+
                     <div class="endpoint-url"><span class="method get">GET</span>/api/employees/{id}/redemptions</div>
                     <p>Get all redemptions for a specific employee</p>
+                </div>
+
+                <div class="endpoint">
+                    <h3>Achievements</h3>
+                    <div class="endpoint-url"><span class="method get">GET</span>/api/achievements</div>
+                    <p>Retrieve a list of all achievements</p>
+
+                    <div class="endpoint-url"><span class="method get">GET</span>/api/achievements/{id}</div>
+                    <p>Retrieve a specific achievement by ID</p>
+
+                    <div class="endpoint-url"><span class="method post">POST</span>/api/achievements</div>
+                    <p>Create a new achievement</p>
+
+                    <div class="endpoint-url"><span class="method put">PUT</span>/api/achievements/{id}</div>
+                    <p>Update an existing achievement</p>
+
+                    <div class="endpoint-url"><span class="method delete">DELETE</span>/api/achievements/{id}</div>
+                    <p>Delete an achievement</p>
+                </div>
+
+                <div class="endpoint">
+                    <h3>User Achievements</h3>
+                    <div class="endpoint-url"><span class="method get">GET</span>/api/user_achievements/user/{userId}</div>
+                    <p>Retrieve all user achievements for a specific user</p>
+
+                    <div class="endpoint-url"><span class="method get">GET</span>/api/user_achievements/{id}</div>
+                    <p>Retrieve a specific user achievement by ID</p>
+
+                    <div class="endpoint-url"><span class="method post">POST</span>/api/user_achievements</div>
+                    <p>Create a new user achievement (e.g., grant an achievement to a user)</p>
+                </div>
+
+                <div class="endpoint">
+                    <h3>Leaderboard</h3>
+                    <div class="endpoint-url"><span class="method get">GET</span>/api/leaderboard</div>
+                    <p>Retrieve the leaderboard</p>
                 </div>
             </div>
         </section>

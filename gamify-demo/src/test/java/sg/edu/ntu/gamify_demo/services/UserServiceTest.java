@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
@@ -41,6 +42,9 @@ public class UserServiceTest {
 
     @Mock
     private UserValidator userValidator;
+    
+    @Mock
+    private PasswordEncoder encoder;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -79,6 +83,9 @@ public class UserServiceTest {
     void testCreateUser_Success() throws UserValidationException {
         // Mock validator to do nothing (validation passes)
         doNothing().when(userValidator).validateUser(any(User.class));
+        
+        // Mock encoder to return a hashed password
+        when(encoder.encode(any(String.class))).thenReturn("encoded_password");
         
         // Mock repository to return the saved user
         when(userRepository.save(any(User.class))).thenReturn(testUser1);

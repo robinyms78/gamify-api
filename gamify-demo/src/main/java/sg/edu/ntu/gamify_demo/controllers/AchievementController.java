@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,13 +18,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.exceptions.AchievementNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
+import sg.edu.ntu.gamify_demo.facades.GamificationFacade;
 import sg.edu.ntu.gamify_demo.interfaces.AchievementService;
+import sg.edu.ntu.gamify_demo.interfaces.UserAchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;
-import sg.edu.ntu.gamify_demo.models.UserAchievement;
 
 /**
  * REST controller for achievement-related endpoints.
@@ -34,14 +35,28 @@ import sg.edu.ntu.gamify_demo.models.UserAchievement;
 @RequestMapping("/api/achievements")
 public class AchievementController {
     
-    @Autowired
-    private AchievementService achievementService;
+    private final AchievementService achievementService;
+    private final UserService userService;
+    private final UserAchievementService userAchievementService;
+    private final GamificationFacade gamificationFacade;
+    private final ObjectMapper objectMapper;
     
+    /**
+     * Constructor for dependency injection.
+     */
     @Autowired
-    private UserService userService;
-    
-    @Autowired
-    private ObjectMapper objectMapper;
+    public AchievementController(
+            AchievementService achievementService,
+            UserService userService,
+            UserAchievementService userAchievementService,
+            GamificationFacade gamificationFacade,
+            ObjectMapper objectMapper) {
+        this.achievementService = achievementService;
+        this.userService = userService;
+        this.userAchievementService = userAchievementService;
+        this.gamificationFacade = gamificationFacade;
+        this.objectMapper = objectMapper;
+    }
     
     /**
      * Get all achievements.
@@ -50,7 +65,7 @@ public class AchievementController {
      */
     @GetMapping
     public ResponseEntity<List<Achievement>> getAllAchievements() {
-        List<Achievement> achievements = achievementService.getAllAchievements();
+        List<Achievement> achievements = gamificationFacade.getAllAchievements();
         return ResponseEntity.ok(achievements);
     }
     
@@ -115,57 +130,15 @@ public class AchievementController {
     }
     
     /**
-     * Get all users who have earned a specific achievement.
+     * Get a user's achievements.
      * 
-     * @param achievementId The ID of the achievement.
-     * @return A list of users who have earned the achievement.
-     */
-    @GetMapping("/{achievementId}/users")
-    public ResponseEntity<List<User>> getAchievementUsers(@PathVariable String achievementId) {
-        Achievement achievement = achievementService.getAchievementById(achievementId);
-        List<UserAchievement> userAchievements = achievementService.getAchievementUsers(achievement);
-        
-        List<User> users = userAchievements.stream()
-                .map(UserAchievement::getUser)
-                .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(users);
-    }
-    
-    /**
-     * Award an achievement to a user.
-     * 
-     * @param achievementId The ID of the achievement.
      * @param userId The ID of the user.
-     * @param metadata Optional metadata about how the achievement was earned.
-     * @return The created UserAchievement.
+     * @return The user's achievements.
      */
-    @PostMapping("/{achievementId}/award/{userId}")
-    public ResponseEntity<UserAchievement> awardAchievement(
-            @PathVariable String achievementId,
-            @PathVariable String userId,
-            @RequestBody(required = false) JsonNode metadata) {
-        
-        Achievement achievement = achievementService.getAchievementById(achievementId);
-        User user = userService.getUserById(userId);
-        
-        if (user == null) {
-            throw new UserNotFoundException(userId);
-        }
-        
-        // If no metadata is provided, create an empty object
-        if (metadata == null) {
-            metadata = objectMapper.createObjectNode();
-        }
-        
-        UserAchievement userAchievement = achievementService.awardAchievement(user, achievement, metadata);
-        
-        if (userAchievement == null) {
-            // User already has this achievement
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-        
-        return new ResponseEntity<>(userAchievement, HttpStatus.CREATED);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<UserAchievementDTO> getUserAchievements(@PathVariable String userId) {
+        UserAchievementDTO userAchievements = gamificationFacade.getUserAchievements(userId);
+        return ResponseEntity.ok(userAchievements);
     }
     
     /**
@@ -187,7 +160,7 @@ public class AchievementController {
             throw new UserNotFoundException(userId);
         }
         
-        boolean hasAchievement = achievementService.hasAchievement(user, achievement);
+        boolean hasAchievement = userAchievementService.hasAchievement(user, achievement);
         
         ObjectNode result = objectMapper.createObjectNode();
         result.put("hasAchievement", hasAchievement);
@@ -196,33 +169,27 @@ public class AchievementController {
     }
     
     /**
-     * Process achievements for a user based on an event.
+     * Process an event for a user.
      * 
      * @param userId The ID of the user.
      * @param eventData JSON data containing eventType and additional event data.
-     * @return A list of newly awarded achievements.
+     * @return Success response.
      */
     @PostMapping("/process/{userId}")
-    public ResponseEntity<List<Achievement>> processAchievements(
+    public ResponseEntity<ObjectNode> processEvent(
             @PathVariable String userId,
             @RequestBody JsonNode eventData) {
-        
-        User user = userService.getUserById(userId);
-        
-        if (user == null) {
-            throw new UserNotFoundException(userId);
-        }
         
         String eventType = eventData.get("eventType").asText();
         JsonNode eventDetails = eventData.get("eventDetails");
         
-        List<UserAchievement> newUserAchievements = achievementService.processAchievements(user, eventType, eventDetails);
+        gamificationFacade.processEvent(eventType, userId, eventDetails);
         
-        List<Achievement> newAchievements = newUserAchievements.stream()
-                .map(UserAchievement::getAchievement)
-                .collect(Collectors.toList());
+        ObjectNode result = objectMapper.createObjectNode();
+        result.put("success", true);
+        result.put("message", "Event processed successfully");
         
-        return ResponseEntity.ok(newAchievements);
+        return ResponseEntity.ok(result);
     }
     
     /**

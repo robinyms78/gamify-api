@@ -21,6 +21,7 @@ import lombok.Setter;
 public class UserAchievementId implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    private String user;
-    private String achievement;
+    // Field names must match the property names in UserAchievement entity
+    private String user; // Maps to UserAchievement.user.id
+    private String achievement; // Maps to UserAchievement.achievement.achievementId
 }

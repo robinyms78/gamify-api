@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -29,10 +30,14 @@ import lombok.Setter;
 @Entity
 @Table(name = "leaderboard")
 public class Leaderboard {
-    @Id
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+@Id
+@Column(name = "user_id")
+private String id;
+
+@OneToOne
+@MapsId
+@JoinColumn(name = "user_id")
+private User user;
     
     @Column(name = "username", nullable = false)
     private String username;
@@ -64,6 +69,7 @@ public class Leaderboard {
      */
     public Leaderboard(User user, int earnedPoints, LadderLevel currentLevel, int rank) {
         this.user = user;
+        this.id = user.getId(); // Set the ID from the user
         this.username = user.getUsername();
         this.department = user.getDepartment();
         this.earnedPoints = earnedPoints;
@@ -78,5 +84,30 @@ public class Leaderboard {
      */
     public void updateRank(int newRank) {
         this.rank = newRank;
+    }
+    
+    /**
+     * Synchronizes this leaderboard entry with the associated user's data.
+     * This method should be called whenever user data changes to maintain consistency.
+     */
+    public void syncWithUser() {
+        if (this.user != null) {
+            this.username = user.getUsername();
+            this.department = user.getDepartment();
+            this.earnedPoints = user.getEarnedPoints();
+        }
+    }
+    
+    /**
+     * Updates the user's level and earned points on the leaderboard.
+     * 
+     * @param level The user's current level.
+     * @param earnedPoints The total points earned by the user.
+     */
+    public void updateLevelAndPoints(LadderLevel level, int earnedPoints) {
+        this.currentLevel = level;
+        this.earnedPoints = earnedPoints;
+        // Also sync other user data to ensure consistency
+        syncWithUser();
     }
 }

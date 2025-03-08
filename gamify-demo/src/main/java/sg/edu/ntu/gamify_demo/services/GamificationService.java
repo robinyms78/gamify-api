@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.interfaces.AchievementService;
+import sg.edu.ntu.gamify_demo.interfaces.UserAchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.UserAchievement;
@@ -26,6 +27,9 @@ public class GamificationService {
     
     @Autowired
     private AchievementService achievementService;
+    
+    @Autowired
+    private UserAchievementService userAchievementService;
     
     @Autowired
     private MessageBrokerService messageBroker;
@@ -94,7 +98,7 @@ public class GamificationService {
      * @return A list of newly awarded UserAchievement objects.
      */
     public List<UserAchievement> processAchievements(User user, String eventType, JsonNode eventData) {
-        List<UserAchievement> newAchievements = achievementService.processAchievements(user, eventType, eventData);
+        List<UserAchievement> newAchievements = userAchievementService.processAchievements(user, eventType, eventData);
         
         // Notify about achievements earned
         if (!newAchievements.isEmpty() && messageBroker != null) {

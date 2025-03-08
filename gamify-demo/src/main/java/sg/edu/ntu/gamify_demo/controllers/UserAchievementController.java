@@ -1,8 +1,5 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +7,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
+import sg.edu.ntu.gamify_demo.facades.GamificationFacade;
 import sg.edu.ntu.gamify_demo.interfaces.AchievementService;
+import sg.edu.ntu.gamify_demo.interfaces.UserAchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;
-import sg.edu.ntu.gamify_demo.models.UserAchievement;
 
 /**
  * REST controller for user achievement-related endpoints.
@@ -24,11 +26,28 @@ import sg.edu.ntu.gamify_demo.models.UserAchievement;
 @RequestMapping("/api/users")
 public class UserAchievementController {
     
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final AchievementService achievementService;
+    private final UserAchievementService userAchievementService;
+    private final GamificationFacade gamificationFacade;
+    private final ObjectMapper objectMapper;
     
+    /**
+     * Constructor for dependency injection.
+     */
     @Autowired
-    private AchievementService achievementService;
+    public UserAchievementController(
+            UserService userService,
+            AchievementService achievementService,
+            UserAchievementService userAchievementService,
+            GamificationFacade gamificationFacade,
+            ObjectMapper objectMapper) {
+        this.userService = userService;
+        this.achievementService = achievementService;
+        this.userAchievementService = userAchievementService;
+        this.gamificationFacade = gamificationFacade;
+        this.objectMapper = objectMapper;
+    }
     
     /**
      * Get all achievements earned by a user.
@@ -37,20 +56,9 @@ public class UserAchievementController {
      * @return A list of achievements earned by the user.
      */
     @GetMapping("/{userId}/achievements")
-    public ResponseEntity<List<Achievement>> getUserAchievements(@PathVariable String userId) {
-        User user = userService.getUserById(userId);
-        
-        if (user == null) {
-            throw new UserNotFoundException(userId);
-        }
-        
-        List<UserAchievement> userAchievements = achievementService.getUserAchievements(user);
-        
-        List<Achievement> achievements = userAchievements.stream()
-                .map(UserAchievement::getAchievement)
-                .collect(Collectors.toList());
-        
-        return ResponseEntity.ok(achievements);
+    public ResponseEntity<UserAchievementDTO> getUserAchievements(@PathVariable String userId) {
+        UserAchievementDTO userAchievements = gamificationFacade.getUserAchievements(userId);
+        return ResponseEntity.ok(userAchievements);
     }
     
     /**
@@ -60,16 +68,21 @@ public class UserAchievementController {
      * @return The number of achievements earned by the user.
      */
     @GetMapping("/{userId}/achievements/count")
-    public ResponseEntity<Long> getUserAchievementCount(@PathVariable String userId) {
+    public ResponseEntity<ObjectNode> getUserAchievementCount(@PathVariable String userId) {
         User user = userService.getUserById(userId);
         
         if (user == null) {
             throw new UserNotFoundException(userId);
         }
         
-        long count = achievementService.countUserAchievements(user);
+        long count = userAchievementService.countUserAchievements(user);
         
-        return ResponseEntity.ok(count);
+        ObjectNode result = objectMapper.createObjectNode();
+        result.put("userId", userId);
+        result.put("username", user.getUsername());
+        result.put("achievementCount", count);
+        
+        return ResponseEntity.ok(result);
     }
     
     /**
@@ -80,7 +93,7 @@ public class UserAchievementController {
      * @return True if the user has the achievement, false otherwise.
      */
     @GetMapping("/{userId}/achievements/{achievementId}")
-    public ResponseEntity<Boolean> hasUserAchievement(
+    public ResponseEntity<ObjectNode> hasUserAchievement(
             @PathVariable String userId,
             @PathVariable String achievementId) {
         
@@ -92,8 +105,30 @@ public class UserAchievementController {
         
         Achievement achievement = achievementService.getAchievementById(achievementId);
         
-        boolean hasAchievement = achievementService.hasAchievement(user, achievement);
+        boolean hasAchievement = userAchievementService.hasAchievement(user, achievement);
         
-        return ResponseEntity.ok(hasAchievement);
+        ObjectNode result = objectMapper.createObjectNode();
+        result.put("userId", userId);
+        result.put("username", user.getUsername());
+        result.put("achievementId", achievementId);
+        result.put("achievementName", achievement.getName());
+        result.put("hasAchievement", hasAchievement);
+        
+        return ResponseEntity.ok(result);
+    }
+    
+    /**
+     * Exception handler for UserNotFoundException.
+     * 
+     * @param ex The exception.
+     * @return Error response.
+     */
+    @org.springframework.web.bind.annotation.ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ObjectNode> handleUserNotFoundException(UserNotFoundException ex) {
+        ObjectNode errorJson = objectMapper.createObjectNode();
+        errorJson.put("error", "User not found");
+        errorJson.put("message", ex.getMessage());
+        
+        return ResponseEntity.status(org.springframework.http.HttpStatus.NOT_FOUND).body(errorJson);
     }
 }

@@ -13,13 +13,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
+import sg.edu.ntu.gamify_demo.facades.GamificationFacade;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
 import sg.edu.ntu.gamify_demo.models.UserLadderStatus;
 import sg.edu.ntu.gamify_demo.services.LadderService;
@@ -33,6 +36,9 @@ public class LadderController {
     
     @Autowired
     private LadderService ladderService;
+    
+    @Autowired
+    private GamificationFacade gamificationFacade;
     
     @Autowired
     private ObjectMapper objectMapper;
@@ -49,7 +55,7 @@ public class LadderController {
     }
     
     /**
-     * Get a user's current ladder status.
+     * Get a user's current ladder status using path variable.
      * 
      * @param userId The ID of the user.
      * @return The user's ladder status.
@@ -57,6 +63,24 @@ public class LadderController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserLadderStatus> getUserLadderStatus(@PathVariable String userId) {
         UserLadderStatus status = ladderService.getUserLadderStatus(userId);
+        
+        if (status == null) {
+            throw new UserNotFoundException(userId);
+        }
+        
+        return ResponseEntity.ok(status);
+    }
+    
+    /**
+     * Get a user's ladder status with query parameter.
+     * Returns current level, earned points, points to next level, and level label.
+     * 
+     * @param userId The ID of the user as a query parameter.
+     * @return The user's ladder status as a DTO.
+     */
+    @GetMapping("/status")
+    public ResponseEntity<LadderStatusDTO> getLadderStatus(@RequestParam String userId) {
+        LadderStatusDTO status = gamificationFacade.getUserLadderStatus(userId);
         
         if (status == null) {
             throw new UserNotFoundException(userId);

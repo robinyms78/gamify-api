@@ -10,6 +10,7 @@ import org.hibernate.annotations.Type;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
@@ -35,13 +36,13 @@ import lombok.Setter;
 @Table(name = "user_achievements")
 public class UserAchievement {
     @Id
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
     private User user;
     
     @Id
-    @ManyToOne
-    @JoinColumn(name = "achievement_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "achievement_id", nullable = false, referencedColumnName = "achievement_id")
     private Achievement achievement;
     
     @Column(name = "earned_at")

@@ -74,9 +74,10 @@ public class UserLadderStatus {
      * 
      * @param newPoints The new total points earned by the user.
      * @param nextLevel The next level in the ladder system.
+     * @param nextNextLevel The level after the next level, or null if nextLevel is the highest level.
      * @return true if the user leveled up, false otherwise.
      */
-    public boolean updatePoints(int newPoints, LadderLevel nextLevel) {
+    public boolean updatePoints(int newPoints, LadderLevel nextLevel, LadderLevel nextNextLevel) {
         boolean leveledUp = false;
         this.earnedPoints = newPoints;
         
@@ -85,7 +86,6 @@ public class UserLadderStatus {
             leveledUp = true;
             
             // Calculate points to next level if there is one
-            LadderLevel nextNextLevel = null; // This would need to be fetched from the repository
             if (nextNextLevel != null) {
                 this.pointsToNextLevel = nextNextLevel.getPointsRequired() - newPoints;
             } else {
