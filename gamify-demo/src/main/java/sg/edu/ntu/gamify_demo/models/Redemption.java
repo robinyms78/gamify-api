@@ -14,14 +14,14 @@ import lombok.Setter;
  * It stores the redemption details including redemptionId and timestamps for creation and updates.
  */
 
-@Getter
-@Setter
-@AllArgsConstructor
+// @Getter
+// @Setter
+// @AllArgsConstructor
 @NoArgsConstructor
 
 public class Redemption {
     // Create instance of User class
-    User user = new User();
+    // User user = new User();
     // Create instance of Reward class
     Reward reward = new Reward();
     
@@ -47,7 +47,7 @@ public class Redemption {
      */
 
     public Redemption(String userId, String rewardId, String redemptionId, String status, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        user.userId = userId;
+        // user.userId = userId;
         reward.rewardId = rewardId;
         this.redemptionId = UUID.randomUUID().toString();
         this.status = status;

@@ -14,13 +14,13 @@ import lombok.Setter;
  * It stores the reward details including rewardId and timestamps for creation and updates.
  */
 
-@Setter 
-@Getter
-@AllArgsConstructor
+// @Setter 
+// @Getter
+// @AllArgsConstructor
 @NoArgsConstructor
 public class Reward {
     // Create instance of user class 
-    User user = new User();
+    // User user = new User();
 
     // Instance variables
     private int costInPoints;
@@ -47,7 +47,7 @@ public class Reward {
 
     public Reward(String name, String description, int costInPoints,  boolean available) 
     {
-        user.userId = UUID.randomUUID().toString();
+        // user.userId = UUID.randomUUID().toString();
         this.rewardId = UUID.randomUUID().toString();
         this.name = name;
         this.description = description;
