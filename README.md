@@ -1,4 +1,4 @@
-# gamify-api# Gamify Demo - Gamification Platform Backend
+# Gamify Demo - Gamification Platform Backend
 
 [![Java Version](https://img.shields.io/badge/Java-17-blue.svg)](https://openjdk.java.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.1-green.svg)](https://spring.io/projects/spring-boot)
@@ -9,17 +9,16 @@ A robust gamification backend service implementing core game mechanics for user 
 
 ### Core Game Mechanics
 - **User Progression System**
-  - Points earning/spending transactions
-  - Multi-level ladder system
-  - Achievement unlocking
-  - Real-time leaderboard updates
+  - Points earning through task completion with priority-based calculations
+  - Multi-level ladder system with defined points requirements
+  - Achievement system with JSON-based criteria
+  - Real-time event processing for progression updates
 
 ### Event-Driven Architecture
 - Domain events for system reactions
-  - `TaskCompletedEvent`
-  - `PointsEarnedEvent`
-  - `PointsSpentEvent`
-- Dual publication system (modern + legacy)
+  - `PointsEarnedEvent` with detailed metadata
+  - Event processing through `/api/achievements/process/{userId}` endpoint
+  - Priority-based points calculation strategy
 
 ### Enterprise Features
 - REST API endpoints
@@ -33,7 +32,7 @@ A robust gamification backend service implementing core game mechanics for user 
 | Component               | Technology                          |
 |-------------------------|-------------------------------------|
 | **Backend Framework**   | Spring Boot 3.1                     |
-| **Database**            | H2 (Embedded/File-based)            |
+| **Database**            | PostgreSQL                         |
 | **Testing**             | JUnit 5, Mockito                    |
 | **Build Tool**          | Maven                               |
 | **Code Quality**        | Lombok, Validation API              |
@@ -72,22 +71,28 @@ Content-Type: application/json
 }
 ```
 
-### Ladder Progression
+### Achievement Management
 ```http
-PUT /api/ladder/users/{userId}
+GET /api/achievements
+GET /api/achievements/{achievementId}
+POST /api/achievements
+PUT /api/achievements/{achievementId} 
+DELETE /api/achievements/{achievementId}
+GET /api/achievements/user/{userId}
+GET /api/achievements/{achievementId}/check/{userId}
+POST /api/achievements/process/{userId}
 ```
 
-### Event Endpoints
+### Event Processing
 ```http
-POST /api/events
+POST /api/achievements/process/{userId}
 Content-Type: application/json
 
 {
   "eventType": "TASK_COMPLETED",
-  "userId": "user123",
-  "data": {
+  "eventDetails": {
     "taskId": "task-789",
-    "pointsAwarded": 50
+    "priority": "HIGH"  // LOW, MEDIUM, HIGH, CRITICAL
   }
 }
 ```
@@ -131,22 +136,42 @@ graph TD
 ## 📦 Data Model Highlights
 
 ### Core Entities
+
+#### Achievement
 ```java
 @Entity
-public class User {
-    private String id;
-    private String username;
-    private int earnedPoints;
-    private int availablePoints;
-    // ... other fields
+@Table(name = "achievements")
+public class Achievement {
+    @Id
+    private String achievementId; // UUID
+    private String name;
+    private String description;
+    @Type(JsonType.class)
+    private JsonNode criteria; // JSON criteria
+    private LocalDateTime createdAt;
 }
+```
 
+#### LadderLevel
+```java
 @Entity
-public class TaskEvent {
-    private String taskId;
-    private String eventId;
-    private int pointsAwarded;
-    // ... other fields
+@Table(name = "ladder_levels")
+public class LadderLevel {
+    @Id
+    private int level;
+    private String label;
+    private int pointsRequired;
+    private LocalDateTime createdAt;
+}
+```
+
+#### PointsEarnedEvent
+```java
+public class PointsEarnedEvent extends DomainEvent {
+    private final int points;
+    private final int newTotal;
+    private final String source;
+    private final JsonNode metadata;
 }
 ```
 
