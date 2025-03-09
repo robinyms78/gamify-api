@@ -97,8 +97,8 @@ public class TaskCompletedCommand implements TaskEventCommand {
         // Publish domain event
         if (domainEventPublisher != null) {
             TaskCompletedEvent domainEvent = new TaskCompletedEvent(
+                    "TASK_COMPLETED",
                     user,
-                    taskId,
                     savedEvent,
                     points,
                     eventData);

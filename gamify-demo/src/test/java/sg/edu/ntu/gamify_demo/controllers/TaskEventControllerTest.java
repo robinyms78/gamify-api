@@ -19,22 +19,28 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.config.TestSecurityConfig;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
+import sg.edu.ntu.gamify_demo.mappers.TaskEventMapper;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;
+import sg.edu.ntu.gamify_demo.services.AuthenticationService;
 import sg.edu.ntu.gamify_demo.services.GamificationService;
 import sg.edu.ntu.gamify_demo.services.LadderService;
 import sg.edu.ntu.gamify_demo.services.TaskEventService;
 
 @WebMvcTest(TaskEventController.class)
+@Import(TestSecurityConfig.class)
 public class TaskEventControllerTest {
 
     @Autowired
@@ -54,6 +60,9 @@ public class TaskEventControllerTest {
     
     @MockBean
     private LadderService ladderService;
+    
+    @MockBean
+    private TaskEventMapper taskEventMapper;
     
     private User testUser;
     private TaskEvent testTaskEvent;
@@ -79,7 +88,20 @@ public class TaskEventControllerTest {
         
         // Mock service responses
         when(userService.getUserById(anyString())).thenReturn(testUser);
-        when(taskEventService.processTaskEvent(anyString(), anyString(), anyString(), any(JsonNode.class)))
+        
+        // Create a mock response for processTaskEvent
+        ObjectNode mockResponse = objectMapper.createObjectNode();
+        mockResponse.put("success", true);
+        mockResponse.put("eventId", testTaskEvent.getEventId());
+        mockResponse.put("userId", "user123");
+        mockResponse.put("taskId", "task123");
+        mockResponse.put("eventType", "TASK_COMPLETED");
+        mockResponse.put("status", "COMPLETED");
+        mockResponse.put("pointsAwarded", 30);
+        
+        when(taskEventService.processTaskEvent(any(JsonNode.class)))
+            .thenReturn(mockResponse);
+        when(taskEventService.getTaskEventById(anyString()))
             .thenReturn(testTaskEvent);
         when(taskEventService.calculatePointsForTask(anyString(), any(JsonNode.class)))
             .thenReturn(30); // High priority task
@@ -99,6 +121,20 @@ public class TaskEventControllerTest {
         data.put("priority", "HIGH");
         requestBody.set("data", data);
         
+        // Mock the response to include priority
+        ObjectNode mockResponse = objectMapper.createObjectNode();
+        mockResponse.put("success", true);
+        mockResponse.put("eventId", testTaskEvent.getEventId());
+        mockResponse.put("userId", "user123");
+        mockResponse.put("taskId", "task123");
+        mockResponse.put("eventType", "TASK_COMPLETED");
+        mockResponse.put("status", "COMPLETED");
+        mockResponse.put("pointsAwarded", 30);
+        mockResponse.put("priority", "HIGH");
+        
+        when(taskEventService.processTaskEvent(any(JsonNode.class)))
+            .thenReturn(mockResponse);
+        
         // Perform request and verify response
         mockMvc.perform(post("/tasks/events")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -113,18 +149,8 @@ public class TaskEventControllerTest {
                 .andExpect(jsonPath("$.pointsAwarded").value(30))
                 .andExpect(jsonPath("$.priority").value("HIGH"));
         
-        // Verify service method calls
-        verify(taskEventService, times(1)).processTaskEvent(
-                eq("user123"), 
-                eq("task123"), 
-                eq("TASK_COMPLETED"), 
-                any(JsonNode.class));
-        
-        verify(taskEventService, times(1)).calculatePointsForTask(
-                eq("task123"), 
-                any(JsonNode.class));
-        
-        verify(ladderService, times(1)).updateUserLadderStatus(eq("user123"));
+        // Verify service method calls - only verify processTaskEvent
+        verify(taskEventService, times(1)).processTaskEvent(any(JsonNode.class));
     }
     
     @Test

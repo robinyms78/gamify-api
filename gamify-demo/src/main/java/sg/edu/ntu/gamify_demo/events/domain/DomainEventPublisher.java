@@ -62,6 +62,24 @@ public class DomainEventPublisher {
                 if (taskEvent.getMetadata() != null) {
                     legacyEventData.set("metadata", taskEvent.getMetadata());
                 }
+            } else if (event instanceof PointsEarnedEvent) {
+                PointsEarnedEvent pointsEvent = (PointsEarnedEvent) event;
+                legacyEventData.put("points", pointsEvent.getPoints());
+                legacyEventData.put("newTotal", pointsEvent.getNewTotal());
+                legacyEventData.put("source", pointsEvent.getSource());
+                
+                if (pointsEvent.getMetadata() != null) {
+                    legacyEventData.set("metadata", pointsEvent.getMetadata());
+                }
+            } else if (event instanceof PointsSpentEvent) {
+                PointsSpentEvent pointsEvent = (PointsSpentEvent) event;
+                legacyEventData.put("points", pointsEvent.getPoints());
+                legacyEventData.put("newTotal", pointsEvent.getNewTotal());
+                legacyEventData.put("source", pointsEvent.getSource());
+                
+                if (pointsEvent.getMetadata() != null) {
+                    legacyEventData.set("metadata", pointsEvent.getMetadata());
+                }
             }
             
             legacyEventPublisher.publishEvent(event.getEventType(), event.getUser(), legacyEventData);

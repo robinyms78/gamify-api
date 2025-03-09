@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +41,7 @@ import sg.edu.ntu.gamify_demo.models.enums.UserRole;
  * Uses @WebMvcTest which focuses only on the web layer.
  */
 @WebMvcTest(UserController.class)
+@WithMockUser(username = "testuser", roles = {"EMPLOYEE"})
 public class UserControllerTest {
 
     @Autowired
@@ -87,6 +90,7 @@ public class UserControllerTest {
 
         // Perform POST request
         mockMvc.perform(post("/api/users")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser1)))
                 .andExpect(status().isCreated())
@@ -106,6 +110,7 @@ public class UserControllerTest {
 
         // Perform POST request
         mockMvc.perform(post("/api/users")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser1)))
                 .andExpect(status().isBadRequest());
@@ -118,7 +123,8 @@ public class UserControllerTest {
         when(userService.getUserById(testUser1.getId())).thenReturn(testUser1);
 
         // Perform GET request
-        mockMvc.perform(get("/api/users/{id}", testUser1.getId()))
+        mockMvc.perform(get("/api/users/{id}", testUser1.getId())
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(testUser1.getId())))
@@ -135,7 +141,8 @@ public class UserControllerTest {
         when(userService.getUserById(anyString())).thenThrow(exception);
 
         // Perform GET request
-        mockMvc.perform(get("/api/users/{id}", "nonexistentid"))
+        mockMvc.perform(get("/api/users/{id}", "nonexistentid")
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isNotFound());
     }
 
@@ -147,7 +154,8 @@ public class UserControllerTest {
         when(userService.getAllUsers()).thenReturn(users);
 
         // Perform GET request
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/users")
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()", is(2)))
@@ -175,6 +183,7 @@ public class UserControllerTest {
 
         // Perform PUT request
         mockMvc.perform(put("/api/users/{id}", testUser1.getId())
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedUser)))
                 .andExpect(status().isOk())
@@ -194,6 +203,7 @@ public class UserControllerTest {
 
         // Perform PUT request
         mockMvc.perform(put("/api/users/{id}", "nonexistentid")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser1)))
                 .andExpect(status().isNotFound());
@@ -208,6 +218,7 @@ public class UserControllerTest {
 
         // Perform PUT request
         mockMvc.perform(put("/api/users/{id}", testUser1.getId())
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser1)))
                 .andExpect(status().isBadRequest());
@@ -220,7 +231,8 @@ public class UserControllerTest {
         doNothing().when(userService).deleteUser(testUser1.getId());
 
         // Perform DELETE request
-        mockMvc.perform(delete("/api/users/{id}", testUser1.getId()))
+        mockMvc.perform(delete("/api/users/{id}", testUser1.getId())
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isNoContent());
     }
 
@@ -232,7 +244,8 @@ public class UserControllerTest {
         doThrow(exception).when(userService).deleteUser(anyString());
 
         // Perform DELETE request
-        mockMvc.perform(delete("/api/users/{id}", "nonexistentid"))
+        mockMvc.perform(delete("/api/users/{id}", "nonexistentid")
+                .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isNotFound());
     }
 }

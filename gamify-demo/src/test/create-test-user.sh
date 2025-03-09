@@ -14,13 +14,17 @@ NC='\033[0m' # No Color
 echo -e "${YELLOW}Creating Test User${NC}"
 echo "========================================"
 
-# Create a test user
-echo -e "\n${YELLOW}Creating user with ID 'user123'${NC}"
+# Create a unique username and email using timestamp
+timestamp=$(date +%s)
+username="testuser-$timestamp"
+email="testuser-$timestamp@example.com"
+
+echo -e "\n${YELLOW}Creating user with username '$username' and email '$email'${NC}"
 
 # Create a properly formatted JSON payload for user creation
 json_data='{
-  "username": "testuser",
-  "email": "testuser@example.com",
+  "username": "'$username'",
+  "email": "'$email'",
   "password": "password123",
   "role": "EMPLOYEE",
   "department": "Engineering"
@@ -30,12 +34,12 @@ echo -e "\n${YELLOW}Sending request:${NC}"
 echo "$json_data"
 
 # Send the request to create a user
-response=$(curl -s -X POST "$BASE_URL/auth/register" \
+response=$(curl -X POST "$BASE_URL/auth/register" \
     -H "Content-Type: application/json" \
     -d "$json_data")
 
-# Display response
-echo -e "\n${YELLOW}Response:${NC}"
+# Display full response
+echo -e "\n${YELLOW}Full Response:${NC}"
 echo "$response"
 
 # Check if successful
@@ -44,6 +48,7 @@ if echo "$response" | grep -q '"message":"User registered successfully"'; then
     # Extract the user ID
     user_id=$(echo "$response" | grep -o '"userId":"[^"]*"' | cut -d':' -f2 | tr -d '"')
     echo -e "${GREEN}User ID: $user_id${NC}"
+    echo -e "${GREEN}Username: $username${NC}" # Output the username for later use
 else
     echo -e "\n${RED}✗ User creation failed${NC}"
 fi

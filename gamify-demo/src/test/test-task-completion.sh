@@ -17,10 +17,15 @@ echo "========================================"
 # Step 1: Create a test user
 echo -e "\n${YELLOW}Step 1: Creating test user${NC}"
 
+# Create unique username and email using timestamp
+timestamp=$(date +%s)
+username="taskuser-$timestamp"
+email="taskuser-$timestamp@example.com"
+
 # Create a properly formatted JSON payload for user creation
 user_data='{
-  "username": "taskuser",
-  "email": "taskuser@example.com",
+  "username": "'$username'",
+  "email": "'$email'",
   "password": "password123",
   "role": "EMPLOYEE",
   "department": "Engineering"

@@ -79,8 +79,21 @@ public class GamificationFacade {
      */
     @Transactional
     public TaskEvent processTaskEvent(String userId, String taskId, String eventType, JsonNode eventData) {
+        // Create a JSON object with the required fields
+        ObjectNode requestData = objectMapper.createObjectNode();
+        requestData.put("userId", userId);
+        requestData.put("taskId", taskId);
+        requestData.put("event_type", eventType);
+        requestData.set("data", eventData);
+        
         // Process the task event
-        TaskEvent taskEvent = taskEventService.processTaskEvent(userId, taskId, eventType, eventData);
+        ObjectNode response = taskEventService.processTaskEvent(requestData);
+        
+        // Get the event ID from the response
+        String eventId = response.get("eventId").asText();
+        
+        // Retrieve the task event by ID
+        TaskEvent taskEvent = taskEventService.getTaskEventById(eventId);
         
         // If this is a task completion event, award points
         if ("TASK_COMPLETED".equals(eventType)) {

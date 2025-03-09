@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 
 import jakarta.annotation.PostConstruct;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
+import sg.edu.ntu.gamify_demo.events.domain.subscribers.LadderStatusSubscriber;
+import sg.edu.ntu.gamify_demo.events.domain.subscribers.PointsEventSubscriber;
 import sg.edu.ntu.gamify_demo.events.domain.subscribers.TaskCompletedEventSubscriber;
 
 /**
@@ -16,6 +18,8 @@ public class EventConfig {
     
     private final DomainEventPublisher domainEventPublisher;
     private final TaskCompletedEventSubscriber taskCompletedEventSubscriber;
+    private final PointsEventSubscriber pointsEventSubscriber;
+    private final LadderStatusSubscriber ladderStatusSubscriber;
     
     /**
      * Constructor for dependency injection.
@@ -23,9 +27,13 @@ public class EventConfig {
     @Autowired
     public EventConfig(
             DomainEventPublisher domainEventPublisher,
-            TaskCompletedEventSubscriber taskCompletedEventSubscriber) {
+            TaskCompletedEventSubscriber taskCompletedEventSubscriber,
+            PointsEventSubscriber pointsEventSubscriber,
+            LadderStatusSubscriber ladderStatusSubscriber) {
         this.domainEventPublisher = domainEventPublisher;
         this.taskCompletedEventSubscriber = taskCompletedEventSubscriber;
+        this.pointsEventSubscriber = pointsEventSubscriber;
+        this.ladderStatusSubscriber = ladderStatusSubscriber;
     }
     
     /**
@@ -36,5 +44,7 @@ public class EventConfig {
     public void registerSubscribers() {
         // Register domain event subscribers
         domainEventPublisher.register(taskCompletedEventSubscriber);
+        domainEventPublisher.register(pointsEventSubscriber);
+        domainEventPublisher.register(ladderStatusSubscriber);
     }
 }

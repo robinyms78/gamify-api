@@ -2,6 +2,7 @@ package sg.edu.ntu.gamify_demo.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,12 +18,14 @@ public class WebSecurityConfig {
 
     /**
      * Configures the security filter chain.
+     * Only active when not in test profile to avoid conflicts with test security config.
      * 
      * @param http The HttpSecurity to configure
      * @return The configured SecurityFilterChain
      * @throws Exception If an error occurs during configuration
      */
     @Bean
+    @Profile("!test") // Only active when not in test profile
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable()) // Disable CSRF for API endpoints

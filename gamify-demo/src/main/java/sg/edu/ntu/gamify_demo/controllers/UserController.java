@@ -28,6 +28,12 @@ public class UserController {
         this.userService = userService;
     }
 
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public User createUser(@RequestBody User user) throws UserValidationException {
+        return userService.createUser(user);
+    }
+
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable String id) throws UserNotFoundException {

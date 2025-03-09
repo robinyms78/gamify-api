@@ -11,6 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
+import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
+import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;
+import sg.edu.ntu.gamify_demo.events.domain.PointsSpentEvent;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.PointsTransaction;
 import sg.edu.ntu.gamify_demo.models.User;
@@ -26,6 +29,7 @@ public class PointsService {
     private final UserService userService;
     private final PointsTransactionRepository pointsTransactionRepository;
     private final EventPublisher eventPublisher;
+    private final DomainEventPublisher domainEventPublisher;
     private final ObjectMapper objectMapper;
     private final LadderService ladderService;
     
@@ -37,11 +41,13 @@ public class PointsService {
             UserService userService,
             PointsTransactionRepository pointsTransactionRepository,
             EventPublisher eventPublisher,
+            DomainEventPublisher domainEventPublisher,
             ObjectMapper objectMapper,
             LadderService ladderService) {
         this.userService = userService;
         this.pointsTransactionRepository = pointsTransactionRepository;
         this.eventPublisher = eventPublisher;
+        this.domainEventPublisher = domainEventPublisher;
         this.objectMapper = objectMapper;
         this.ladderService = ladderService;
     }
@@ -89,19 +95,12 @@ public class PointsService {
         // Update the user's ladder status
         ladderService.updateUserLadderStatus(user.getId());
         
-        // Publish points earned event
-        if (eventPublisher != null) {
-            ObjectNode eventData = objectMapper.createObjectNode();
-            eventData.put("points", points);
-            eventData.put("newTotal", newPoints);
-            eventData.put("source", source);
-            
-            if (metadata != null) {
-                eventData.set("metadata", metadata);
-            }
-            
-            eventPublisher.publishEvent("POINTS_EARNED", user, eventData);
+        // Publish points earned event using domain events
+        if (domainEventPublisher != null) {
+            PointsEarnedEvent event = new PointsEarnedEvent(user, points, newPoints, source, metadata);
+            domainEventPublisher.publish(event);
         }
+        // Legacy event publishing (will be handled by DomainEventPublisher's legacy forwarding)
         
         return newPoints;
     }
@@ -138,19 +137,12 @@ public class PointsService {
         transaction.setCreatedAt(LocalDateTime.now());
         pointsTransactionRepository.save(transaction);
         
-        // Publish points spent event
-        if (eventPublisher != null) {
-            ObjectNode eventData = objectMapper.createObjectNode();
-            eventData.put("points", points);
-            eventData.put("newTotal", user.getAvailablePoints());
-            eventData.put("source", source);
-            
-            if (metadata != null) {
-                eventData.set("metadata", metadata);
-            }
-            
-            eventPublisher.publishEvent("POINTS_SPENT", user, eventData);
+        // Publish points spent event using domain events
+        if (domainEventPublisher != null) {
+            PointsSpentEvent event = new PointsSpentEvent(user, points, user.getAvailablePoints(), source, metadata);
+            domainEventPublisher.publish(event);
         }
+        // Legacy event publishing (will be handled by DomainEventPublisher's legacy forwarding)
         
         return true;
     }

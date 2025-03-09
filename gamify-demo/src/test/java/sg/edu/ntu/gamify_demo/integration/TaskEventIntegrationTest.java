@@ -11,12 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.config.TestIntegrationConfig;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
 import sg.edu.ntu.gamify_demo.models.PointsTransaction;
@@ -35,6 +37,7 @@ import sg.edu.ntu.gamify_demo.services.TaskEventService;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@Import(TestIntegrationConfig.class)
 public class TaskEventIntegrationTest {
 
     @Autowired
@@ -108,12 +111,21 @@ public class TaskEventIntegrationTest {
         eventData.put("priority", "HIGH");
         eventData.put("description", "Complete project documentation");
         
+        // Create a JSON object with the required fields
+        ObjectNode requestData = objectMapper.createObjectNode();
+        requestData.put("userId", testUser.getId());
+        requestData.put("taskId", taskId);
+        requestData.put("event_type", eventType);
+        requestData.set("data", eventData);
+        
         // Process task completion event
-        TaskEvent taskEvent = taskEventService.processTaskEvent(
-                testUser.getId(), 
-                taskId, 
-                eventType, 
-                eventData);
+        ObjectNode response = taskEventService.processTaskEvent(requestData);
+        
+        // Get the event ID from the response
+        String eventId = response.get("eventId").asText();
+        
+        // Retrieve the task event by ID
+        TaskEvent taskEvent = taskEventService.getTaskEventById(eventId);
         
         // Verify task event was created
         assertNotNull(taskEvent);
@@ -148,11 +160,15 @@ public class TaskEventIntegrationTest {
         eventData2.put("priority", "CRITICAL");
         eventData2.put("description", "Fix critical production bug");
         
-        taskEventService.processTaskEvent(
-                testUser.getId(), 
-                "task789", 
-                eventType, 
-                eventData2);
+        // Create a JSON object with the required fields
+        ObjectNode requestData2 = objectMapper.createObjectNode();
+        requestData2.put("userId", testUser.getId());
+        requestData2.put("taskId", "task789");
+        requestData2.put("event_type", eventType);
+        requestData2.set("data", eventData2);
+        
+        // Process task completion event
+        taskEventService.processTaskEvent(requestData2);
         
         // Verify user points were updated
         updatedUser = userService.getUserById(testUser.getId());
@@ -170,11 +186,15 @@ public class TaskEventIntegrationTest {
         ObjectNode lowPriorityData = objectMapper.createObjectNode();
         lowPriorityData.put("priority", "LOW");
         
-        taskEventService.processTaskEvent(
-                testUser.getId(), 
-                "task-low", 
-                "TASK_COMPLETED", 
-                lowPriorityData);
+        // Create a JSON object with the required fields
+        ObjectNode lowRequestData = objectMapper.createObjectNode();
+        lowRequestData.put("userId", testUser.getId());
+        lowRequestData.put("taskId", "task-low");
+        lowRequestData.put("event_type", "TASK_COMPLETED");
+        lowRequestData.set("data", lowPriorityData);
+        
+        // Process task completion event
+        taskEventService.processTaskEvent(lowRequestData);
         
         User user = userService.getUserById(testUser.getId());
         assertEquals(10, user.getEarnedPoints()); // LOW = 10 points
@@ -183,11 +203,15 @@ public class TaskEventIntegrationTest {
         ObjectNode mediumPriorityData = objectMapper.createObjectNode();
         mediumPriorityData.put("priority", "MEDIUM");
         
-        taskEventService.processTaskEvent(
-                testUser.getId(), 
-                "task-medium", 
-                "TASK_COMPLETED", 
-                mediumPriorityData);
+        // Create a JSON object with the required fields
+        ObjectNode mediumRequestData = objectMapper.createObjectNode();
+        mediumRequestData.put("userId", testUser.getId());
+        mediumRequestData.put("taskId", "task-medium");
+        mediumRequestData.put("event_type", "TASK_COMPLETED");
+        mediumRequestData.set("data", mediumPriorityData);
+        
+        // Process task completion event
+        taskEventService.processTaskEvent(mediumRequestData);
         
         user = userService.getUserById(testUser.getId());
         assertEquals(30, user.getEarnedPoints()); // 10 + 20 = 30
@@ -195,11 +219,15 @@ public class TaskEventIntegrationTest {
         // Test DEFAULT priority (when priority is not specified)
         ObjectNode noPriorityData = objectMapper.createObjectNode();
         
-        taskEventService.processTaskEvent(
-                testUser.getId(), 
-                "task-default", 
-                "TASK_COMPLETED", 
-                noPriorityData);
+        // Create a JSON object with the required fields
+        ObjectNode defaultRequestData = objectMapper.createObjectNode();
+        defaultRequestData.put("userId", testUser.getId());
+        defaultRequestData.put("taskId", "task-default");
+        defaultRequestData.put("event_type", "TASK_COMPLETED");
+        defaultRequestData.set("data", noPriorityData);
+        
+        // Process task completion event
+        taskEventService.processTaskEvent(defaultRequestData);
         
         user = userService.getUserById(testUser.getId());
         assertEquals(45, user.getEarnedPoints()); // 30 + 15 = 45

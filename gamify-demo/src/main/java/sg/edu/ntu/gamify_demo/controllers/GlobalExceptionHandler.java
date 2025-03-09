@@ -4,79 +4,64 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.exceptions.AuthenticationException;
 import sg.edu.ntu.gamify_demo.exceptions.DuplicateUserException;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Global exception handler for the application.
- * Handles various exceptions and returns appropriate HTTP responses.
- */
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Handles authentication exceptions.
-     * 
-     * @param ex The authentication exception
-     * @return A response with a 401 status code and error message
-     */
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Map<String, String>> handleAuthenticationException(AuthenticationException ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Authentication failed");
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ObjectNode> handleIllegalArgumentException(IllegalArgumentException ex) {
+        ObjectNode errorResponse = objectMapper.createObjectNode();
+        errorResponse.put("error", "Invalid request");
         errorResponse.put("message", ex.getMessage());
-        
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    /**
-     * Handles duplicate user exceptions.
-     * 
-     * @param ex The duplicate user exception
-     * @return A response with a 409 status code and error message
-     */
-    @ExceptionHandler(DuplicateUserException.class)
-    public ResponseEntity<Map<String, String>> handleDuplicateUserException(DuplicateUserException ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Registration failed");
+    @ExceptionHandler(UserValidationException.class)
+    public ResponseEntity<ObjectNode> handleUserValidationException(UserValidationException ex) {
+        ObjectNode errorResponse = objectMapper.createObjectNode();
+        errorResponse.put("error", "Validation error");
         errorResponse.put("message", ex.getMessage());
-        
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    /**
-     * Handles user not found exceptions.
-     * 
-     * @param ex The user not found exception
-     * @return A response with a 404 status code and error message
-     */
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException ex) {
-        Map<String, String> errorResponse = new HashMap<>();
+    public ResponseEntity<ObjectNode> handleUserNotFoundException(UserNotFoundException ex) {
+        ObjectNode errorResponse = objectMapper.createObjectNode();
         errorResponse.put("error", "User not found");
         errorResponse.put("message", ex.getMessage());
-        
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    /**
-     * Handles user validation exceptions.
-     * 
-     * @param ex The user validation exception
-     * @return A response with a 400 status code and error message
-     */
-    @ExceptionHandler(UserValidationException.class)
-    public ResponseEntity<Map<String, String>> handleUserValidationException(UserValidationException ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Validation failed");
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ObjectNode> handleAuthenticationException(AuthenticationException ex) {
+        ObjectNode errorResponse = objectMapper.createObjectNode();
+        errorResponse.put("error", "Authentication failed");
         errorResponse.put("message", ex.getMessage());
-        
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicateUserException.class)
+    public ResponseEntity<ObjectNode> handleDuplicateUserException(DuplicateUserException ex) {
+        ObjectNode errorResponse = objectMapper.createObjectNode();
+        errorResponse.put("error", "Registration failed");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ObjectNode> handleGeneralException(Exception ex) {
+        ObjectNode errorResponse = objectMapper.createObjectNode();
+        errorResponse.put("error", "Server error");
+        errorResponse.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }
