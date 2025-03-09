@@ -1,6 +1,3 @@
-// Java class for Redemption
-// Redemption.java
-
 package sg.edu.ntu.gamify_demo.models;
 
 import java.time.LocalDateTime;
@@ -18,12 +15,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import sg.edu.ntu.gamify_demo.models.enums.RewardStatus;
 
 /**
- * The Redemption class represents a class which check the reward redemption status the user in the system.
- * It stores the redemption details including redemptionId and timestamps for creation and updates.
+ * The Redemption class represents a reward redemption by a user.
+ * It stores the redemption details including status, timestamps, and relationships to user and reward.
  */
-
 @Getter
 @Setter
 @AllArgsConstructor

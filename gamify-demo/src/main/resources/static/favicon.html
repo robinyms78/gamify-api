@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favicon Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #3498db;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Adding a Favicon to Gamify API</h1>
+    
+    <p>To add a favicon to the Gamify API application, follow these steps:</p>
+    
+    <ol>
+        <li>Create a favicon.ico file (16x16 or 32x32 pixels)</li>
+        <li>Place the favicon.ico file in the <code>src/main/resources/static</code> directory</li>
+        <li>Add the following line to the <code>&lt;head&gt;</code> section of your HTML files:</li>
+    </ol>
+    
+    <pre>&lt;link rel="icon" href="/favicon.ico" type="image/x-icon"&gt;</pre>
+    
+    <p>Alternatively, you can use a PNG image as a favicon:</p>
+    
+    <pre>&lt;link rel="icon" href="/images/favicon.png" type="image/png"&gt;</pre>
+    
+    <p>For better cross-browser support, you might want to include multiple formats and sizes:</p>
+    
+    <pre>&lt;link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png"&gt;
+&lt;link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png"&gt;
+&lt;link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png"&gt;
+&lt;link rel="manifest" href="/site.webmanifest"&gt;</pre>
+    
+    <p>You can generate a complete favicon package using online tools like <a href="https://realfavicongenerator.net/" target="_blank">Real Favicon Generator</a>.</p>
+</body>
+</html>

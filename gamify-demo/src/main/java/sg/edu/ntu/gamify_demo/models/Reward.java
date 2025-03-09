@@ -1,6 +1,3 @@
-// Java class for Reward
-// Reward.java
-
 package sg.edu.ntu.gamify_demo.models;
 
 import java.time.LocalDateTime;
@@ -15,11 +12,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * The Reward class represents a class which rewards the user in the system.
- * It stores the reward details including rewardId and timestamps for creation and updates.
+ * The Reward class represents a reward that users can redeem with their points.
+ * It stores the reward details including cost, availability, and descriptions.
  */
 
 @Setter 

@@ -1,0 +1,1102 @@
+{
+  "info": {
+    "name": "Achievement API Tests",
+    "description": "Tests for Achievement and UserAchievement API endpoints in the Gamification system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"sarahj\",\n    \"email\": \"sarah.j@company.com\",\n    \"password\": \"Pass123!\",\n    \"role\": \"EMPLOYEE\",\n    \"department\": \"Engineering\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new user (Sarah) for testing"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"authToken\", jsonData.token);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"sarahj\",\n    \"password\": \"Pass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login to get JWT token"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Info",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"userId\", jsonData.id);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Get current user info and save user ID"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints to get JWT token for API access"
+    },
+    {
+      "name": "2. Ladder Setup",
+      "item": [
+        {
+          "name": "Create Level 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"level\": 1,\n    \"label\": \"Beginner\",\n    \"pointsRequired\": 0\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ladder/levels",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ladder",
+                "levels"
+              ]
+            },
+            "description": "Create Level 1 (Beginner)"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Level 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"level\": 2,\n    \"label\": \"Intermediate\",\n    \"pointsRequired\": 100\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ladder/levels",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ladder",
+                "levels"
+              ]
+            },
+            "description": "Create Level 2 (Intermediate)"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Level 3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"level\": 3,\n    \"label\": \"Advanced\",\n    \"pointsRequired\": 250\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ladder/levels",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ladder",
+                "levels"
+              ]
+            },
+            "description": "Create Level 3 (Advanced)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Ladder Levels",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ladder/levels",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ladder",
+                "levels"
+              ]
+            },
+            "description": "Get all ladder levels"
+          },
+          "response": []
+        }
+      ],
+      "description": "Setup ladder levels for achievement testing"
+    },
+    {
+      "name": "3. Achievement CRUD",
+      "item": [
+        {
+          "name": "Create First Steps Achievement",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"firstStepsId\", jsonData.achievementId);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"First Steps\",\n    \"description\": \"Complete your first task\",\n    \"criteria\": {\n        \"taskCount\": 1\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/achievements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements"
+              ]
+            },
+            "description": "Create First Steps achievement"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Level 3 Achievement",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"level3AchievementId\", jsonData.achievementId);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Level 3 Champion\",\n    \"description\": \"Reach Level 3 in the gamification ladder\",\n    \"criteria\": {\n        \"requiredLevel\": 3\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/achievements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements"
+              ]
+            },
+            "description": "Create Level 3 Champion achievement"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Task Master Achievement",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"taskMasterId\", jsonData.achievementId);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Task Master\",\n    \"description\": \"Complete 5 tasks\",\n    \"criteria\": {\n        \"taskCount\": 5\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/achievements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements"
+              ]
+            },
+            "description": "Create Task Master achievement"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Achievements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements"
+              ]
+            },
+            "description": "Get all achievements"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Achievement by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{level3AchievementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{level3AchievementId}}"
+              ]
+            },
+            "description": "Get Level 3 Champion achievement details"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Achievement",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Level 3 Champion\",\n    \"description\": \"Reach Level 3 and complete at least 3 tasks\",\n    \"criteria\": {\n        \"requiredLevel\": 3,\n        \"minTasks\": 3\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{level3AchievementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{level3AchievementId}}"
+              ]
+            },
+            "description": "Update Level 3 Champion achievement"
+          },
+          "response": []
+        }
+      ],
+      "description": "Achievement CRUD operations"
+    },
+    {
+      "name": "4. Business Flow Integration",
+      "item": [
+        {
+          "name": "Complete Task 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"points\": 50,\n    \"eventType\": \"TASK_COMPLETED\",\n    \"eventData\": {\n        \"taskId\": \"task-1\",\n        \"priority\": \"medium\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gamification/users/{{userId}}/points/award",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "users",
+                "{{userId}}",
+                "points",
+                "award"
+              ]
+            },
+            "description": "Simulate completion of task 1"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Achievements for Task 1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"eventType\": \"TASK_COMPLETED\",\n    \"eventDetails\": {\n        \"taskId\": \"task-1\",\n        \"taskCount\": 1\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gamification/users/{{userId}}/achievements/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "users",
+                "{{userId}}",
+                "achievements",
+                "process"
+              ]
+            },
+            "description": "Process achievements for first task completion"
+          },
+          "response": []
+        },
+        {
+          "name": "Check First Steps Achievement",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{firstStepsId}}/check/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{firstStepsId}}",
+                "check",
+                "{{userId}}"
+              ]
+            },
+            "description": "Check if First Steps achievement was awarded"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Ladder Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ladder/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ladder",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Get user's ladder status"
+          },
+          "response": []
+        }
+      ],
+      "description": "Business flow integration - Task completion and points"
+    },
+    {
+      "name": "5. Complete Tasks to Reach Level 3",
+      "item": [
+        {
+          "name": "Complete Task 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"points\": 50,\n    \"eventType\": \"TASK_COMPLETED\",\n    \"eventData\": {\n        \"taskId\": \"task-2\",\n        \"priority\": \"medium\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gamification/users/{{userId}}/points/award",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "users",
+                "{{userId}}",
+                "points",
+                "award"
+              ]
+            },
+            "description": "Simulate completion of task 2"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Achievements for Task 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"eventType\": \"TASK_COMPLETED\",\n    \"eventDetails\": {\n        \"taskId\": \"task-2\",\n        \"taskCount\": 2\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gamification/users/{{userId}}/achievements/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "users",
+                "{{userId}}",
+                "achievements",
+                "process"
+              ]
+            },
+            "description": "Process achievements for task 2"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Ladder Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ladder/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ladder",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Update user's ladder status"
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Tasks 3-5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"points\": 150,\n    \"eventType\": \"TASK_COMPLETED\",\n    \"eventData\": {\n        \"taskId\": \"task-bulk\",\n        \"priority\": \"high\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gamification/users/{{userId}}/points/award",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "users",
+                "{{userId}}",
+                "points",
+                "award"
+              ]
+            },
+            "description": "Simulate completion of tasks 3-5 (bulk points)"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Achievements for Tasks 3-5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"eventType\": \"TASK_COMPLETED\",\n    \"eventDetails\": {\n        \"taskId\": \"task-bulk\",\n        \"taskCount\": 5\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gamification/users/{{userId}}/achievements/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "users",
+                "{{userId}}",
+                "achievements",
+                "process"
+              ]
+            },
+            "description": "Process achievements for tasks 3-5"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Ladder Status After All Tasks",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/ladder/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "ladder",
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Update user's ladder status after all tasks"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Level-Based Achievements",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"eventType\": \"LEVEL_UP\",\n    \"eventDetails\": {\n        \"newLevel\": 3,\n        \"taskCount\": 5\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/gamification/users/{{userId}}/achievements/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "gamification",
+                "users",
+                "{{userId}}",
+                "achievements",
+                "process"
+              ]
+            },
+            "description": "Process level-based achievements"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Level 3 Achievement",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{level3AchievementId}}/check/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{level3AchievementId}}",
+                "check",
+                "{{userId}}"
+              ]
+            },
+            "description": "Check if Level 3 Champion achievement was awarded"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Task Master Achievement",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{taskMasterId}}/check/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{taskMasterId}}",
+                "check",
+                "{{userId}}"
+              ]
+            },
+            "description": "Check if Task Master achievement was awarded"
+          },
+          "response": []
+        }
+      ],
+      "description": "Complete tasks to reach Level 3 and earn achievements"
+    },
+    {
+      "name": "6. User Achievements",
+      "item": [
+        {
+          "name": "Get User Achievements",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/achievements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "achievements"
+              ]
+            },
+            "description": "Get all achievements for the user"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Achievement Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/achievements/count",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "achievements",
+                "count"
+              ]
+            },
+            "description": "Get achievement count for the user"
+          },
+          "response": []
+        }
+      ],
+      "description": "User achievement endpoints"
+    },
+    {
+      "name": "7. Manual Achievement Assignment",
+      "item": [
+        {
+          "name": "Create Special Achievement",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.environment.set(\"specialAchievementId\", jsonData.achievementId);",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Special Recognition\",\n    \"description\": \"Awarded for exceptional performance\",\n    \"criteria\": {\n        \"manual\": true\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/achievements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements"
+              ]
+            },
+            "description": "Create a special achievement for manual assignment"
+          },
+          "response": []
+        },
+        {
+          "name": "Award Special Achievement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"awardedBy\": \"Manager\",\n    \"reason\": \"Outstanding contribution to the project\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{specialAchievementId}}/award/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{specialAchievementId}}",
+                "award",
+                "{{userId}}"
+              ]
+            },
+            "description": "Manually award the special achievement"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Special Achievement",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{specialAchievementId}}/check/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{specialAchievementId}}",
+                "check",
+                "{{userId}}"
+              ]
+            },
+            "description": "Verify the special achievement was awarded"
+          },
+          "response": []
+        }
+      ],
+      "description": "Manual achievement assignment"
+    },
+    {
+      "name": "8. Achievement Users",
+      "item": [
+        {
+          "name": "Get Achievement Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{level3AchievementId}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{level3AchievementId}}",
+                "users"
+              ]
+            },
+            "description": "Get users who have earned the Level 3 Champion achievement"
+          },
+          "response": []
+        }
+      ],
+      "description": "Get users who have earned an achievement"
+    },
+    {
+      "name": "9. Cleanup",
+      "item": [
+        {
+          "name": "Delete Special Achievement",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/achievements/{{specialAchievementId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "achievements",
+                "{{specialAchievementId}}"
+              ]
+            },
+            "description": "Delete the special achievement (optional)"
+          },
+          "response": []
+        }
+      ],
+      "description": "Cleanup operations"
+    }
+  ]
+}
