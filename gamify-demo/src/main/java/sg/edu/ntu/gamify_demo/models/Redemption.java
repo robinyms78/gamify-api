@@ -1,19 +1,14 @@
 package sg.edu.ntu.gamify_demo.models;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
-
-import org.hibernate.annotations.CreationTimestamp;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,57 +27,40 @@ import sg.edu.ntu.gamify_demo.models.enums.RewardStatus;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "reward_redemptions")
+@Table(name = "redemptions")
 public class Redemption {
+
     @Id
-    @Column(name = "redemption_id")
-    private String redemptionId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
     
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    
-    @ManyToOne
-    @JoinColumn(name = "reward_id", nullable = false)
-    private Reward reward;
-    
-    @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private RewardStatus status;
-    
-    @Column(name = "redeemed_at")
-    private LocalDateTime redeemedAt;
-    
-    @CreationTimestamp
+    private String status;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @JsonIgnoreProperties("redemption")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "employee_id", referencedColumnName = "id")
+    private Employee employee;
+
+    @JsonIgnoreProperties("redemption")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "reward_id", referencedColumnName = "id")
+    private Reward reward;
+
     /**
      * Constructs a Redemption object with the provided details.
-     * 
-     * @param user The user redeeming the reward.
-     * @param reward The reward being redeemed.
-     * @param status The status of the redemption.
+     * @param id The unique identifier of the employee.
+     * @param redemption id The unique identifier of the redemption.
+     * @param reward_id The unique identifier of the reward.
+     * @param status The redemption status.
+     * @param createdAt The timestamp of when the redemption was created.
+     * @param updatedAt The timestamp of when the redemption was last updated.
      */
-    public Redemption(User user, Reward reward, RewardStatus status) {
-        this.redemptionId = UUID.randomUUID().toString();
-        this.user = user;
-        this.reward = reward;
-        this.status = status;
-    }
-    
-    /**
-     * Marks this redemption as completed with the current timestamp.
-     */
-    public void complete() {
-        this.status = RewardStatus.COMPLETED;
-        this.redeemedAt = LocalDateTime.now();
-    }
-    
-    /**
-     * Marks this redemption as cancelled.
-     */
-    public void cancel() {
-        this.status = RewardStatus.CANCELLED;
-    }
 }

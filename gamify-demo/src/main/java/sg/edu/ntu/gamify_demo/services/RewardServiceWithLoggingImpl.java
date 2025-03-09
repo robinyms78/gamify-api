@@ -3,14 +3,11 @@
 
 package sg.edu.ntu.gamify_demo.services;
 
-import java.util.ArrayList;
-
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
-import sg.edu.ntu.gamify_demo.exceptions.RewardNotFoundException;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.models.Reward;
 import sg.edu.ntu.gamify_demo.repositories.RewardRepository;
@@ -28,46 +25,49 @@ public class RewardServiceWithLoggingImpl implements RewardService {
     }
 
     // Method
-    // Create
+    // Save
     @Override
-    public Reward createReward(Reward reward) {
-        logger.info("🟢 RewardServiceImpl.createReward() called");
-        return rewardRepository.createReward(reward);
+    public Reward saveReward(Reward reward) {
+        Reward newReward = rewardRepository.save(reward);
+        logger.info("🟢 RewardServiceWithLoggingImpl.saveReward() called");
+        return newReward;
     }
 
     // Get One
-    public Reward getReward(String id) {
-        logger.info("🟢 RewardServiceImpl.getReward() called");
-        return rewardRepository.getReward(getRewardIndex(id));
+    @Override
+    public Reward getReward(Long id) {
+        Reward reward = rewardRepository.findById(id).get();
+        logger.info("🟢 RewardServiceWithLoggingImpl.getReward() called");
+        return reward;
     }
 
     // Get All
-    public ArrayList<Reward> getAllRewards() {
-        logger.info("🟢 RewardServiceImpl.getAllReward() called");
-        return rewardRepository.getAllRewards();
+    @Override
+    public List<Reward> getAllRewards() {
+        List<Reward> allRewards = rewardRepository.findAll();
+        logger.info("🟢 RewardServiceWithLoggingImpl.getAllRewards() called");
+        return allRewards;
     }
 
     // Update
-    public Reward updateReward(String id, Reward reward) {
-        logger.info("🟢 RewardServiceImpl.updateReward() called");
-        return rewardRepository.updatReward(getRewardIndex(id), reward);
+    @Override
+    public Reward updateReward(Long id, Reward reward) {
+        Reward rewardToUpdate = rewardRepository.findById(id).get();
+        rewardToUpdate.setId(reward.getId());
+        rewardToUpdate.setName(reward.getName());
+        rewardToUpdate.setDescription(reward.getDescription());
+        rewardToUpdate.setCostInPoints(reward.getCostInPoints());
+        rewardToUpdate.setAvailable(reward.isAvailable());
+        rewardToUpdate.setCreatedAt(reward.getCreatedAt());
+        rewardToUpdate.setUpdatedAt(reward.getUpdatedAt());
+        logger.info("🟢 RewardServiceWithLoggingImpl.updateReward() called");
+        return rewardRepository.save(rewardToUpdate);
     }
 
     // Delete
-    public void deleteReward(String id) {
-        logger.info("🟢 RewardServiceImpl.deleteReward() called");
-        rewardRepository.deleteReward(getRewardIndex(id));
-    }
-
-    // Helper method
-    private int getRewardIndex(String id) {
-
-        for (Reward reward : rewardRepository.getAllRewards()) {
-            if(reward.getRewardId().equals(id)) {
-                return rewardRepository.getAllRewards().indexOf(reward);
-            }
-        }
-
-        throw new RewardNotFoundException(id);
+    @Override
+    public void deleteReward(Long id) {
+        rewardRepository.deleteById(id);
+        logger.info("🟢 RewardServiceWithLoggingImpl.deleteReward() called");
     }
 }
