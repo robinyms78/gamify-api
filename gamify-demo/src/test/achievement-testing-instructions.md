@@ -133,17 +133,17 @@ Expected output:
 
 ### Step 4: Run API Tests
 
-First, start the application:
+First, ensure the application is running. If not, start it:
 
 ```bash
-# Start the application
+# Start the application, if not already running
 mvn spring-boot:run
 ```
 
-Then, in a new terminal window, run the API tests:
+Then, in a new terminal window, execute the API tests:
 
 ```bash
-# Make the script executable
+# Make the script executable, if not already executable
 chmod +x src/test/achievement-test.sh
 
 # Run the API tests
@@ -151,9 +151,9 @@ chmod +x src/test/achievement-test.sh
 ```
 
 Expected output:
-- The script should execute all API endpoints successfully
-- You should see JSON responses for each endpoint
-- The final message should be "Test completed successfully"
+- The script should execute all API endpoints successfully.
+- You should see JSON responses for each endpoint as they are tested.
+- The final message should be "Test completed successfully".
 
 ### Step 5: Check Test Coverage
 

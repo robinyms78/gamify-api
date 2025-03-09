@@ -58,17 +58,17 @@ Alternatively, you can run the requests individually in the order they appear in
 
 ## Test Flow
 
-The tests follow this business flow:
+The tests in `achievement-api-tests.sh` follow this business flow:
 
 1. **Authentication**: Register and login a test user.
 2. **Ladder Setup**: Create ladder levels with different point thresholds.
-3. **Achievement CRUD**: Create, read, update, and delete achievements.
+3. **Achievement CRUD**: Create, read, and update achievements. Delete is optional and commented out in the cleanup step.
 4. **Business Flow Integration**: Simulate task completion and points awarding.
-5. **Level Progression**: Complete tasks to reach Level 3.
+5. **Level Reaching**: Complete tasks to reach Level 3.
 6. **User Achievements**: Get user achievements and counts.
 7. **Manual Achievement Assignment**: Manually award a special achievement.
 8. **Achievement Users**: Get users who have earned a specific achievement.
-9. **Cleanup**: Delete test data (optional).
+9. **Cleanup**: Cleanup tests, delete test data is optional and commented out.
 
 ## Notes
 
