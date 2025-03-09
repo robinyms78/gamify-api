@@ -106,7 +106,7 @@
             left: 0;
             width: 100%;
             height: 100px;
-            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1000 100" xmlns="http://www.w3.org/2000/svg"><path fill="%23f8fafc" d="M0 70L50 80Q100 90 150 70T250 50T350 70T450 50T550 30T650 50T750 30T850 50T950 30L1000 20V100H0Z"/></svg>');
+            background: url('image/svg+xml;utf8,<svg viewBox="0 0 1000 100" xmlns="http://www.w3.org/2000/svg"><path fill="%23f8fafc" d="M0 70L50 80Q100 90 150 70T250 50T350 70T450 50T550 30T650 50T750 30T850 50T950 30L1000 20V100H0Z"/></svg>');
             background-size: cover;
         }
 
@@ -275,21 +275,35 @@
                     <i class="fas fa-trophy"></i>
                 </div>
                 <h3>Achievements System</h3>
-                <p>Create custom achievements with automated rewards and tracking.</p>
+                <p>Create custom achievements with automated rewards and tracking. Define achievement criteria using JSON structures.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <h3>Real-time Analytics</h3>
-                <p>Detailed insights into employee engagement and performance metrics.</p>
+                <p>Detailed insights into employee engagement and performance metrics. Track points earned, achievements unlocked, and ladder level progression.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-medal"></i>
                 </div>
                 <h3>Leaderboards</h3>
-                <p>Dynamic rankings to foster healthy competition among teams.</p>
+                <p>Dynamic rankings to foster healthy competition among teams. (Implementation details not yet visible.)</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3>Task-Based Points</h3>
+                <p>Award points based on task completion, using configurable strategies like priority-based calculations (Priority: LOW, MEDIUM, HIGH, CRITICAL).</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-level-up-alt"></i>
+                </div>
+                <h3>Ladder Level Progression</h3>
+                <p>Users progress through levels by earning points. Ladder levels and point requirements are configurable.</p>
             </div>
         </section>
         
@@ -299,20 +313,138 @@
             <div class="endpoint-card">
                 <div class="endpoint-header" onclick="toggleEndpoint(this)">
                     <span class="method-tag get">GET</span>
-                    <code>/api/users</code>
+                    <code>/api/achievements</code>
                 </div>
                 <div class="endpoint-details">
-                    <p>Retrieve paginated list of all users</p>
+                    <p>Retrieve a list of all achievements.</p>
+                    <div class="code-block">
+                        <pre><code class="language-json">[
+  {
+    "achievementId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+    "name": "Task Master",
+    "description": "Complete 100 tasks.",
+    "criteria": {
+      "type": "TASK_COMPLETION",
+      "count": 100
+    },
+    "createdAt": "2024-07-28T10:00:00"
+  }
+]</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method-tag get">GET</span>
+                    <code>/api/achievements/{achievementId}</code>
+                </div>
+                <div class="endpoint-details">
+                    <p>Retrieve a specific achievement by its ID.</p>
                     <div class="code-block">
                         <pre><code class="language-json">{
-  "data": [
+  "achievementId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+  "name": "Task Master",
+  "description": "Complete 100 tasks.",
+  "criteria": {
+    "type": "TASK_COMPLETION",
+    "count": 100
+  },
+  "createdAt": "2024-07-28T10:00:00"
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+           <div class="endpoint-card">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method-tag post">POST</span>
+                    <code>/api/achievements</code>
+                </div>
+                <div class="endpoint-details">
+                    <p>Create a new achievement.</p>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+  "name": "New Achievement",
+  "description": "Description of the new achievement",
+  "criteria": {
+    "type": "POINTS_EARNED",
+    "threshold": 5000
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method-tag put">PUT</span>
+                    <code>/api/achievements/{achievementId}</code>
+                </div>
+                <div class="endpoint-details">
+                    <p>Update an existing achievement.</p>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+  "name": "Updated Achievement Name",
+  "description": "Updated description of the achievement",
+  "criteria": {
+    "type": "POINTS_EARNED",
+    "threshold": 10000
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method-tag delete">DELETE</span>
+                    <code>/api/achievements/{achievementId}</code>
+                </div>
+                <div class="endpoint-details">
+                    <p>Delete an achievement.</p>
+                    <div class="code-block">
+                        <pre><code class="language-text">No content returned on success.</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="endpoint-card">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method-tag get">GET</span>
+                    <code>/api/achievements/user/{userId}</code>
+                </div>
+                <div class="endpoint-details">
+                    <p>Retrieve a user's achievements.</p>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+  "userId": "user123",
+  "achievements": [
     {
-      "id": "usr_123",
-      "username": "john.doe",
-      "points": 4500,
-      "level": 3
+      "achievementId": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
+      "name": "Task Master",
+      "description": "Complete 100 tasks."
     }
   ]
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+           <div class="endpoint-card">
+                <div class="endpoint-header" onclick="toggleEndpoint(this)">
+                    <span class="method-tag post">POST</span>
+                    <code>   /api/achievements/process/{userId}</code>
+                </div>
+                <div class="endpoint-details">
+                    <p>Process an event for a user (e.g., TASK_COMPLETED).</p>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+  "eventType": "TASK_COMPLETED",
+  "eventDetails": {
+    "taskId": "task-789",
+    "priority": "HIGH"
+  }
 }</code></pre>
                     </div>
                 </div>
