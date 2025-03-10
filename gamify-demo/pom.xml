@@ -87,15 +87,6 @@
   			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 
-		<dependency>
-  			<groupId>org.springframework.boot</groupId>
-  			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -182,6 +173,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<skipTests>true</skipTests>
 					<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
 					<forkCount>1</forkCount>

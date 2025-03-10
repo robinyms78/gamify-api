@@ -49,8 +49,8 @@ public class RewardControllerWithLoggingImpl {
 
     // Get all reward
     @GetMapping("")
-    public ResponseEntity<ArrayList<Reward>> getAllRewards() {
-        ArrayList<Reward> allRewards = rewardService.getAllRewards();
+    public ResponseEntity<List<Reward>> getAllRewards() {
+        List<Reward> allRewards = rewardService.getAllRewards();
         return new ResponseEntity<>(allRewards, HttpStatus.OK);
     }
 

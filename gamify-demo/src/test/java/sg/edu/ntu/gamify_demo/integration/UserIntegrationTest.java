@@ -37,7 +37,7 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test") // Use test profile to use H2 database
+@ActiveProfiles("test") // Use test profile for database testing
 @Import(TestIntegrationConfig.class)
 public class UserIntegrationTest {
 

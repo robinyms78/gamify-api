@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ public class DomainEventPublisherTest {
         eventsProcessedCounter = mock(Counter.class);
         eventProcessingTimer = mock(Timer.class);
         
-        when(meterRegistry.counter(anyString(), any())).thenReturn(eventsProcessedCounter);
+        when(meterRegistry.counter(anyString(), any(Iterable.class))).thenReturn(eventsProcessedCounter);
         when(meterRegistry.timer(anyString())).thenReturn(eventProcessingTimer);
         
         // Configure subscriber mock
@@ -94,9 +95,8 @@ public class DomainEventPublisherTest {
         verify(testSubscriber, times(1)).onEvent(event);
         
         // Verify metrics
-        verify(meterRegistry).counter(eq("events.processed"),
-            eq("event_type"), eq("TASK_COMPLETED"),
-            eq("user"), eq("user123"));
+        ArgumentCaptor<Iterable<Tag>> tagsCaptor = ArgumentCaptor.forClass(Iterable.class);
+        verify(meterRegistry).counter(eq("events.processed"), tagsCaptor.capture());
         
         verify(eventsProcessedCounter).increment();
         

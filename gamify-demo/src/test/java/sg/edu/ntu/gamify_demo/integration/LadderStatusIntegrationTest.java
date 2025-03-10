@@ -33,7 +33,7 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
+@ActiveProfiles("test") // Use test profile for database testing
 @Transactional
 @WithMockUser(username = "testuser", roles = {"EMPLOYEE"})
 public class LadderStatusIntegrationTest {
