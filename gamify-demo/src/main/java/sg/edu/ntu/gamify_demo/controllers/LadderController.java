@@ -1,6 +1,5 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,14 @@ import sg.edu.ntu.gamify_demo.facades.GamificationFacade;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
 import sg.edu.ntu.gamify_demo.models.UserLadderStatus;
 import sg.edu.ntu.gamify_demo.services.LadderService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller for ladder-related endpoints.
