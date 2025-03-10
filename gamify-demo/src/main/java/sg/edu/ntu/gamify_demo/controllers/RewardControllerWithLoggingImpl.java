@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 
 import java.util.List;
+import java.util.ArrayList;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,40 +56,22 @@ public class RewardControllerWithLoggingImpl {
 
     // Get one reward by rewardId
     @GetMapping("/{id}")
-    public ResponseEntity<Reward> getReward(@PathVariable String id) {
-
-        try {
-            Reward foundReward = rewardService.getReward(id);
-            return new ResponseEntity<>(foundReward, HttpStatus.OK);
-        } catch (RewardNotFoundException e) {
-            logger.error("🔴 " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
+    public ResponseEntity<Reward> getReward(@PathVariable Long id) {
+        Reward foundReward = rewardService.getReward(id);
+        return new ResponseEntity<>(foundReward, HttpStatus.OK);
     }
 
     // Update reward
     @PutMapping("/{id}")
-    public ResponseEntity<Reward> updateReward(@PathVariable String id, @RequestBody Reward reward) {
-        
-        try {
-            Reward updateReward = rewardService.updateReward(id, reward);
-            return new ResponseEntity<>(updateReward, HttpStatus.OK);
-        } catch (RewardNotFoundException e) {
-            logger.error("🔴 " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Reward> updateReward(@PathVariable Long id, @RequestBody Reward reward) {
+        Reward updateReward = rewardService.updateReward(id, reward);
+        return new ResponseEntity<>(updateReward, HttpStatus.OK);
     }
 
     // Delete reward
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteReward(@PathVariable String id) {
-
-        try {
-            rewardService.deleteReward(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (RewardNotFoundException e) {
-            logger.error("🔴 " + e.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<HttpStatus> deleteReward(@PathVariable Long id) {
+        rewardService.deleteReward(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
