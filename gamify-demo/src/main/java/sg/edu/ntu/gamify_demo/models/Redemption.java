@@ -44,10 +44,10 @@ public class Redemption {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @JsonIgnoreProperties("redemption")
+    @JsonIgnoreProperties("redemptions")
     @ManyToOne(optional = false)
-    @JoinColumn(name = "employee_id", referencedColumnName = "id")
-    private Employee employee;
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @JsonIgnoreProperties("redemption")
     @ManyToOne(optional = false)
@@ -56,9 +56,9 @@ public class Redemption {
 
     /**
      * Constructs a Redemption object with the provided details.
-     * @param id The unique identifier of the employee.
-     * @param redemption id The unique identifier of the redemption.
-     * @param reward_id The unique identifier of the reward.
+     * @param id The unique identifier of the redemption.
+     * @param user The user who made the redemption.
+     * @param reward The reward that was redeemed.
      * @param status The redemption status.
      * @param createdAt The timestamp of when the redemption was created.
      * @param updatedAt The timestamp of when the redemption was last updated.

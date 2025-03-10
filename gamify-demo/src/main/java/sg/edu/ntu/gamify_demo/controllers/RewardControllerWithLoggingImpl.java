@@ -3,8 +3,17 @@
 
 package sg.edu.ntu.gamify_demo.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 import java.util.List;
+import java.util.ArrayList;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +30,7 @@ import sg.edu.ntu.gamify_demo.services.RewardServiceWithLoggingImpl;
 
 @RestController
 @RequestMapping("/rewards")
+@Tag(name = "Rewards", description = "Endpoints for managing rewards system")
 public class RewardControllerWithLoggingImpl {
     
     private RewardService rewardService;
@@ -32,8 +42,8 @@ public class RewardControllerWithLoggingImpl {
 
     // Save reward
     @PostMapping("")
-    public ResponseEntity<Reward> saveReward(@RequestBody Reward reward) {
-        Reward newReward = rewardService.saveReward(reward);
+    public ResponseEntity<Reward> createReward(@RequestBody Reward reward) {
+        Reward newReward = rewardService.createReward(reward);
         return new ResponseEntity<>(newReward, HttpStatus.CREATED);
     } 
 

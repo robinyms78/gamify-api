@@ -40,9 +40,6 @@ public class Employee
     @Column(name = "department")
     private String department;
 
-    @OneToMany(mappedBy = "employee")
-    private List<Redemption> redemptions;
-
     /**
      * Constructs an Employee object with the provided details.
      * @param id The unique identifier of the employee.

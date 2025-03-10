@@ -17,6 +17,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.interfaces.AchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
@@ -31,6 +35,7 @@ import sg.edu.ntu.gamify_demo.services.LadderService;
  */
 @RestController
 @RequestMapping("/api/gamification")
+@Tag(name = "Gamification", description = "Points and achievements management")
 public class GamificationController {
     
     @Autowired
@@ -55,7 +60,12 @@ public class GamificationController {
      * @return The user's points.
      */
     @GetMapping("/users/{userId}/points")
-    public ResponseEntity<ObjectNode> getUserPoints(@PathVariable String userId) {
+    @Operation(summary = "Get user points", description = "Retrieves total points for a user")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved points")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    public ResponseEntity<ObjectNode> getUserPoints(
+        @Parameter(description = "User ID", example = "uuid-1234") 
+        @PathVariable String userId) {
         int points = gamificationService.getUserPoints(userId);
         
         ObjectNode result = objectMapper.createObjectNode();

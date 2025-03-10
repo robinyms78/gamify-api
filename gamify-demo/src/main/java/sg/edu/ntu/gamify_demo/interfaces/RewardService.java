@@ -5,7 +5,7 @@ import sg.edu.ntu.gamify_demo.models.Reward;
 
 public interface RewardService {
     List<Reward> getAllRewards();
-    Reward saveReward(Reward reward);
+    Reward createReward(Reward reward);
     Reward getReward(Long id);
     Reward updateReward(Long id, Reward reward);
     void deleteReward(Long id);

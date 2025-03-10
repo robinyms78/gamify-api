@@ -1,6 +1,7 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +13,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+
 import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.exceptions.AchievementNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
@@ -32,12 +28,16 @@ import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 /**
  * REST controller for achievement-related endpoints.
  */
 @RestController
 @RequestMapping("/api/achievements")
-@Tag(name = "Achievements", description = "Endpoints for managing achievements and user achievement tracking")
 public class AchievementController {
     
     private final AchievementService achievementService;
@@ -69,9 +69,6 @@ public class AchievementController {
      * @return A list of all achievements.
      */
     @GetMapping
-    @Operation(summary = "Get all achievements", description = "Retrieves a list of all available achievements")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved achievements list",
-               content = @Content(schema = @Schema(implementation = List.class)))
     public ResponseEntity<List<Achievement>> getAllAchievements() {
         List<Achievement> achievements = gamificationFacade.getAllAchievements();
         return ResponseEntity.ok(achievements);
@@ -84,14 +81,13 @@ public class AchievementController {
      * @return The achievement if found.
      */
     @GetMapping("/{achievementId}")
-    @Operation(summary = "Get achievement details", description = "Retrieves details of a specific achievement")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Achievement found",
-                    content = @Content(schema = @Schema(implementation = Achievement.class))),
+    @Operation(summary = "Get an achievement by its ID", description = "Retrieves a specific achievement based on its unique identifier.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved the achievement"),
         @ApiResponse(responseCode = "404", description = "Achievement not found")
     })
     public ResponseEntity<Achievement> getAchievementById(
-        @Parameter(description = "ID of the achievement to retrieve", example = "achieve-123")
+        @Parameter(description = "The ID of the achievement to retrieve", example = "a1b2c3d4-e5f6-7890-1234-567890abcdef")
         @PathVariable String achievementId) {
         Achievement achievement = achievementService.getAchievementById(achievementId);
         return ResponseEntity.ok(achievement);
@@ -104,21 +100,7 @@ public class AchievementController {
      * @return The created achievement.
      */
     @PostMapping
-    @Operation(summary = "Create achievement", description = "Creates a new achievement in the system")
-    @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Achievement created successfully",
-                    content = @Content(schema = @Schema(implementation = Achievement.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid achievement data")
-    })
-    public ResponseEntity<Achievement> createAchievement(
-        @Parameter(description = "Achievement data in JSON format", required = true,
-                  content = @Content(schema = @Schema(example = """
-                      {
-                          "name": "Master Explorer", 
-                          "description": "Complete 50 tasks",
-                          "criteria": {"tasksCompleted": 50}
-                      }""")))
-        @RequestBody JsonNode achievementData) {
+    public ResponseEntity<Achievement> createAchievement(@RequestBody JsonNode achievementData) {
         String name = achievementData.get("name").asText();
         String description = achievementData.get("description").asText();
         JsonNode criteria = achievementData.get("criteria");
@@ -135,17 +117,9 @@ public class AchievementController {
      * @return The updated achievement.
      */
     @PutMapping("/{achievementId}")
-    @Operation(summary = "Update achievement", description = "Updates an existing achievement")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Achievement updated successfully",
-                    content = @Content(schema = @Schema(implementation = Achievement.class))),
-        @ApiResponse(responseCode = "404", description = "Achievement not found"),
-        @ApiResponse(responseCode = "400", description = "Invalid update data")
-    })
     public ResponseEntity<Achievement> updateAchievement(
-        @Parameter(description = "ID of the achievement to update", example = "achieve-456")
-        @PathVariable String achievementId,
-        @RequestBody JsonNode achievementData) {
+            @PathVariable String achievementId,
+            @RequestBody JsonNode achievementData) {
         
         String name = achievementData.get("name").asText();
         String description = achievementData.get("description").asText();
@@ -162,14 +136,7 @@ public class AchievementController {
      * @return No content response.
      */
     @DeleteMapping("/{achievementId}")
-    @Operation(summary = "Delete achievement", description = "Removes an achievement from the system")
-    @ApiResponses({
-        @ApiResponse(responseCode = "204", description = "Achievement deleted successfully"),
-        @ApiResponse(responseCode = "404", description = "Achievement not found")
-    })
-    public ResponseEntity<Void> deleteAchievement(
-        @Parameter(description = "ID of the achievement to delete", example = "achieve-789")
-        @PathVariable String achievementId) {
+    public ResponseEntity<Void> deleteAchievement(@PathVariable String achievementId) {
         achievementService.deleteAchievement(achievementId);
         return ResponseEntity.noContent().build();
     }
@@ -181,15 +148,7 @@ public class AchievementController {
      * @return The user's achievements.
      */
     @GetMapping("/user/{userId}")
-    @Operation(summary = "Get user achievements", description = "Retrieves all achievements earned by a user")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved user achievements",
-                    content = @Content(schema = @Schema(implementation = UserAchievementDTO.class))),
-        @ApiResponse(responseCode = "404", description = "User not found")
-    })
-    public ResponseEntity<UserAchievementDTO> getUserAchievements(
-        @Parameter(description = "ID of the user", example = "user-123")
-        @PathVariable String userId) {
+    public ResponseEntity<UserAchievementDTO> getUserAchievements(@PathVariable String userId) {
         UserAchievementDTO userAchievements = gamificationFacade.getUserAchievements(userId);
         return ResponseEntity.ok(userAchievements);
     }
@@ -202,18 +161,9 @@ public class AchievementController {
      * @return True if the user has the achievement, false otherwise.
      */
     @GetMapping("/{achievementId}/check/{userId}")
-    @Operation(summary = "Check achievement progress", 
-              description = "Checks if a user has earned a specific achievement")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Check completed",
-                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
-        @ApiResponse(responseCode = "404", description = "User or achievement not found")
-    })
     public ResponseEntity<ObjectNode> checkUserAchievement(
-        @Parameter(description = "ID of the achievement to check", example = "achieve-123")
-        @PathVariable String achievementId,
-        @Parameter(description = "ID of the user to check", example = "user-456")
-        @PathVariable String userId) {
+            @PathVariable String achievementId,
+            @PathVariable String userId) {
         
         Achievement achievement = achievementService.getAchievementById(achievementId);
         User user = userService.getUserById(userId);
@@ -238,24 +188,9 @@ public class AchievementController {
      * @return Success response.
      */
     @PostMapping("/process/{userId}")
-    @Operation(summary = "Process achievement event", 
-              description = "Handles events that might trigger achievement unlocks")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Event processed successfully",
-                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-        @ApiResponse(responseCode = "400", description = "Invalid event data")
-    })
     public ResponseEntity<ObjectNode> processEvent(
-        @Parameter(description = "ID of the user", example = "user-789")
-        @PathVariable String userId,
-        @Parameter(description = "Event data in JSON format", required = true,
-                  content = @Content(schema = @Schema(example = """
-                      {
-                          "eventType": "TASK_COMPLETED", 
-                          "eventDetails": {"taskType": "BUG_FIX"}
-                      }""")))
-        @RequestBody JsonNode eventData) {
+            @PathVariable String userId,
+            @RequestBody JsonNode eventData) {
         
         String eventType = eventData.get("eventType").asText();
         JsonNode eventDetails = eventData.get("eventDetails");

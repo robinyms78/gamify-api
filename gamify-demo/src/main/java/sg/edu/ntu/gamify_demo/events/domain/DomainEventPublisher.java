@@ -11,6 +11,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import java.util.Arrays;
+
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
 import sg.edu.ntu.gamify_demo.models.User;
 
@@ -24,14 +28,16 @@ public class DomainEventPublisher {
     private final List<DomainEventSubscriber<?>> subscribers = new CopyOnWriteArrayList<>();
     private final EventPublisher legacyEventPublisher;
     private final ObjectMapper objectMapper;
+    private final MeterRegistry meterRegistry;
     
     /**
      * Constructor for dependency injection.
      */
     @Autowired
-    public DomainEventPublisher(EventPublisher legacyEventPublisher, ObjectMapper objectMapper) {
+    public DomainEventPublisher(EventPublisher legacyEventPublisher, ObjectMapper objectMapper, MeterRegistry meterRegistry) {
         this.legacyEventPublisher = legacyEventPublisher;
         this.objectMapper = objectMapper;
+        this.meterRegistry = meterRegistry;
     }
     
     /**
@@ -43,6 +49,15 @@ public class DomainEventPublisher {
      */
     @SuppressWarnings("unchecked")
     public <T extends DomainEvent> void publish(T event) {
+        // Record metrics
+        if (meterRegistry != null) {
+            List<Tag> tags = Arrays.asList(
+                Tag.of("event_type", event.getEventType()),
+                Tag.of("user", event.getUser().getId())
+            );
+            meterRegistry.counter("events.processed", tags).increment();
+        }
+        
         // Publish to domain event subscribers
         for (DomainEventSubscriber<?> subscriber : getInterestedSubscribers(event)) {
             ((DomainEventSubscriber<T>) subscriber).onEvent(event);

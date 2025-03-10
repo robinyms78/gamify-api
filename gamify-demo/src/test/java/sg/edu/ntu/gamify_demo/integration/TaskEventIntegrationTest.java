@@ -35,7 +35,7 @@ import sg.edu.ntu.gamify_demo.services.LadderService;
 import sg.edu.ntu.gamify_demo.services.TaskEventService;
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("test") // Use test profile for database testing
 @Transactional
 @Import(TestIntegrationConfig.class)
 public class TaskEventIntegrationTest {

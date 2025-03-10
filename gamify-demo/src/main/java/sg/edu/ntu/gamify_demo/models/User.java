@@ -130,12 +130,15 @@ public class User {
     }
     
     /**
-     * Helper method to add a redemption.
+     * Helper method to add a redemption and maintain bidirectional relationship.
      * 
      * @param redemption The redemption to add.
      */
     public void addRedemption(Redemption redemption) {
         redemptions.add(redemption);
+        if (redemption.getUser() != this) {
+            redemption.setUser(this);
+        }
     }
     
     /**
