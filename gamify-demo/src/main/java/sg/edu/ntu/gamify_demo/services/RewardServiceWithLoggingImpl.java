@@ -27,9 +27,9 @@ public class RewardServiceWithLoggingImpl implements RewardService {
     // Method
     // Save
     @Override
-    public Reward saveReward(Reward reward) {
+    public Reward createReward(Reward reward) {
         Reward newReward = rewardRepository.save(reward);
-        logger.info("🟢 RewardServiceWithLoggingImpl.saveReward() called");
+        logger.info("🟢 RewardServiceWithLoggingImpl.createReward() called");
         return newReward;
     }
 
