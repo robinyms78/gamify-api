@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.swagger.v3.oas.annotations.Operation;
 import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.exceptions.AchievementNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
@@ -64,6 +65,7 @@ public class AchievementController {
      * @return A list of all achievements.
      */
     @GetMapping
+    @Operation(summary = "Retrieve all achievements")
     public ResponseEntity<List<Achievement>> getAllAchievements() {
         List<Achievement> achievements = gamificationFacade.getAllAchievements();
         return ResponseEntity.ok(achievements);
