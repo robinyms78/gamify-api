@@ -32,6 +32,7 @@ import sg.edu.ntu.gamify_demo.services.LadderService;
  */
 @RestController
 @RequestMapping("/api/ladder")
+@Tag(name = "Ladder System", description = "Manage user rankings and level progression")
 public class LadderController {
     
     @Autowired
@@ -49,6 +50,9 @@ public class LadderController {
      * @return A map of level numbers to points required.
      */
     @GetMapping("/levels")
+    @Operation(summary = "Get all levels", 
+              description = "Retrieve all ladder levels with their point requirements")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved levels listing")
     public ResponseEntity<Map<Integer, Integer>> getLadderLevels() {
         Map<Integer, Integer> levels = ladderService.getLadderLevels();
         return ResponseEntity.ok(levels);
@@ -61,7 +65,16 @@ public class LadderController {
      * @return The user's ladder status.
      */
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserLadderStatus> getUserLadderStatus(@PathVariable String userId) {
+    @Operation(summary = "Get user's ladder status", 
+              description = "Retrieve a user's current ladder position and progress")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved user status",
+                    content = @Content(schema = @Schema(implementation = UserLadderStatus.class))),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<UserLadderStatus> getUserLadderStatus(
+        @Parameter(description = "User ID to retrieve status for", required = true, example = "user-123")
+        @PathVariable String userId) {
         UserLadderStatus status = ladderService.getUserLadderStatus(userId);
         
         if (status == null) {
@@ -79,7 +92,16 @@ public class LadderController {
      * @return The user's ladder status as a DTO.
      */
     @GetMapping("/status")
-    public ResponseEntity<LadderStatusDTO> getLadderStatus(@RequestParam String userId) {
+    @Operation(summary = "Get ladder status via query", 
+              description = "Retrieve ladder status using query parameter")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved status",
+                    content = @Content(schema = @Schema(implementation = LadderStatusDTO.class))),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<LadderStatusDTO> getLadderStatus(
+        @Parameter(description = "User ID as query parameter", required = true, example = "user-456")
+        @RequestParam String userId) {
         LadderStatusDTO status = gamificationFacade.getUserLadderStatus(userId);
         
         if (status == null) {
@@ -96,7 +118,16 @@ public class LadderController {
      * @return The updated ladder status.
      */
     @PutMapping("/users/{userId}")
-    public ResponseEntity<UserLadderStatus> updateUserLadderStatus(@PathVariable String userId) {
+    @Operation(summary = "Update ladder status", 
+              description = "Recalculate and update a user's ladder position")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Status updated successfully",
+                    content = @Content(schema = @Schema(implementation = UserLadderStatus.class))),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<UserLadderStatus> updateUserLadderStatus(
+        @Parameter(description = "User ID to update", required = true, example = "user-789")
+        @PathVariable String userId) {
         UserLadderStatus status = ladderService.updateUserLadderStatus(userId);
         
         if (status == null) {
@@ -113,7 +144,16 @@ public class LadderController {
      * @return The label for the level.
      */
     @GetMapping("/levels/{level}/label")
-    public ResponseEntity<ObjectNode> getLevelLabel(@PathVariable int level) {
+    @Operation(summary = "Get level label", 
+              description = "Retrieve the display label for a specific level")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved label",
+                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
+        @ApiResponse(responseCode = "404", description = "Level not found")
+    })
+    public ResponseEntity<ObjectNode> getLevelLabel(
+        @Parameter(description = "Level number to query", required = true, example = "5")
+        @PathVariable int level) {
         String label = ladderService.getLevelLabel(level);
         
         ObjectNode result = objectMapper.createObjectNode();
@@ -130,7 +170,22 @@ public class LadderController {
      * @return The created ladder level.
      */
     @PostMapping("/levels")
-    public ResponseEntity<LadderLevel> createLadderLevel(@RequestBody JsonNode levelData) {
+    @Operation(summary = "Create new level", 
+              description = "Add a new level to the ladder system")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Level created successfully",
+                    content = @Content(schema = @Schema(implementation = LadderLevel.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid level data")
+    })
+    public ResponseEntity<LadderLevel> createLadderLevel(
+        @Parameter(description = "Level data in JSON format", required = true,
+                  content = @Content(schema = @Schema(example = """
+                      {
+                          "level": 5,
+                          "label": "Senior Adventurer",
+                          "pointsRequired": 1000
+                      }""")))
+        @RequestBody JsonNode levelData) {
         int level = levelData.get("level").asInt();
         String label = levelData.get("label").asText();
         int pointsRequired = levelData.get("pointsRequired").asInt();
@@ -147,9 +202,18 @@ public class LadderController {
      * @return The updated ladder level.
      */
     @PutMapping("/levels/{level}")
+    @Operation(summary = "Update existing level", 
+              description = "Modify an existing ladder level configuration")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Level updated successfully",
+                    content = @Content(schema = @Schema(implementation = LadderLevel.class))),
+        @ApiResponse(responseCode = "404", description = "Level not found"),
+        @ApiResponse(responseCode = "400", description = "Invalid update data")
+    })
     public ResponseEntity<LadderLevel> updateLadderLevel(
-            @PathVariable int level,
-            @RequestBody JsonNode levelData) {
+        @Parameter(description = "Level number to update", required = true, example = "3")
+        @PathVariable int level,
+        @RequestBody JsonNode levelData) {
         
         String label = levelData.get("label").asText();
         int pointsRequired = levelData.get("pointsRequired").asInt();
@@ -170,7 +234,16 @@ public class LadderController {
      * @return No content response if successful, or an error message if the level cannot be deleted.
      */
     @DeleteMapping("/levels/{level}")
-    public ResponseEntity<ObjectNode> deleteLadderLevel(@PathVariable int level) {
+    @Operation(summary = "Delete level", 
+              description = "Remove a level from the ladder system")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Level deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Level not found"),
+        @ApiResponse(responseCode = "409", description = "Level cannot be deleted (active users)")
+    })
+    public ResponseEntity<ObjectNode> deleteLadderLevel(
+        @Parameter(description = "Level number to delete", required = true, example = "2")
+        @PathVariable int level) {
         boolean deleted = ladderService.deleteLadderLevel(level);
         
         if (deleted) {
