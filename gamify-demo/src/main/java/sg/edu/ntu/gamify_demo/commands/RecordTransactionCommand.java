@@ -1,19 +1,15 @@
 package sg.edu.ntu.gamify_demo.commands;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.Services.PointsService;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;
 import sg.edu.ntu.gamify_demo.models.PointsTransaction;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.repositories.PointsTransactionRepository;
-import sg.edu.ntu.gamify_demo.services.PointsService;
 
 /**
  * Command to record a points transaction for a completed task.

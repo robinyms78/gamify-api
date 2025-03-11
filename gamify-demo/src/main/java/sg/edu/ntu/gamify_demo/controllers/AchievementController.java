@@ -2,7 +2,6 @@ package sg.edu.ntu.gamify_demo.controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,7 +43,6 @@ public class AchievementController {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public AchievementController(
             AchievementService achievementService,
             UserService userService,

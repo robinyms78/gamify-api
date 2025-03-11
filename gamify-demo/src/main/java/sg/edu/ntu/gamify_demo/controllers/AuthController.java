@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import sg.edu.ntu.gamify_demo.Services.AuthenticationService;
 import sg.edu.ntu.gamify_demo.dtos.AuthResponse;
 import sg.edu.ntu.gamify_demo.dtos.LoginRequest;
 import sg.edu.ntu.gamify_demo.dtos.RegistrationRequest;
@@ -19,7 +20,6 @@ import sg.edu.ntu.gamify_demo.exceptions.AuthenticationException;
 import sg.edu.ntu.gamify_demo.exceptions.DuplicateUserException;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.repositories.UserRepository;
-import sg.edu.ntu.gamify_demo.services.AuthenticationService;
 
 /**
  * Controller for handling authentication-related endpoints.

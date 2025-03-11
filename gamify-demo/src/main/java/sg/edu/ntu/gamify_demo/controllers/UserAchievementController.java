@@ -1,6 +1,5 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +34,6 @@ public class UserAchievementController {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public UserAchievementController(
             UserService userService,
             AchievementService achievementService,

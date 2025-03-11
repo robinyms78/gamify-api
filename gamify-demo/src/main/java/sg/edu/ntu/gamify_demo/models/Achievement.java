@@ -1,5 +1,4 @@
 package sg.edu.ntu.gamify_demo.models;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -11,6 +10,8 @@ import org.hibernate.annotations.Type;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,8 @@ import lombok.Setter;
 @Table(name = "achievements")
 public class Achievement {
     @Id
-    @Column(name = "achievement_id")
+    @GeneratedValue(strategy = GenerationType.UUID) // For UUID in Hibernate 6+
+    @Column(name = "achievement_id", updatable = false, nullable = false)
     private String achievementId;
     
     @Column(name = "name", nullable = false)

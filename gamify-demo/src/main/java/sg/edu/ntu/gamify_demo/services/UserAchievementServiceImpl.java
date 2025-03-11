@@ -1,9 +1,8 @@
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +49,7 @@ public class UserAchievementServiceImpl implements UserAchievementService {
      * @param achievementMapper Mapper for converting between entities and DTOs.
      * @param objectMapper Mapper for JSON objects.
      */
-    @Autowired
+    
     public UserAchievementServiceImpl(
             UserAchievementRepository userAchievementRepository,
             AchievementService achievementService,

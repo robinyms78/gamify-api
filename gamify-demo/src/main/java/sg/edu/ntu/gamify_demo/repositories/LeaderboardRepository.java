@@ -1,5 +1,8 @@
 package sg.edu.ntu.gamify_demo.repositories;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -7,15 +10,12 @@ import org.springframework.stereotype.Repository;
 import sg.edu.ntu.gamify_demo.models.Leaderboard;
 import sg.edu.ntu.gamify_demo.models.User;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
  * Repository interface for Leaderboard entity.
  * Provides methods to interact with the leaderboard table in the database.
  */
 @Repository
-public interface LeaderboardRepository extends JpaRepository<Leaderboard, User> {
+public interface LeaderboardRepository extends JpaRepository<Leaderboard, String> {
     
     /**
      * Finds a leaderboard entry by user.

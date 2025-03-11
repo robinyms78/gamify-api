@@ -1,8 +1,7 @@
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,7 +28,6 @@ public class AchievementServiceImpl implements AchievementService {
      * @param achievementRepository Repository for achievements.
      * @param achievementFactory Factory for creating achievements.
      */
-    @Autowired
     public AchievementServiceImpl(AchievementRepository achievementRepository, AchievementFactory achievementFactory) {
         this.achievementRepository = achievementRepository;
         this.achievementFactory = achievementFactory;

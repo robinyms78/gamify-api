@@ -1,6 +1,5 @@
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +18,6 @@ public class LeaderboardSyncService {
     private final LeaderboardRepository leaderboardRepository;
     private final UserRepository userRepository;
 
-    @Autowired
     public LeaderboardSyncService(LeaderboardRepository leaderboardRepository, UserRepository userRepository) {
         this.leaderboardRepository = leaderboardRepository;
         this.userRepository = userRepository;

@@ -1,10 +1,9 @@
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +32,6 @@ public class LadderStatusServiceImpl implements LadderStatusService {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public LadderStatusServiceImpl(
             UserService userService,
             LadderLevelRepository ladderLevelRepository,

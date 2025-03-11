@@ -1,13 +1,15 @@
 // Java class for RewardService
 // RewardService.java
 
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.models.Reward;
 import sg.edu.ntu.gamify_demo.repositories.RewardRepository;
@@ -16,7 +18,7 @@ import sg.edu.ntu.gamify_demo.repositories.RewardRepository;
 @Component
 public class RewardServiceWithLoggingImpl implements RewardService {
 
-    private RewardRepository rewardRepository;
+    private final RewardRepository rewardRepository;
     private final Logger logger = LoggerFactory.getLogger(RewardService.class);
 
     // Constructor

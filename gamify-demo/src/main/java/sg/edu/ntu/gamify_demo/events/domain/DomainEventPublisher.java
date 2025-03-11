@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
-import sg.edu.ntu.gamify_demo.models.User;
 
 /**
  * Publisher for domain events.
@@ -28,7 +25,6 @@ public class DomainEventPublisher {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public DomainEventPublisher(EventPublisher legacyEventPublisher, ObjectMapper objectMapper) {
         this.legacyEventPublisher = legacyEventPublisher;
         this.objectMapper = objectMapper;
@@ -53,8 +49,7 @@ public class DomainEventPublisher {
             // Convert domain event to legacy format
             ObjectNode legacyEventData = objectMapper.createObjectNode();
             
-            if (event instanceof TaskCompletedEvent) {
-                TaskCompletedEvent taskEvent = (TaskCompletedEvent) event;
+            if (event instanceof TaskCompletedEvent taskEvent) {
                 legacyEventData.put("taskId", taskEvent.getTaskId());
                 legacyEventData.put("eventId", taskEvent.getTaskEvent().getEventId());
                 legacyEventData.put("pointsAwarded", taskEvent.getPointsAwarded());
@@ -62,8 +57,7 @@ public class DomainEventPublisher {
                 if (taskEvent.getMetadata() != null) {
                     legacyEventData.set("metadata", taskEvent.getMetadata());
                 }
-            } else if (event instanceof PointsEarnedEvent) {
-                PointsEarnedEvent pointsEvent = (PointsEarnedEvent) event;
+            } else if (event instanceof PointsEarnedEvent pointsEvent) {
                 legacyEventData.put("points", pointsEvent.getPoints());
                 legacyEventData.put("newTotal", pointsEvent.getNewTotal());
                 legacyEventData.put("source", pointsEvent.getSource());
@@ -71,8 +65,7 @@ public class DomainEventPublisher {
                 if (pointsEvent.getMetadata() != null) {
                     legacyEventData.set("metadata", pointsEvent.getMetadata());
                 }
-            } else if (event instanceof PointsSpentEvent) {
-                PointsSpentEvent pointsEvent = (PointsSpentEvent) event;
+            } else if (event instanceof PointsSpentEvent pointsEvent) {
                 legacyEventData.put("points", pointsEvent.getPoints());
                 legacyEventData.put("newTotal", pointsEvent.getNewTotal());
                 legacyEventData.put("source", pointsEvent.getSource());

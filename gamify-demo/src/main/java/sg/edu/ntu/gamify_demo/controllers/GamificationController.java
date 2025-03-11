@@ -17,14 +17,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.Services.GamificationService;
+import sg.edu.ntu.gamify_demo.Services.LadderService;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
-import sg.edu.ntu.gamify_demo.interfaces.AchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.UserAchievement;
-import sg.edu.ntu.gamify_demo.services.GamificationService;
-import sg.edu.ntu.gamify_demo.services.LadderService;
 
 /**
  * REST controller for gamification-related endpoints.
@@ -35,9 +34,6 @@ public class GamificationController {
     
     @Autowired
     private GamificationService gamificationService;
-    
-    @Autowired
-    private AchievementService achievementService;
     
     @Autowired
     private UserService userService;

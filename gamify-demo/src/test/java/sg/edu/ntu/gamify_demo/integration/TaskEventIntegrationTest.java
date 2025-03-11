@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.Services.LadderService;
+import sg.edu.ntu.gamify_demo.Services.TaskEventService;
 import sg.edu.ntu.gamify_demo.config.TestIntegrationConfig;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
@@ -31,8 +32,7 @@ import sg.edu.ntu.gamify_demo.repositories.PointsTransactionRepository;
 import sg.edu.ntu.gamify_demo.repositories.TaskEventRepository;
 import sg.edu.ntu.gamify_demo.repositories.UserLadderStatusRepository;
 import sg.edu.ntu.gamify_demo.repositories.UserRepository;
-import sg.edu.ntu.gamify_demo.services.LadderService;
-import sg.edu.ntu.gamify_demo.services.TaskEventService;
+
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -137,7 +137,7 @@ public class TaskEventIntegrationTest {
         
         // Verify points transaction was created
         List<PointsTransaction> transactions = pointsTransactionRepository.findByUserAndEventType(testUser, "TASK_COMPLETED");
-        assertTrue(transactions.size() > 0);
+        assertTrue(!transactions.isEmpty());
         
         PointsTransaction transaction = transactions.get(0);
         assertEquals(testUser, transaction.getUser());

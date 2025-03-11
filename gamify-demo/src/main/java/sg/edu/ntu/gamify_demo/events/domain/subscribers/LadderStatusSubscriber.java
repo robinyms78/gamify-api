@@ -1,6 +1,5 @@
 package sg.edu.ntu.gamify_demo.events.domain.subscribers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import sg.edu.ntu.gamify_demo.events.domain.DomainEvent;
@@ -21,7 +20,6 @@ public class LadderStatusSubscriber implements DomainEventSubscriber<PointsEarne
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public LadderStatusSubscriber(LadderStatusService ladderStatusService) {
         this.ladderStatusService = ladderStatusService;
     }

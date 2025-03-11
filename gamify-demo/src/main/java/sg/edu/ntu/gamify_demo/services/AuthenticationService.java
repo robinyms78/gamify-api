@@ -1,14 +1,17 @@
-package sg.edu.ntu.gamify_demo.services;
-
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import sg.edu.ntu.gamify_demo.models.User;
+package sg.edu.ntu.gamify_demo.Services;
 
 import java.security.Key;
 import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import sg.edu.ntu.gamify_demo.models.User;
 
 @Service
 public class AuthenticationService {

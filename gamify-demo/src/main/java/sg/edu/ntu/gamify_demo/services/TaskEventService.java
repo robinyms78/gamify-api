@@ -1,6 +1,5 @@
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +34,6 @@ public class TaskEventService {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public TaskEventService(TaskEventRepository taskEventRepository,
                             UserService userService,
                             TaskEventCommandFactory commandFactory,

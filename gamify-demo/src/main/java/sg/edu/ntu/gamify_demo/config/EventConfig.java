@@ -1,6 +1,5 @@
 package sg.edu.ntu.gamify_demo.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import jakarta.annotation.PostConstruct;
@@ -24,7 +23,6 @@ public class EventConfig {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public EventConfig(
             DomainEventPublisher domainEventPublisher,
             TaskCompletedEventSubscriber taskCompletedEventSubscriber,
