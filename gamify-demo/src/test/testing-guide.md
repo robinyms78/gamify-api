@@ -141,7 +141,13 @@ curl -X GET "http://localhost:8080/api/ladder/status?userId=your-test-user-id"
 
 You should see that the user has leveled up.
 
-## 5. Troubleshooting
+## 5. Database Configuration
+
+The tests are configured to use PostgreSQL instead of H2 in-memory database. This ensures that the tests run in an environment that closely matches the production environment.
+
+Make sure your PostgreSQL database is running and properly configured in the `application-test.properties` file before running the tests.
+
+## 6. Troubleshooting
 
 If you encounter issues during testing:
 
@@ -172,3 +178,5 @@ curl -X GET "http://localhost:8080/api/health"
 ```
 
 This should return a 200 OK response.
+
+4. If you encounter database-related issues, make sure your PostgreSQL database is running and the connection details in `application-test.properties` are correct.

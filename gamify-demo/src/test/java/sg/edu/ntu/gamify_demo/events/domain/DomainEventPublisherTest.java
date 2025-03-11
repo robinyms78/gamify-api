@@ -8,6 +8,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import io.micrometer.core.instrument.Timer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -31,6 +35,9 @@ public class DomainEventPublisherTest {
     private ObjectMapper objectMapper;
     private User testUser;
     private DomainEventSubscriber<DomainEvent> testSubscriber;
+    private MeterRegistry meterRegistry;
+    private Counter eventsProcessedCounter;
+    private Timer eventProcessingTimer;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -39,12 +46,18 @@ public class DomainEventPublisherTest {
         legacyEventPublisher = mock(EventPublisher.class);
         objectMapper = new ObjectMapper();
         testSubscriber = mock(DomainEventSubscriber.class);
+        meterRegistry = mock(MeterRegistry.class);
+        eventsProcessedCounter = mock(Counter.class);
+        eventProcessingTimer = mock(Timer.class);
+        
+        when(meterRegistry.counter(anyString(), any(Iterable.class))).thenReturn(eventsProcessedCounter);
+        when(meterRegistry.timer(anyString())).thenReturn(eventProcessingTimer);
         
         // Configure subscriber mock
         when(testSubscriber.isInterestedIn(any())).thenReturn(true);
         
         // Create publisher
-        publisher = new DomainEventPublisher(legacyEventPublisher, objectMapper);
+        publisher = new DomainEventPublisher(legacyEventPublisher, objectMapper, meterRegistry);
         
         // Register subscriber
         publisher.register(testSubscriber);
@@ -80,6 +93,12 @@ public class DomainEventPublisherTest {
         // Assert
         // Verify subscriber was notified
         verify(testSubscriber, times(1)).onEvent(event);
+        
+        // Verify metrics
+        ArgumentCaptor<Iterable<Tag>> tagsCaptor = ArgumentCaptor.forClass(Iterable.class);
+        verify(meterRegistry).counter(eq("events.processed"), tagsCaptor.capture());
+        
+        verify(eventsProcessedCounter).increment();
         
         // Verify legacy event publisher was called with correct parameters
         ArgumentCaptor<JsonNode> dataCaptor = ArgumentCaptor.forClass(JsonNode.class);

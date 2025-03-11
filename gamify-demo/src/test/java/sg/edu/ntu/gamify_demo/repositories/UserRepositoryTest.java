@@ -18,10 +18,10 @@ import sg.edu.ntu.gamify_demo.models.enums.UserRole;
 
 /**
  * Test class for UserRepository.
- * Uses @DataJpaTest which provides in-memory database for testing JPA repositories.
+ * Uses @DataJpaTest which provides database for testing JPA repositories.
  */
 @DataJpaTest
-@ActiveProfiles("test") // Use test profile to use H2 database
+@ActiveProfiles("test") // Use test profile for database testing
 public class UserRepositoryTest {
 
     @Autowired

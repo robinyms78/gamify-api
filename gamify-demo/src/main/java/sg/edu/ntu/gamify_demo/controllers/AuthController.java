@@ -11,7 +11,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import sg.edu.ntu.gamify_demo.Services.AuthenticationService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import sg.edu.ntu.gamify_demo.dtos.AuthResponse;
 import sg.edu.ntu.gamify_demo.dtos.LoginRequest;
 import sg.edu.ntu.gamify_demo.dtos.RegistrationRequest;
@@ -20,6 +28,7 @@ import sg.edu.ntu.gamify_demo.exceptions.AuthenticationException;
 import sg.edu.ntu.gamify_demo.exceptions.DuplicateUserException;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.repositories.UserRepository;
+import sg.edu.ntu.gamify_demo.services.AuthenticationService;
 
 /**
  * Controller for handling authentication-related endpoints.
@@ -27,6 +36,7 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
  */
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication", description = "Endpoints for user registration and login")
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -48,7 +58,23 @@ public class AuthController {
      * @throws DuplicateUserException if the username or email already exists
      */
     @PostMapping("/register")
-    public ResponseEntity<RegistrationResponse> registerUser(@RequestBody RegistrationRequest request) {
+    @Operation(summary = "Register a new user",
+        description = "Creates a new user account with the provided details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "User registered successfully",
+            content = @Content(schema = @Schema(implementation = RegistrationResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Conflict - Username or email already exists",
+            content = @Content(examples = {
+                @ExampleObject(value = "{\"error\": \"Registration failed\", \"message\": \"Username already exists\"}"),
+                @ExampleObject(value = "{\"error\": \"Registration failed\", \"message\": \"Email already exists\"}")
+            })),
+        @ApiResponse(responseCode = "400", description = "Bad Request - Invalid input data")
+    })
+    public ResponseEntity<RegistrationResponse> registerUser(
+            @Parameter(description = "Registration request containing user details",
+                required = true,
+                content = @Content(schema = @Schema(implementation = RegistrationRequest.class)))
+            @RequestBody RegistrationRequest request) {
         // Check if username already exists
         if (userRepository.existsByUsername(request.username())) {
             throw new DuplicateUserException("Username already exists");
@@ -90,7 +116,21 @@ public class AuthController {
      * @throws AuthenticationException if the credentials are invalid
      */
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginUser(@RequestBody LoginRequest request) {
+    @Operation(summary = "Authenticate user",
+        description = "Authenticates user credentials and returns JWT token")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login successful",
+            content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid credentials",
+            content = @Content(examples = {
+                @ExampleObject(value = "{\"error\": \"Authentication failed\", \"message\": \"Invalid credentials\"}")
+            }))
+    })
+    public ResponseEntity<AuthResponse> loginUser(
+            @Parameter(description = "Login request containing credentials",
+                required = true,
+                content = @Content(schema = @Schema(implementation = LoginRequest.class)))
+            @RequestBody LoginRequest request) {
         // Find user by username
         Optional<User> optionalUser = userRepository.findByUsername(request.username());
         

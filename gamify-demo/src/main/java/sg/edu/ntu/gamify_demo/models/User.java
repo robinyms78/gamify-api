@@ -11,6 +11,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -38,6 +40,7 @@ import sg.edu.ntu.gamify_demo.models.enums.UserRole;
 @Table(name = "users")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private String id;
 
@@ -130,12 +133,15 @@ public class User {
     }
     
     /**
-     * Helper method to add a redemption.
+     * Helper method to add a redemption and maintain bidirectional relationship.
      * 
      * @param redemption The redemption to add.
      */
     public void addRedemption(Redemption redemption) {
         redemptions.add(redemption);
+        if (redemption.getUser() != this) {
+            redemption.setUser(this);
+        }
     }
     
     /**

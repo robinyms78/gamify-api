@@ -35,7 +35,7 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
 
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("test") // Use test profile for database testing
 @Transactional
 @Import(TestIntegrationConfig.class)
 public class TaskEventIntegrationTest {

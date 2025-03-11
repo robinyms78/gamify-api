@@ -17,23 +17,32 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.GamificationService;
-import sg.edu.ntu.gamify_demo.Services.LadderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
+import sg.edu.ntu.gamify_demo.interfaces.AchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.UserAchievement;
+import sg.edu.ntu.gamify_demo.services.GamificationService;
+import sg.edu.ntu.gamify_demo.services.LadderService;
 
 /**
  * REST controller for gamification-related endpoints.
  */
 @RestController
 @RequestMapping("/api/gamification")
+@Tag(name = "Gamification", description = "Points and achievements management")
 public class GamificationController {
     
     @Autowired
     private GamificationService gamificationService;
+    
+    @Autowired
+    private AchievementService achievementService;
     
     @Autowired
     private UserService userService;
@@ -51,7 +60,12 @@ public class GamificationController {
      * @return The user's points.
      */
     @GetMapping("/users/{userId}/points")
-    public ResponseEntity<ObjectNode> getUserPoints(@PathVariable String userId) {
+    @Operation(summary = "Get user points", description = "Retrieves total points for a user")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved points")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    public ResponseEntity<ObjectNode> getUserPoints(
+        @Parameter(description = "User ID", example = "uuid-1234") 
+        @PathVariable String userId) {
         int points = gamificationService.getUserPoints(userId);
         
         ObjectNode result = objectMapper.createObjectNode();

@@ -4,12 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
+import java.util.Arrays;
+
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
+import sg.edu.ntu.gamify_demo.models.User;
 
 /**
  * Publisher for domain events.
@@ -21,13 +28,16 @@ public class DomainEventPublisher {
     private final List<DomainEventSubscriber<?>> subscribers = new CopyOnWriteArrayList<>();
     private final EventPublisher legacyEventPublisher;
     private final ObjectMapper objectMapper;
+    private final MeterRegistry meterRegistry;
     
     /**
      * Constructor for dependency injection.
      */
-    public DomainEventPublisher(EventPublisher legacyEventPublisher, ObjectMapper objectMapper) {
+    @Autowired
+    public DomainEventPublisher(EventPublisher legacyEventPublisher, ObjectMapper objectMapper, MeterRegistry meterRegistry) {
         this.legacyEventPublisher = legacyEventPublisher;
         this.objectMapper = objectMapper;
+        this.meterRegistry = meterRegistry;
     }
     
     /**
@@ -39,6 +49,15 @@ public class DomainEventPublisher {
      */
     @SuppressWarnings("unchecked")
     public <T extends DomainEvent> void publish(T event) {
+        // Record metrics
+        if (meterRegistry != null) {
+            List<Tag> tags = Arrays.asList(
+                Tag.of("event_type", event.getEventType()),
+                Tag.of("user", event.getUser().getId())
+            );
+            meterRegistry.counter("events.processed", tags).increment();
+        }
+        
         // Publish to domain event subscribers
         for (DomainEventSubscriber<?> subscriber : getInterestedSubscribers(event)) {
             ((DomainEventSubscriber<T>) subscriber).onEvent(event);
@@ -49,7 +68,8 @@ public class DomainEventPublisher {
             // Convert domain event to legacy format
             ObjectNode legacyEventData = objectMapper.createObjectNode();
             
-            if (event instanceof TaskCompletedEvent taskEvent) {
+            if (event instanceof TaskCompletedEvent) {
+                TaskCompletedEvent taskEvent = (TaskCompletedEvent) event;
                 legacyEventData.put("taskId", taskEvent.getTaskId());
                 legacyEventData.put("eventId", taskEvent.getTaskEvent().getEventId());
                 legacyEventData.put("pointsAwarded", taskEvent.getPointsAwarded());
@@ -57,7 +77,8 @@ public class DomainEventPublisher {
                 if (taskEvent.getMetadata() != null) {
                     legacyEventData.set("metadata", taskEvent.getMetadata());
                 }
-            } else if (event instanceof PointsEarnedEvent pointsEvent) {
+            } else if (event instanceof PointsEarnedEvent) {
+                PointsEarnedEvent pointsEvent = (PointsEarnedEvent) event;
                 legacyEventData.put("points", pointsEvent.getPoints());
                 legacyEventData.put("newTotal", pointsEvent.getNewTotal());
                 legacyEventData.put("source", pointsEvent.getSource());
@@ -65,7 +86,8 @@ public class DomainEventPublisher {
                 if (pointsEvent.getMetadata() != null) {
                     legacyEventData.set("metadata", pointsEvent.getMetadata());
                 }
-            } else if (event instanceof PointsSpentEvent pointsEvent) {
+            } else if (event instanceof PointsSpentEvent) {
+                PointsSpentEvent pointsEvent = (PointsSpentEvent) event;
                 legacyEventData.put("points", pointsEvent.getPoints());
                 legacyEventData.put("newTotal", pointsEvent.getNewTotal());
                 legacyEventData.put("source", pointsEvent.getSource());

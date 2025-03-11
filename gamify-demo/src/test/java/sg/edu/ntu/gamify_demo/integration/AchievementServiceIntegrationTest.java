@@ -32,7 +32,7 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
  * These tests verify that the Achievement Service works correctly with real repositories.
  */
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("test") // Use test profile for database testing
 @Transactional
 public class AchievementServiceIntegrationTest {
     

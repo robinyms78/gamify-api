@@ -8,6 +8,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -23,6 +31,7 @@ import sg.edu.ntu.gamify_demo.models.TaskEvent;
  */
 @RestController
 @RequestMapping("/tasks")
+@Tag(name = "Task Events", description = "Operations related to task events processing")
 public class TaskEventController {
 
     private final TaskEventService taskEventService;
@@ -45,7 +54,27 @@ public class TaskEventController {
      * @return The processed task event and any additional information.
      */
     @PostMapping("/events")
-    public ResponseEntity<ObjectNode> processTaskEvent(@RequestBody JsonNode eventData) {
+    @Operation(summary = "Process task event", 
+               description = "Processes a task-related event and updates user progress")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Task event processed successfully",
+                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid request format/missing fields"),
+        @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<ObjectNode> processTaskEvent(
+        @Parameter(description = "Event data in JSON format", required = true,
+                  content = @Content(schema = @Schema(example = """
+                      {
+                          "userId": "123e4567-e89b-12d3-a456-426614174000",
+                          "taskId": "task-789",
+                          "event_type": "COMPLETION",
+                          "data": {
+                              "priority": "HIGH",
+                              "details": "Additional event information"
+                          }
+                      }""")))
+        @RequestBody JsonNode eventData) {
         try {
             // Validate required fields
             if (!eventData.has("userId") || !eventData.has("taskId") || !eventData.has("event_type")) {
@@ -83,7 +112,16 @@ public class TaskEventController {
      * @return The task event DTO.
      */
     @GetMapping("/events/{eventId}")
-    public ResponseEntity<TaskEventDTO> getTaskEvent(@PathVariable String eventId) {
+    @Operation(summary = "Get task event by ID", 
+              description = "Retrieves detailed information about a specific task event")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved task event",
+                    content = @Content(schema = @Schema(implementation = TaskEventDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Task event not found")
+    })
+    public ResponseEntity<TaskEventDTO> getTaskEvent(
+        @Parameter(description = "ID of the event to retrieve", example = "event-12345")
+        @PathVariable String eventId) {
         TaskEvent taskEvent = taskEventService.getTaskEventById(eventId);
         if (taskEvent == null) {
             return ResponseEntity.notFound().build();
