@@ -15,7 +15,7 @@ import java.util.Optional;
  * Provides methods to interact with the leaderboard table in the database.
  */
 @Repository
-public interface LeaderboardRepository extends JpaRepository<Leaderboard, User> {
+public interface LeaderboardRepository extends JpaRepository<Leaderboard, String> {
     
     /**
      * Finds a leaderboard entry by user.
