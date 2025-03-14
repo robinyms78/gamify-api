@@ -1,31 +1,22 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.ZonedDateTime;
-import java.util.UUID;
-import java.util.List;
-import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
+import lombok.*;
 
-/**
- * The Reward class represents a reward that users can redeem with their points.
- * It stores the reward details including cost, availability, and descriptions.
- */
-
-@Setter 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Entity
+@Table(name = "rewards")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Reward {
 
     @Id
