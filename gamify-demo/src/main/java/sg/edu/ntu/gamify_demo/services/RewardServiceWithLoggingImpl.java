@@ -19,8 +19,8 @@ import sg.edu.ntu.gamify_demo.factories.RedemptionFactory;
 import sg.edu.ntu.gamify_demo.interfaces.RewardRedemptionService;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
-import sg.edu.ntu.gamify_demo.models.Reward;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
+import sg.edu.ntu.gamify_demo.models.Rewards;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.RedemptionStatus;
 import sg.edu.ntu.gamify_demo.observers.RedemptionObserver;
@@ -54,32 +54,32 @@ public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemp
     // Method
     // Save reward
     @Override
-    public Reward saveReward(Reward reward) {
-        Reward newReward = rewardRepository.save(reward);
+    public Rewards saveReward(Rewards reward) {
+        Rewards newReward = rewardRepository.save(reward);
         logger.info("🟢 RewardServiceWithLoggingImpl.createReward() called");
         return newReward;
     }
 
     // Get reward by id
     @Override
-    public Reward getReward(String rewardId) {
-        Reward reward = rewardRepository.findById(rewardId).get();
+    public Rewards getReward(String rewardId) {
+        Rewards reward = rewardRepository.findById(rewardId).get();
         logger.info("🟢 RewardServiceWithLoggingImpl.getReward() called");
         return reward;
     }
 
     // Get all available reward
     @Override
-    public List<Reward> getAllRewards() {
-        List<Reward> allRewards = rewardRepository.findAll();
+    public List<Rewards> getAllRewards() {
+        List<Rewards> allRewards = rewardRepository.findAll();
         logger.info("🟢 RewardServiceWithLoggingImpl.getAllRewards() called");
         return allRewards;
     }
 
     // Update reward
     @Override
-    public Reward updateReward(String rewardId, Reward reward) {
-        Reward rewardToUpdate = rewardRepository.findById(rewardId).get();
+    public Rewards updateReward(String rewardId, Rewards reward) {
+        Rewards rewardToUpdate = rewardRepository.findById(rewardId).get();
         rewardToUpdate.setId(reward.getId());
         rewardToUpdate.setName(reward.getName());
         rewardToUpdate.setDescription(reward.getDescription());

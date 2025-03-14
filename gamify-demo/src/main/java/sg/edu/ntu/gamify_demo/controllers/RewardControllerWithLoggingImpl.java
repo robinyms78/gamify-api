@@ -18,8 +18,8 @@ import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
 import sg.edu.ntu.gamify_demo.dtos.RewardRedemptionRequest;
 import sg.edu.ntu.gamify_demo.interfaces.RewardRedemptionService;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
-import sg.edu.ntu.gamify_demo.models.Reward;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
+import sg.edu.ntu.gamify_demo.models.Rewards;
 
 @RestController
 @RequestMapping("/rewards")
@@ -36,29 +36,29 @@ public class RewardControllerWithLoggingImpl {
 
     // Save reward
     @PostMapping("")
-    public ResponseEntity<Reward> createReward(@RequestBody Reward reward) {
-        Reward newReward = rewardService.saveReward(reward);
+    public ResponseEntity<Rewards> createReward(@RequestBody Rewards reward) {
+        Rewards newReward = rewardService.saveReward(reward);
         return new ResponseEntity<>(newReward, HttpStatus.CREATED);
     } 
 
     // Get all reward
     @GetMapping("")
-    public ResponseEntity<List<Reward>> getAllRewards() {
-        List<Reward> allRewards = rewardService.getAllRewards();
+    public ResponseEntity<List<Rewards>> getAllRewards() {
+        List<Rewards> allRewards = rewardService.getAllRewards();
         return new ResponseEntity<>(allRewards, HttpStatus.OK);
     }
 
     // Get one reward by rewardId
     @GetMapping("/{id}")
-    public ResponseEntity<Reward> getReward(@PathVariable String rewardId) {
-        Reward foundReward = rewardService.getReward(rewardId);
+    public ResponseEntity<Rewards> getReward(@PathVariable String rewardId) {
+        Rewards foundReward = rewardService.getReward(rewardId);
         return new ResponseEntity<>(foundReward, HttpStatus.OK);
     }
 
     // Update reward
     @PutMapping("/{id}")
-    public ResponseEntity<Reward> updateReward(@PathVariable String rewardId, @RequestBody Reward reward) {
-        Reward updateReward = rewardService.updateReward(rewardId, reward);
+    public ResponseEntity<Rewards> updateReward(@PathVariable String rewardId, @RequestBody Rewards reward) {
+        Rewards updateReward = rewardService.updateReward(rewardId, reward);
         return new ResponseEntity<>(updateReward, HttpStatus.OK);
     }
 

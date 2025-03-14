@@ -1,16 +1,16 @@
 package sg.edu.ntu.gamify_demo.interfaces;
 
 import java.util.List;
-import sg.edu.ntu.gamify_demo.models.Reward;
+import sg.edu.ntu.gamify_demo.models.Rewards;
 
 public interface RewardService {
-    List<Reward> getAllRewards();
+    List<Rewards> getAllRewards();
 
-    Reward saveReward(Reward reward);
+    Rewards saveReward(Rewards reward);
     
-    Reward getReward(String rewardId);
+    Rewards getReward(String rewardId);
     
-    Reward updateReward(String rewardId, Reward reward);
+    Rewards updateReward(String rewardId, Rewards reward);
     
     void deleteReward(String rewardId);
 }

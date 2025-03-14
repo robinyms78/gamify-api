@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Builder;
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
 import sg.edu.ntu.gamify_demo.factories.RedemptionFactory;
-import sg.edu.ntu.gamify_demo.models.Reward;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
+import sg.edu.ntu.gamify_demo.models.Rewards;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.RedemptionStatus;
 import sg.edu.ntu.gamify_demo.repositories.RewardRedemptionRepository;
@@ -46,7 +46,7 @@ public class RedeemRewardCommand {
     public RedemptionResult execute() {
         // Fetch user and reward
         User user = userRepository.findById(userId).orElse(null);
-        Reward reward = rewardRepository.findById(rewardId).orElse(null);
+        Rewards reward = rewardRepository.findById(rewardId).orElse(null);
         
         // Validate user and reward
         if (user == null) {
@@ -117,7 +117,7 @@ public class RedeemRewardCommand {
     /**
      * Sends a notification about the redemption.
      */
-    private void sendRedemptionNotification(User user, Reward reward, RewardRedemption redemption) {
+    private void sendRedemptionNotification(User user, Rewards reward, RewardRedemption redemption) {
         if (messageBroker != null) {
             ObjectNode notification = objectMapper.createObjectNode();
             notification.put("userId", user.getId());

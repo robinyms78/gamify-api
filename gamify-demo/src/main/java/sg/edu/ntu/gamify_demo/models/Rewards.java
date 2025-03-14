@@ -17,7 +17,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reward {
+public class Rewards {
 
     @Id
     @Column(name = "id")
@@ -42,7 +42,7 @@ public class Reward {
     private ZonedDateTime updatedAt;
 
     @OneToMany(mappedBy = "reward")
-    private List<Redemption> redemptions;
+    private List<RewardRedemption> redemptions;
 
     /**
      * Constructs a Reward object with the provided details.

@@ -19,50 +19,6 @@ echo "========================================"
 echo -e "\n${YELLOW}Step 1: Creating test user${NC}"
 
 sleep 2
-#!/bin/bash
-
-# Test script for verifying rewards and redemption functionality
-# This test covers creating rewards, redeeming rewards, and verifying redemption status changes
-
-# Base URL - change this to match your environment
-BASE_URL="http://localhost:8080"
-
-# Colors for output
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
-
-echo -e "${YELLOW}Rewards and Redemption Test${NC}"
-echo "========================================"
-
-# Step 1: Create a test user
-echo -e "\n${YELLOW}Step 1: Creating test user${NC}"
-
-sleep 2
-
-sleep 2
-#!/bin/bash
-
-# Test script for verifying rewards and redemption functionality
-# This test covers creating rewards, redeeming rewards, and verifying redemption status changes
-
-# Base URL - change this to match your environment
-BASE_URL="http://localhost:8080"
-
-# Colors for output
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-YELLOW='\033[0;33m'
-NC='\033[0m' # No Color
-
-echo -e "${YELLOW}Rewards and Redemption Test${NC}"
-echo "========================================"
-
-# Step 1: Create a test user
-echo -e "\n${YELLOW}Step 1: Creating test user${NC}"
-
-sleep 2
 
 # Create unique username and email using timestamp
 timestamp=$(date +%s)
@@ -70,22 +26,16 @@ username="rewarduser-$timestamp"
 email="rewarduser-$timestamp@example.com"
 
 # Create a properly formatted JSON payload for user creation
-user_data='{
-  "username": "'$username'",
-  "email": "'$email'",
-  "password": "password123",
-  "role": "EMPLOYEE",
-  "department": "Engineering"
-}'
+fixed_user_data="{\"username\":\"$username\",\"email\":\"$email\",\"password\":\"password123\",\"role\":\"EMPLOYEE\",\"department\":\"Engineering\"}"
 
 echo -e "\n${YELLOW}Sending user creation request:${NC}"
-echo "$user_data"
+echo "$fixed_user_data"
 
 # Send the request to create a user
-echo "curl -s -X POST \"$BASE_URL/auth/register\" -H \"Content-Type: application/json\" -d '$user_data'"
-user_response=$(curl -s -X POST "$BASE_URL/auth/register" \
+echo "curl -v -X POST \"$BASE_URL/auth/register\" -H \"Content-Type: application/json\" -d '$fixed_user_data'"
+user_response=$(curl -v -X POST "$BASE_URL/auth/register" \
     -H "Content-Type: application/json" \
-    -d "$user_data")
+    -d "$fixed_user_data" 2>&1)
 
 # Check if successful and extract user ID
 if echo "$user_response" | grep -q '"message":"User registered successfully"'; then
@@ -95,7 +45,7 @@ if echo "$user_response" | grep -q '"message":"User registered successfully"'; t
     echo -e "${GREEN}User ID: $user_id${NC}"
 else
     echo -e "\n${RED}✗ User creation failed${NC}"
-    echo "$user_response"
+    echo "Response: $user_response"
     exit 1
 fi
 
@@ -108,15 +58,7 @@ echo -e "\n${YELLOW}Step 2: Awarding initial points to the user${NC}"
 task_id="task-reward-$timestamp-1"
 
 # Create a properly formatted JSON payload for task completion
-task_data='{
-  "userId": "'$user_id'",
-  "taskId": "'$task_id'",
-  "event_type": "TASK_COMPLETED",
-  "data": {
-    "priority": "LOW",
-    "description": "Initial task for reward test"
-  }
-}'
+task_data="{\"userId\":\"$user_id\",\"taskId\":\"$task_id\",\"event_type\":\"TASK_COMPLETED\",\"data\":{\"priority\":\"LOW\",\"description\":\"Initial task for reward test\"}}"
 
 echo -e "\n${YELLOW}Sending task completion request:${NC}"
 echo "$task_data"
@@ -159,12 +101,7 @@ reward_cost=$((current_points + 50))
 reward_name="Extra Day Off - Test $timestamp"
 
 # Create a properly formatted JSON payload for reward creation
-reward_data='{
-  "name": "'$reward_name'",
-  "description": "An extra day off work as a reward for good performance",
-  "costInPoints": '$reward_cost',
-  "available": true
-}'
+reward_data="{\"name\":\"$reward_name\",\"description\":\"An extra day off work as a reward for good performance\",\"costInPoints\":$reward_cost,\"available\":true}"
 
 echo -e "\n${YELLOW}Sending reward creation request:${NC}"
 echo "$reward_data"
@@ -191,10 +128,7 @@ fi
 echo -e "\n${YELLOW}Step 4: Testing redemption with insufficient points${NC}"
 
 # Create redemption request
-redemption_request='{
-  "userId": "'$user_id'",
-  "rewardId": "'$reward_id'"
-}'
+redemption_request="{\"userId\":\"$user_id\",\"rewardId\":\"$reward_id\"}"
 
 echo -e "\n${YELLOW}Sending redemption request with insufficient points:${NC}"
 echo "$redemption_request"
@@ -223,15 +157,7 @@ echo -e "\n${YELLOW}Step 5: Awarding more points to the user${NC}"
 task_id="task-reward-$timestamp-2"
 
 # Create a properly formatted JSON payload for high-priority task completion
-task_data='{
-  "userId": "'$user_id'",
-  "taskId": "'$task_id'",
-  "event_type": "TASK_COMPLETED",
-  "data": {
-    "priority": "HIGH",
-    "description": "High priority task for reward test"
-  }
-}'
+task_data="{\"userId\":\"$user_id\",\"taskId\":\"$task_id\",\"event_type\":\"TASK_COMPLETED\",\"data\":{\"priority\":\"HIGH\",\"description\":\"High priority task for reward test\"}}"
 
 echo -e "\n${YELLOW}Sending high-priority task completion request:${NC}"
 echo "$task_data"
@@ -268,15 +194,7 @@ if [ "$updated_points" -lt "$reward_cost" ]; then
     task_id="task-reward-$timestamp-3"
     
     # Create a properly formatted JSON payload for another high-priority task
-    task_data='{
-      "userId": "'$user_id'",
-      "taskId": "'$task_id'",
-      "event_type": "TASK_COMPLETED",
-      "data": {
-        "priority": "HIGH",
-        "description": "Additional high priority task for reward test"
-      }
-    }'
+    task_data="{\"userId\":\"$user_id\",\"taskId\":\"$task_id\",\"event_type\":\"TASK_COMPLETED\",\"data\":{\"priority\":\"HIGH\",\"description\":\"Additional high priority task for reward test\"}}"
     
     # Send the request
     task_response=$(curl -s -X POST "$BASE_URL/tasks/events" \
@@ -314,10 +232,7 @@ if [ "$updated_points" -lt "$reward_cost" ]; then
 fi
 
 # Create redemption request
-redemption_request='{
-  "userId": "'$user_id'",
-  "rewardId": "'$reward_id'"
-}'
+redemption_request="{\"userId\":\"$user_id\",\"rewardId\":\"$reward_id\"}"
 
 echo -e "\n${YELLOW}Sending redemption request with sufficient points:${NC}"
 echo "$redemption_request"
@@ -445,15 +360,7 @@ echo -e "\n${YELLOW}Step 10: Creating another reward for cancellation test${NC}"
 
 # Award more points first
 task_id="task-reward-$timestamp-4"
-task_data='{
-  "userId": "'$user_id'",
-  "taskId": "'$task_id'",
-  "event_type": "TASK_COMPLETED",
-  "data": {
-    "priority": "HIGH",
-    "description": "Task for cancellation test"
-  }
-}'
+task_data="{\"userId\":\"$user_id\",\"taskId\":\"$task_id\",\"event_type\":\"TASK_COMPLETED\",\"data\":{\"priority\":\"HIGH\",\"description\":\"Task for cancellation test\"}}"
 
 # Send the request
 curl -s -X POST "$BASE_URL/tasks/events" \
@@ -472,12 +379,7 @@ echo -e "${GREEN}Current user points: $current_points${NC}"
 reward_cost=$((current_points / 2))
 reward_name="Coffee Voucher - Test $timestamp"
 
-reward_data='{
-  "name": "'$reward_name'",
-  "description": "A voucher for a free coffee",
-  "costInPoints": '$reward_cost',
-  "available": true
-}'
+reward_data="{\"name\":\"$reward_name\",\"description\":\"A voucher for a free coffee\",\"costInPoints\":$reward_cost,\"available\":true}"
 
 # Send the request to create a reward
 reward_response=$(curl -s -X POST "$BASE_URL/rewards" \
@@ -489,10 +391,7 @@ reward_id2=$(echo "$reward_response" | grep -o '"id":"[^"]*"' | cut -d':' -f2 | 
 echo -e "${GREEN}Second Reward ID: $reward_id2${NC}"
 
 # Redeem the second reward
-redemption_request='{
-  "userId": "'$user_id'",
-  "rewardId": "'$reward_id2'"
-}'
+redemption_request="{\"userId\":\"$user_id\",\"rewardId\":\"$reward_id2\"}"
 
 # Send the request
 redemption_response=$(curl -s -X POST "$BASE_URL/rewards/redeem" \

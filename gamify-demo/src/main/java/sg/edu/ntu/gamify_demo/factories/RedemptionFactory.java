@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import sg.edu.ntu.gamify_demo.models.Reward;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
+import sg.edu.ntu.gamify_demo.models.Rewards;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.RedemptionStatus;
 
@@ -25,7 +25,7 @@ public class RedemptionFactory {
      * @param reward The reward being redeemed
      * @return A new RewardRedemption object
      */
-    public RewardRedemption createRedemption(User user, Reward reward) {
+    public RewardRedemption createRedemption(User user, Rewards reward) {
         return RewardRedemption.builder()
             .id(UUID.randomUUID().toString())
             .user(user)
@@ -44,7 +44,7 @@ public class RedemptionFactory {
      * @param status The initial status of the redemption
      * @return A new RewardRedemption object
      */
-    public RewardRedemption createRedemption(User user, Reward reward, RedemptionStatus status) {
+    public RewardRedemption createRedemption(User user, Rewards reward, RedemptionStatus status) {
         return RewardRedemption.builder()
             .id(UUID.randomUUID().toString())
             .user(user)

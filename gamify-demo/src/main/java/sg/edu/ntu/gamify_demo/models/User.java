@@ -90,7 +90,7 @@ public class User {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<Redemption> redemptions = new ArrayList<>();
+    private List<RewardRedemption> redemptions = new ArrayList<>();
 
     /**
      * Initializes default values for new users
@@ -140,7 +140,7 @@ public class User {
      * 
      * @param redemption The redemption to add.
      */
-    public void addRedemption(Redemption redemption) {
+    public void addRedemption(RewardRedemption redemption) {
         redemptions.add(redemption);
         if (redemption.getUser() != this) {
             redemption.setUser(this);
