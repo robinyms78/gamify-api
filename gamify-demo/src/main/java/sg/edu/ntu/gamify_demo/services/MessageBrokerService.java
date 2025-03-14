@@ -1,4 +1,4 @@
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
 import org.springframework.stereotype.Service;
 

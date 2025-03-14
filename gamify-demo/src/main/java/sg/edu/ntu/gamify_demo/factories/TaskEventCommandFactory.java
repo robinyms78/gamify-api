@@ -1,11 +1,11 @@
 package sg.edu.ntu.gamify_demo.factories;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import sg.edu.ntu.gamify_demo.Services.PointsService;
 import sg.edu.ntu.gamify_demo.commands.CalculatePointsCommand;
 import sg.edu.ntu.gamify_demo.commands.CompositeTaskCommand;
 import sg.edu.ntu.gamify_demo.commands.RecordTransactionCommand;
@@ -17,7 +17,6 @@ import sg.edu.ntu.gamify_demo.interfaces.LadderStatusService;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.repositories.PointsTransactionRepository;
 import sg.edu.ntu.gamify_demo.repositories.TaskEventRepository;
-import sg.edu.ntu.gamify_demo.services.PointsService;
 import sg.edu.ntu.gamify_demo.strategies.task.TaskPointsCalculationStrategy;
 
 /**
@@ -38,7 +37,6 @@ public class TaskEventCommandFactory {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public TaskEventCommandFactory(
             TaskEventRepository taskEventRepository,
             PointsTransactionRepository pointsTransactionRepository,

@@ -2,13 +2,12 @@ package sg.edu.ntu.gamify_demo.events.domain.subscribers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import sg.edu.ntu.gamify_demo.Services.PointsService;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEvent;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventSubscriber;
 import sg.edu.ntu.gamify_demo.events.domain.TaskCompletedEvent;
-import sg.edu.ntu.gamify_demo.services.PointsService;
 
 /**
  * Subscriber for task completion events.
@@ -24,7 +23,6 @@ public class TaskCompletedEventSubscriber implements DomainEventSubscriber<TaskC
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public TaskCompletedEventSubscriber(PointsService pointsService) {
         this.pointsService = pointsService;
     }

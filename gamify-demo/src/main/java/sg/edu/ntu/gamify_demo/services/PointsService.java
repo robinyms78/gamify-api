@@ -1,14 +1,12 @@
-package sg.edu.ntu.gamify_demo.services;
+package sg.edu.ntu.gamify_demo.Services;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
@@ -36,7 +34,6 @@ public class PointsService {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public PointsService(
             UserService userService,
             PointsTransactionRepository pointsTransactionRepository,

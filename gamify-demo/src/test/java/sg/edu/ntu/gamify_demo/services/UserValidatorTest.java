@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import sg.edu.ntu.gamify_demo.Services.UserValidator;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.UserRole;

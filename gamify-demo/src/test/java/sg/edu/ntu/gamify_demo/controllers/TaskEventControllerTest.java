@@ -3,7 +3,6 @@ package sg.edu.ntu.gamify_demo.controllers;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,23 +20,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.Services.GamificationService;
+import sg.edu.ntu.gamify_demo.Services.LadderService;
+import sg.edu.ntu.gamify_demo.Services.TaskEventService;
 import sg.edu.ntu.gamify_demo.config.TestSecurityConfig;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.mappers.TaskEventMapper;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;
-import sg.edu.ntu.gamify_demo.services.AuthenticationService;
-import sg.edu.ntu.gamify_demo.services.GamificationService;
-import sg.edu.ntu.gamify_demo.services.LadderService;
-import sg.edu.ntu.gamify_demo.services.TaskEventService;
+
 
 @WebMvcTest(TaskEventController.class)
 @Import(TestSecurityConfig.class)

@@ -1,6 +1,5 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,10 +20,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.Services.TaskEventService;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventDTO;
 import sg.edu.ntu.gamify_demo.mappers.TaskEventMapper;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
-import sg.edu.ntu.gamify_demo.services.TaskEventService;
 
 /**
  * REST controller for task event-related endpoints.
@@ -42,7 +41,6 @@ public class TaskEventController {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public TaskEventController(TaskEventService taskEventService, TaskEventMapper taskEventMapper, ObjectMapper objectMapper) {
         this.taskEventService = taskEventService;
         this.taskEventMapper = taskEventMapper;

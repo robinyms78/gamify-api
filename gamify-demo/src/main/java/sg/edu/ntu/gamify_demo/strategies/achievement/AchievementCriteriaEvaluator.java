@@ -1,9 +1,7 @@
 package sg.edu.ntu.gamify_demo.strategies.achievement;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,7 +14,7 @@ import sg.edu.ntu.gamify_demo.models.User;
  * the evaluation to the appropriate strategy based on the criteria type.
  */
 @Component
-public class AchievementCriteriaEvaluator {
+public final class AchievementCriteriaEvaluator {
 
     private final Map<String, AchievementCriteriaStrategy> strategies = new HashMap<>();
     
@@ -28,7 +26,6 @@ public class AchievementCriteriaEvaluator {
      * @param taskCompletionStrategy Strategy for task completion criteria.
      * @param consecutiveDaysStrategy Strategy for consecutive days criteria.
      */
-    @Autowired
     public AchievementCriteriaEvaluator(
             PointsThresholdStrategy pointsThresholdStrategy,
             TaskCompletionStrategy taskCompletionStrategy,

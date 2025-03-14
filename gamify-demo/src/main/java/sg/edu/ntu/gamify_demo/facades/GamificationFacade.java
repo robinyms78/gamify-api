@@ -2,7 +2,6 @@ package sg.edu.ntu.gamify_demo.facades;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.Services.PointsService;
+import sg.edu.ntu.gamify_demo.Services.TaskEventService;
 import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
@@ -20,8 +21,6 @@ import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 import sg.edu.ntu.gamify_demo.models.User;
-import sg.edu.ntu.gamify_demo.services.PointsService;
-import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.strategies.task.TaskPointsCalculationStrategy;
 
 /**
@@ -45,7 +44,6 @@ public class GamificationFacade {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
     public GamificationFacade(
             LadderStatusService ladderStatusService,
             AchievementService achievementService,

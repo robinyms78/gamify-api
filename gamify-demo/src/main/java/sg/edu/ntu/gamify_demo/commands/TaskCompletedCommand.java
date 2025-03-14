@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import sg.edu.ntu.gamify_demo.Services.PointsService;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.TaskCompletedEvent;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;
 import sg.edu.ntu.gamify_demo.repositories.TaskEventRepository;
-import sg.edu.ntu.gamify_demo.services.PointsService;
 import sg.edu.ntu.gamify_demo.strategies.task.TaskPointsCalculationStrategy;
 
 /**

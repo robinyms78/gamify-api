@@ -1,5 +1,4 @@
 package sg.edu.ntu.gamify_demo.controllers;
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,7 +27,7 @@ import sg.edu.ntu.gamify_demo.exceptions.AuthenticationException;
 import sg.edu.ntu.gamify_demo.exceptions.DuplicateUserException;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.repositories.UserRepository;
-import sg.edu.ntu.gamify_demo.services.AuthenticationService;
+import sg.edu.ntu.gamify_demo.Services.AuthenticationService;
 
 /**
  * Controller for handling authentication-related endpoints.

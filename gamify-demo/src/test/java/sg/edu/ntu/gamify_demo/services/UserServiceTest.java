@@ -24,6 +24,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import sg.edu.ntu.gamify_demo.Services.UserServiceImpl;
+import sg.edu.ntu.gamify_demo.Services.UserValidator;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
 import sg.edu.ntu.gamify_demo.models.User;

@@ -2,7 +2,6 @@ package sg.edu.ntu.gamify_demo.events;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,7 +33,6 @@ public class AchievementProcessor implements EventListener {
      * @param userAchievementService Service for managing user achievements.
      * @param eventPublisher Publisher for events.
      */
-    @Autowired
     public AchievementProcessor(UserAchievementService userAchievementService, EventPublisher eventPublisher) {
         this.userAchievementService = userAchievementService;
         this.eventPublisher = eventPublisher;

@@ -3,7 +3,6 @@ package sg.edu.ntu.gamify_demo.events.domain.subscribers;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.events.domain.DomainEvent;
 import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;
 import sg.edu.ntu.gamify_demo.events.domain.PointsSpentEvent;
 import sg.edu.ntu.gamify_demo.events.domain.TaskCompletedEvent;
@@ -39,7 +37,7 @@ public class PointsEventSubscriberTest {
             java.lang.reflect.Field loggerField = PointsEventSubscriber.class.getDeclaredField("logger");
             loggerField.setAccessible(true);
             loggerField.set(subscriber, mock(Logger.class));
-        } catch (Exception e) {
+        } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e) {
             // If this fails, the tests will still run, but without mocking the logger
         }
         

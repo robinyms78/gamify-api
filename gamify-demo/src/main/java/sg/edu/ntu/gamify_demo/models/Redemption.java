@@ -15,7 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sg.edu.ntu.gamify_demo.models.enums.RewardStatus;
 
 /**
  * The Redemption class represents a reward redemption by a user.
