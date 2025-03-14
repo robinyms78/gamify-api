@@ -1,38 +1,55 @@
-// Java class for RewardService
-// RewardService.java
-
 package sg.edu.ntu.gamify_demo.services;
 
+import java.time.ZonedDateTime;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
+import sg.edu.ntu.gamify_demo.commands.RedeemRewardCommand;
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
+import sg.edu.ntu.gamify_demo.factories.RedemptionFactory;
 import sg.edu.ntu.gamify_demo.interfaces.RewardRedemptionService;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Reward;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 import sg.edu.ntu.gamify_demo.models.User;
+import sg.edu.ntu.gamify_demo.models.enums.RedemptionStatus;
+import sg.edu.ntu.gamify_demo.observers.RedemptionObserver;
 import sg.edu.ntu.gamify_demo.repositories.RewardRedemptionRepository;
 import sg.edu.ntu.gamify_demo.repositories.RewardRepository;
+import sg.edu.ntu.gamify_demo.repositories.UserRepository;
+import sg.edu.ntu.gamify_demo.states.RedemptionStateFactory;
 
+/**
+ * Implementation of RewardService and RewardRedemptionService.
+ * This service handles reward management and redemption operations.
+ */
 @Service
 @Component
+@RequiredArgsConstructor
 public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemptionService {
 
     private final UserService userService;
+    private final UserRepository userRepository;
     private final RewardRepository rewardRepository;
     private final RewardRedemptionRepository rewardRedemptionRepository;
+    private final PointsTransactionService pointsTransactionService;
+    private final RedemptionFactory redemptionFactory;
+    private final RedemptionStateFactory stateFactory;
+    private final ObjectMapper objectMapper;
+    private final MessageBrokerService messageBroker;
+    private final List<RedemptionObserver> observers;
+    
     private final Logger logger = LoggerFactory.getLogger(RewardService.class);
-
-    // Constructor
-    public RewardServiceWithLoggingImpl(RewardRepository rewardRepository, RewardRedemptionRepository rewardRedemptionRepository, UserService userService) {
-        this.rewardRepository = rewardRepository;
-        this.rewardRedemptionRepository = rewardRedemptionRepository;
-        this.userService = userService;
-    }
 
     // Method
     // Save reward
@@ -124,26 +141,107 @@ public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemp
         logger.info("🟢 RewardServiceWithLoggingImpl.deleteRedemption() called");
     }
 
-    // Redeem reward
+    /**
+     * Redeems a reward for a user.
+     * This method uses the Command pattern to encapsulate the redemption process.
+     * 
+     * @param userId The ID of the user redeeming the reward
+     * @param rewardId The ID of the reward being redeemed
+     * @return A RedemptionResult containing the result of the redemption
+     */
     @Override
+    @Transactional
     public RedemptionResult redeemReward(String userId, String rewardId) {
-        User user = userService.getUserById(userId);
-        Reward reward = rewardRepository.findById(rewardId).get();
-        Long userPoints = user.getEarnedPoints();
-        Long rewardPoints = reward.getCostInPoints();
-        if(userPoints < rewardPoints) {
-            return new RedemptionResult(false, "Insufficient points");
-        } else {
-            userService.deductPoints(userId, rewardPoints.intValue());
-            createRedemptionRecord(user, reward);
-            return new RedemptionResult(true, "Reward redeemed successfully");
+        logger.info("🟢 RewardServiceWithLoggingImpl.redeemReward() called for user {} and reward {}", userId, rewardId);
+        
+        // Use the Command pattern to execute the redemption
+        RedeemRewardCommand command = RedeemRewardCommand.builder()
+            .userId(userId)
+            .rewardId(rewardId)
+            .userRepository(userRepository)
+            .rewardRepository(rewardRepository)
+            .redemptionRepository(rewardRedemptionRepository)
+            .pointsTransactionService(pointsTransactionService)
+            .redemptionFactory(redemptionFactory)
+            .messageBroker(messageBroker)
+            .objectMapper(objectMapper)
+            .build();
+        
+        RedemptionResult result = command.execute();
+        
+        // Notify observers if redemption was successful
+        if (result.isSuccess() && result.getRedemptionId() != null) {
+            RewardRedemption redemption = rewardRedemptionRepository.findById(result.getRedemptionId()).orElse(null);
+            if (redemption != null && observers != null) {
+                for (RedemptionObserver observer : observers) {
+                    observer.onRedemptionCreated(redemption);
+                }
+            }
         }
+        
+        return result;
     }
-
-    // Helper method to create redemption records
-    private void createRedemptionRecord(User user, Reward reward) {
-        RewardRedemption redemption = new RewardRedemption(user, reward, "PROCESSING");
-        rewardRedemptionRepository.save(redemption);
+    
+    /**
+     * Completes a redemption.
+     * This method transitions a redemption from PROCESSING to COMPLETED status.
+     * 
+     * @param redemptionId The ID of the redemption to complete
+     * @return A RedemptionResult containing the result of the operation
+     */
+    @Transactional
+    public RedemptionResult completeRedemption(String redemptionId) {
+        logger.info("🟢 RewardServiceWithLoggingImpl.completeRedemption() called for redemption {}", redemptionId);
+        
+        RewardRedemption redemption = rewardRedemptionRepository.findById(redemptionId).orElse(null);
+        if (redemption == null) {
+            return RedemptionResult.builder()
+                .success(false)
+                .message("Redemption not found")
+                .timestamp(ZonedDateTime.now())
+                .build();
+        }
+        
+        // Use the State pattern to handle the transition
+        stateFactory.getStateForRedemption(redemption).complete(redemption);
+        
+        return RedemptionResult.builder()
+            .success(true)
+            .message("Redemption completed successfully")
+            .redemptionId(redemptionId)
+            .timestamp(ZonedDateTime.now())
+            .build();
+    }
+    
+    /**
+     * Cancels a redemption.
+     * This method transitions a redemption to CANCELLED status.
+     * 
+     * @param redemptionId The ID of the redemption to cancel
+     * @return A RedemptionResult containing the result of the operation
+     */
+    @Transactional
+    public RedemptionResult cancelRedemption(String redemptionId) {
+        logger.info("🟢 RewardServiceWithLoggingImpl.cancelRedemption() called for redemption {}", redemptionId);
+        
+        RewardRedemption redemption = rewardRedemptionRepository.findById(redemptionId).orElse(null);
+        if (redemption == null) {
+            return RedemptionResult.builder()
+                .success(false)
+                .message("Redemption not found")
+                .timestamp(ZonedDateTime.now())
+                .build();
+        }
+        
+        // Use the State pattern to handle the transition
+        stateFactory.getStateForRedemption(redemption).cancel(redemption);
+        
+        return RedemptionResult.builder()
+            .success(true)
+            .message("Redemption cancelled successfully")
+            .redemptionId(redemptionId)
+            .timestamp(ZonedDateTime.now())
+            .build();
     }
 
     // Count redemptions

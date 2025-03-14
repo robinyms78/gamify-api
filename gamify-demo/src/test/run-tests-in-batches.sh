@@ -78,6 +78,13 @@ print_header "Running Points/Transaction-related tests"
 run_command "mvn test -Dtest.group=PointsService -Dtest=\"sg.edu.ntu.gamify_demo.services.PointsServiceTest\"" "Points Service Tests"
 run_command "mvn test -Dtest.group=PointsEvents -Dtest=\"sg.edu.ntu.gamify_demo.events.domain.subscribers.PointsEventSubscriberTest\"" "Points Event Subscriber Tests"
 
+# Reward-related tests
+print_header "Running Reward-related tests"
+run_command "mvn test -Dtest.group=RewardService -Dtest=\"sg.edu.ntu.gamify_demo.services.RewardServiceWithLoggingImplTest\"" "Reward Service Tests"
+run_command "mvn test -Dtest.group=RewardRedemption -Dtest=\"sg.edu.ntu.gamify_demo.services.RewardRedemptionServiceTest\"" "Reward Redemption Service Tests"
+run_command "mvn test -Dtest.group=RewardController -Dtest=\"sg.edu.ntu.gamify_demo.controllers.RewardControllerWithLoggingImplTest\"" "Reward Controller Tests"
+run_command "$(dirname "$0")/run-rewards-redemption-test.sh" "Reward Redemption Integration Tests"
+
 # Domain Event-related tests
 print_header "Running Domain Event-related tests"
 run_command "mvn test -Dtest.group=DomainEvents -Dtest=\"sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisherTest\"" "Domain Event Publisher Tests"

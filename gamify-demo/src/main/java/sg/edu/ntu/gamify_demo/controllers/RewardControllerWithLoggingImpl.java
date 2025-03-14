@@ -104,10 +104,47 @@ public class RewardControllerWithLoggingImpl {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // Redeem reward
+    /**
+     * Redeems a reward for a user.
+     * 
+     * @param request The redemption request containing user and reward IDs
+     * @return The result of the redemption operation
+     */
     @PostMapping("/redeem")
     public ResponseEntity<?> redeemReward(@RequestBody RewardRedemptionRequest request) {
         RedemptionResult result = rewardRedemptionService.redeemReward(request.getUserId(), request.getRewardId());
+        if (result.isSuccess()) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+    }
+    
+    /**
+     * Completes a redemption.
+     * 
+     * @param redemptionId The ID of the redemption to complete
+     * @return The result of the operation
+     */
+    @PostMapping("/redemption/{id}/complete")
+    public ResponseEntity<?> completeRedemption(@PathVariable("id") String redemptionId) {
+        RedemptionResult result = rewardRedemptionService.completeRedemption(redemptionId);
+        if (result.isSuccess()) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+    }
+    
+    /**
+     * Cancels a redemption.
+     * 
+     * @param redemptionId The ID of the redemption to cancel
+     * @return The result of the operation
+     */
+    @PostMapping("/redemption/{id}/cancel")
+    public ResponseEntity<?> cancelRedemption(@PathVariable("id") String redemptionId) {
+        RedemptionResult result = rewardRedemptionService.cancelRedemption(redemptionId);
         if (result.isSuccess()) {
             return ResponseEntity.ok(result);
         } else {

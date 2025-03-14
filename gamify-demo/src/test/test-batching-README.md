@@ -81,6 +81,12 @@ Tests are organized into the following groups:
 - PointsService: Points Service Tests
 - PointsEvents: Points Event Subscriber Tests
 
+### Reward-related Tests
+- RewardService: Reward Service Tests
+- RewardRedemption: Reward Redemption Service Tests
+- RewardController: Reward Controller Tests
+- RewardRedemptionIntegration: Reward Redemption Integration Tests
+
 ### Domain Event-related Tests
 - DomainEvents: Domain Event Publisher Tests
 - EventSubscribers: Event Subscribers Tests
