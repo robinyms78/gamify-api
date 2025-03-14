@@ -2,6 +2,7 @@
 // RewardControllerWithLoggingImpl.java
 
 package sg.edu.ntu.gamify_demo.controllers;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -14,11 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.v3.oas.annotations.tags.Tag;
-import sg.edu.ntu.gamify_demo.Services.RewardServiceWithLoggingImpl;
-import sg.edu.ntu.gamify_demo.interfaces.RewardService;
-import sg.edu.ntu.gamify_demo.models.Reward;
 
 @RestController
 @RequestMapping("/rewards")
@@ -35,7 +31,7 @@ public class RewardControllerWithLoggingImpl {
     // Save reward
     @PostMapping("")
     public ResponseEntity<Reward> createReward(@RequestBody Reward reward) {
-        Reward newReward = rewardService.createReward(reward);
+        Reward newReward = rewardService.saveReward(reward);
         return new ResponseEntity<>(newReward, HttpStatus.CREATED);
     } 
 
@@ -66,4 +62,53 @@ public class RewardControllerWithLoggingImpl {
         rewardService.deleteReward(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    // Save reward redemption
+    @PostMapping("/redemption")
+    public ResponseEntity<RewardRedemption> saveRedemption(@RequestBody RewardRedemption redemption) {
+        RewardRedemption newRedemption = rewardRedemptionService.saveRedemption(redemption);
+        return new ResponseEntity<>(newRedemption, HttpStatus.CREATED);
+    } 
+
+    // Get all available reward redemption
+    @GetMapping("/redemption")
+    public ResponseEntity<List<RewardRedemption>> getAllRedemptions() {
+        List<RewardRedemption> allRedemptions = rewardRedemptionService.getAllRedemptions();
+        return new ResponseEntity<>(allRedemptions, HttpStatus.OK);
+    }
+
+    // Get one reward redemption by redemption Id
+    @GetMapping("/redemption/{id}")
+    public ResponseEntity<RewardRedemption> getRedemption(@PathVariable Long id) {
+        RewardRedemption foundRedemption = rewardRedemptionService.getRedemption(id);
+        return new ResponseEntity<>(foundRedemption, HttpStatus.OK);
+    }
+
+    // Update reward redemption
+    @PutMapping("/redemption/{id}")
+    public ResponseEntity<RewardRedemption> updateRedemption(@PathVariable Long id, @RequestBody RewardRedemption redemption) {
+        RewardRedemption updateRedemption = rewardRedemptionService.updateRedemption(id, redemption);
+        return new ResponseEntity<>(updateRedemption, HttpStatus.OK);
+    }
+
+    // Delete reward redemption
+    @DeleteMapping("/redemption/{id}")
+    public ResponseEntity<HttpStatus> deleteRedemption(@PathVariable Long id) {
+        rewardRedemptionService.deleteRedemption(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // // Redeem reward
+    // @PostMapping("/redemption")
+    // public ResponseEntity<String> redeemReward(Long userId, Long id) {
+    //     rewardRedemptionService.redeemReward(userId, id);
+    //     return new ResponseEntity<>(HttpStatus.OK);
+    // }
+
+    // // Count redemptions
+    // @GetMapping("/redemption/count")
+    // public ResponseEntity<Integer> countRedemptions() {
+    //     Integer count = rewardRedemptionService.countRedemptions();
+    //     return new ResponseEntity<>(count, HttpStatus.OK);
+    // }
 }
