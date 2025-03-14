@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import sg.edu.ntu.gamify_demo.Services.PointsService;
+import sg.edu.ntu.gamify_demo.services.PointsService;
 import sg.edu.ntu.gamify_demo.commands.CalculatePointsCommand;
 import sg.edu.ntu.gamify_demo.commands.CompositeTaskCommand;
 import sg.edu.ntu.gamify_demo.commands.RecordTransactionCommand;
@@ -76,7 +76,7 @@ public class TaskEventCommandFactory {
                         pointsCalculationStrategy);
                 
                 // Get the points from the calculation command
-                int points = calculatePointsCommand.getCalculatedPoints();
+                Long points = calculatePointsCommand.getCalculatedPoints();
                 
                 RecordTransactionCommand recordTransactionCommand = new RecordTransactionCommand(
                         user,

@@ -1,5 +1,5 @@
 package sg.edu.ntu.gamify_demo.models;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -49,7 +49,7 @@ public class Achievement {
     
     @CreationTimestamp
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
     
     /**
      * Constructs an Achievement with the provided details.

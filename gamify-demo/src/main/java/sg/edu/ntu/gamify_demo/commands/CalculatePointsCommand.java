@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.commands;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,14 +59,15 @@ public class CalculatePointsCommand implements TaskEventCommand {
         taskEvent.setTaskId(taskId);
         taskEvent.setEventType("TASK_COMPLETED");
         taskEvent.setStatus(TaskStatus.COMPLETED);
-        taskEvent.setCompletionTime(LocalDateTime.now());
+        taskEvent.setCompletionTime(ZonedDateTime.now());
         taskEvent.setMetadata(eventData);
         
         // Calculate points but don't store them in the TaskEvent
         // (we'll use them in the PointsEarnedEvent)
-        int points = pointsCalculationStrategy.calculatePoints(taskId, eventData);
+        long points = pointsCalculationStrategy.calculatePoints(taskId, eventData);
         
-        // Save and return the task event
+        // Save the calculated points in the task event
+        taskEvent.setPointsEarned(points);
         return taskEventRepository.save(taskEvent);
     }
     
@@ -75,7 +76,7 @@ public class CalculatePointsCommand implements TaskEventCommand {
      * 
      * @return The calculated points.
      */
-    public int getCalculatedPoints() {
-        return pointsCalculationStrategy.calculatePoints(taskId, eventData);
+    public Long getCalculatedPoints() {
+        return (long) pointsCalculationStrategy.calculatePoints(taskId, eventData);
     }
 }

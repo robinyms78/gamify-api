@@ -1,7 +1,7 @@
 package sg.edu.ntu.gamify_demo.strategies.achievement;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,7 +54,7 @@ public class ConsecutiveDaysStrategy implements AchievementCriteriaStrategy {
         Set<LocalDate> activityDates = transactions.stream()
                 .map(PointsTransaction::getTimestamp)
                 .filter(timestamp -> timestamp != null)
-                .map(LocalDateTime::toLocalDate)
+                .map(ZonedDateTime::toLocalDate)
                 .collect(Collectors.toSet());
         
         // Check for consecutive days

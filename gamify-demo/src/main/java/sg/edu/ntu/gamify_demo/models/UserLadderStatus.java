@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -44,14 +44,17 @@ public class UserLadderStatus {
     private LadderLevel currentLevel;
     
     @Column(name = "earned_points", nullable = false)
-    private int earnedPoints;
+    private Long earnedPoints;
     
     @Column(name = "points_to_next_level", nullable = false)
-    private int pointsToNextLevel;
+    private Long pointsToNextLevel;
+    
+    @Column(name = "achievements")
+    private String achievements;
     
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
     
     /**
      * Constructs a UserLadderStatus with the provided details.
@@ -61,7 +64,7 @@ public class UserLadderStatus {
      * @param earnedPoints The total points the user has earned.
      * @param pointsToNextLevel The points needed to reach the next level.
      */
-    public UserLadderStatus(User user, LadderLevel currentLevel, int earnedPoints, int pointsToNextLevel) {
+    public UserLadderStatus(User user, LadderLevel currentLevel, Long earnedPoints, Long pointsToNextLevel) {
         this.user = user;
         this.id = user.getId(); // Set the ID from the user
         this.currentLevel = currentLevel;
@@ -77,7 +80,7 @@ public class UserLadderStatus {
      * @param nextNextLevel The level after the next level, or null if nextLevel is the highest level.
      * @return true if the user leveled up, false otherwise.
      */
-    public boolean updatePoints(int newPoints, LadderLevel nextLevel, LadderLevel nextNextLevel) {
+    public boolean updatePoints(Long newPoints, LadderLevel nextLevel, LadderLevel nextNextLevel) {
         boolean leveledUp = false;
         this.earnedPoints = newPoints;
         
@@ -89,7 +92,7 @@ public class UserLadderStatus {
             if (nextNextLevel != null) {
                 this.pointsToNextLevel = nextNextLevel.getPointsRequired() - newPoints;
             } else {
-                this.pointsToNextLevel = 0; // Max level reached
+                this.pointsToNextLevel = 0L; // Max level reached
             }
         } else if (nextLevel != null) {
             this.pointsToNextLevel = nextLevel.getPointsRequired() - newPoints;

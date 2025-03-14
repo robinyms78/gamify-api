@@ -3,7 +3,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.PointsService;
+import sg.edu.ntu.gamify_demo.services.PointsService;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;
 import sg.edu.ntu.gamify_demo.models.PointsTransaction;
@@ -20,7 +20,7 @@ public class RecordTransactionCommand implements TaskEventCommand {
     private final User user;
     private final String taskId;
     private final JsonNode eventData;
-    private final int points;
+    private final Long points;
     private final PointsTransactionRepository pointsTransactionRepository;
     private final PointsService pointsService;
     private final DomainEventPublisher domainEventPublisher;
@@ -42,7 +42,7 @@ public class RecordTransactionCommand implements TaskEventCommand {
             User user,
             String taskId,
             JsonNode eventData,
-            int points,
+            Long points,
             PointsTransactionRepository pointsTransactionRepository,
             PointsService pointsService,
             DomainEventPublisher domainEventPublisher,
@@ -85,9 +85,9 @@ public class RecordTransactionCommand implements TaskEventCommand {
         user.addPointsTransaction(savedTransaction);
         
         // Publish a domain event for points earned
-        int newTotal = user.getAvailablePoints();
+        int newTotal = user.getAvailablePoints().intValue();
         PointsEarnedEvent pointsEarnedEvent = new PointsEarnedEvent(
-                user, points, newTotal, "TASK_COMPLETED", eventData);
+                user, points.intValue(), newTotal, "TASK_COMPLETED", eventData);
         domainEventPublisher.publish(pointsEarnedEvent);
         
         // Return null as we're not creating a task event

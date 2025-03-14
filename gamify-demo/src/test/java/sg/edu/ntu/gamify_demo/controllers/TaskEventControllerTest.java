@@ -1,7 +1,8 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,7 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,9 +27,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.GamificationService;
-import sg.edu.ntu.gamify_demo.Services.LadderService;
-import sg.edu.ntu.gamify_demo.Services.TaskEventService;
+import sg.edu.ntu.gamify_demo.services.GamificationService;
+import sg.edu.ntu.gamify_demo.services.LadderService;
+import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.config.TestSecurityConfig;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.mappers.TaskEventMapper;
@@ -72,8 +73,8 @@ public class TaskEventControllerTest {
         testUser.setId("user123");
         testUser.setUsername("testuser");
         testUser.setEmail("test@example.com");
-        testUser.setEarnedPoints(100);
-        testUser.setAvailablePoints(100);
+        testUser.setEarnedPoints(100L);
+        testUser.setAvailablePoints(100L);
         
         // Create a test task event
         testTaskEvent = new TaskEvent();
@@ -82,7 +83,7 @@ public class TaskEventControllerTest {
         testTaskEvent.setTaskId("task123");
         testTaskEvent.setEventType("TASK_COMPLETED");
         testTaskEvent.setStatus(TaskStatus.COMPLETED);
-        testTaskEvent.setCompletionTime(LocalDateTime.now());
+        testTaskEvent.setCompletionTime(ZonedDateTime.now());
         
         // Mock service responses
         when(userService.getUserById(anyString())).thenReturn(testUser);
@@ -101,9 +102,11 @@ public class TaskEventControllerTest {
             .thenReturn(mockResponse);
         when(taskEventService.getTaskEventById(anyString()))
             .thenReturn(testTaskEvent);
+        ObjectNode taskData = objectMapper.createObjectNode();
+        taskData.put("priority", "HIGH");
         when(taskEventService.calculatePointsForTask(anyString(), any(JsonNode.class)))
             .thenReturn(30); // High priority task
-        when(gamificationService.awardPoints(anyString(), anyInt(), anyString(), any(JsonNode.class)))
+        when(gamificationService.awardPoints(anyString(), anyLong(), anyString(), any(JsonNode.class)))
             .thenReturn(testUser.getEarnedPoints() + 30);
     }
     

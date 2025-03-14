@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.TaskEventService;
+import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventDTO;
 import sg.edu.ntu.gamify_demo.mappers.TaskEventMapper;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;

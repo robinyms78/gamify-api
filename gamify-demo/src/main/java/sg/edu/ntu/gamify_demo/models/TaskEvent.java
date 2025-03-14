@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -56,13 +56,13 @@ public class TaskEvent {
     private TaskStatus status;
     
     @Column(name = "assigned_at")
-    private LocalDateTime assignedAt;
+    private ZonedDateTime assignedAt;
     
     @Column(name = "due_date")
-    private LocalDateTime dueDate;
+    private ZonedDateTime dueDate;
     
     @Column(name = "completion_time")
-    private LocalDateTime completionTime;
+    private ZonedDateTime completionTime;
     
     @Type(JsonType.class)
     @Column(name = "metadata", columnDefinition = "json")
@@ -70,11 +70,14 @@ public class TaskEvent {
     
     @CreationTimestamp
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
     
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
+    
+    @Column(name = "points_earned")
+    private Long pointsEarned;
     
     /**
      * Constructs a TaskEvent for a task assignment.
@@ -85,14 +88,14 @@ public class TaskEvent {
      * @param metadata Additional data about the task.
      * @return A new TaskEvent representing a task assignment.
      */
-    public static TaskEvent createAssignmentEvent(User user, String taskId, LocalDateTime dueDate, JsonNode metadata) {
+    public static TaskEvent createAssignmentEvent(User user, String taskId, ZonedDateTime dueDate, JsonNode metadata) {
         TaskEvent event = new TaskEvent();
         event.eventId = UUID.randomUUID().toString();
         event.user = user;
         event.taskId = taskId;
         event.eventType = "TASK_ASSIGNED";
         event.status = TaskStatus.ASSIGNED;
-        event.assignedAt = LocalDateTime.now();
+        event.assignedAt = ZonedDateTime.now();
         event.dueDate = dueDate;
         event.metadata = metadata;
         return event;
@@ -112,7 +115,7 @@ public class TaskEvent {
     public void markCompleted() {
         this.status = TaskStatus.COMPLETED;
         this.eventType = "TASK_COMPLETED";
-        this.completionTime = LocalDateTime.now();
+        this.completionTime = ZonedDateTime.now();
     }
     
     /**

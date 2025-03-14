@@ -27,7 +27,7 @@ import sg.edu.ntu.gamify_demo.exceptions.AuthenticationException;
 import sg.edu.ntu.gamify_demo.exceptions.DuplicateUserException;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.repositories.UserRepository;
-import sg.edu.ntu.gamify_demo.Services.AuthenticationService;
+import sg.edu.ntu.gamify_demo.services.AuthenticationService;
 
 /**
  * Controller for handling authentication-related endpoints.
@@ -92,8 +92,8 @@ public class AuthController {
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .role(request.role())
                 .department(request.department())
-                .earnedPoints(0)
-                .availablePoints(0)
+                .earnedPoints(0L)
+                .availablePoints(0L)
                 .build();
 
         // Save user to database

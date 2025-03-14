@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.LadderService;
+import sg.edu.ntu.gamify_demo.services.LadderService;
 import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.facades.GamificationFacade;
@@ -60,8 +60,8 @@ public class LadderController {
     @Operation(summary = "Get all levels", 
               description = "Retrieve all ladder levels with their point requirements")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved levels listing")
-    public ResponseEntity<Map<Integer, Integer>> getLadderLevels() {
-        Map<Integer, Integer> levels = ladderService.getLadderLevels();
+    public ResponseEntity<Map<Long, Long>> getLadderLevels() {
+        Map<Long, Long> levels = ladderService.getLadderLevels();
         return ResponseEntity.ok(levels);
     }
     

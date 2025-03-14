@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -17,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import sg.edu.ntu.gamify_demo.Services.LadderStatusServiceImpl;
 import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
@@ -61,14 +61,22 @@ public class LadderStatusServiceImplTest {
                 .passwordHash("hashedpassword")
                 .role(UserRole.EMPLOYEE)
                 .department("IT")
-                .earnedPoints(100)
-                .availablePoints(50)
+                .earnedPoints(100L)
+                .availablePoints(50L)
                 .build();
 
-        level1 = new LadderLevel(1, "Beginner", 0);
-        level2 = new LadderLevel(2, "Intermediate", 200);
+        level1 = LadderLevel.builder()
+                .level(1L)
+                .label("Beginner")
+                .pointsRequired(0L)
+                .build();
+        level2 = LadderLevel.builder()
+                .level(2L)
+                .label("Intermediate")
+                .pointsRequired(200L)
+                .build();
 
-        userLadderStatus = new UserLadderStatus(testUser, level1, 100, 100);
+        userLadderStatus = new UserLadderStatus(testUser, level1, 100L, 100L);
     }
 
     @Test
@@ -106,7 +114,7 @@ public class LadderStatusServiceImplTest {
         when(userService.getUserById(anyString())).thenReturn(testUser);
         when(ladderLevelRepository.findByLevel(1)).thenReturn(level1);
         when(ladderLevelRepository.findAllByOrderByLevelAsc()).thenReturn(Arrays.asList(level1, level2));
-        when(pointsCalculationStrategy.calculatePointsToNextLevel(anyInt(), any(), any())).thenReturn(100);
+        when(pointsCalculationStrategy.calculatePointsToNextLevel(anyLong(), any(), any())).thenReturn(100L);
         when(userLadderStatusRepository.save(any(UserLadderStatus.class))).thenReturn(userLadderStatus);
 
         // Act
@@ -122,13 +130,13 @@ public class LadderStatusServiceImplTest {
     @Test
     public void testUpdateUserLadderStatus_UserLevelsUp_ReturnsUpdatedDTO() {
         // Arrange
-        testUser.setEarnedPoints(250); // Enough for level 2
-        UserLadderStatus updatedStatus = new UserLadderStatus(testUser, level2, 250, 0);
+        testUser.setEarnedPoints(250L); // Set to long to match UserLadderStatus constructor
+        UserLadderStatus updatedStatus = new UserLadderStatus(testUser, level2, 250L, 0L);
 
         when(userService.getUserById(anyString())).thenReturn(testUser);
         when(userLadderStatusRepository.findById(anyString())).thenReturn(Optional.of(userLadderStatus));
         when(ladderLevelRepository.findAllByOrderByLevelAsc()).thenReturn(Arrays.asList(level1, level2));
-        when(pointsCalculationStrategy.calculatePointsToNextLevel(anyInt(), any(), any())).thenReturn(0);
+        when(pointsCalculationStrategy.calculatePointsToNextLevel(anyLong(), any(), any())).thenReturn(0L);
         when(userLadderStatusRepository.save(any(UserLadderStatus.class))).thenReturn(updatedStatus);
 
         // Act

@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,17 +61,17 @@ public class LadderStatusIntegrationTest {
     public void setup() {
         // Create test ladder levels
         level1 = new LadderLevel();
-        level1.setLevel(1);
+        level1.setLevel(1L);
         level1.setLabel("Beginner");
-        level1.setPointsRequired(0);
-        level1.setCreatedAt(LocalDateTime.now());
+        level1.setPointsRequired(0L);
+        level1.setCreatedAt(ZonedDateTime.now());
         level1 = ladderLevelRepository.save(level1);
 
         level2 = new LadderLevel();
-        level2.setLevel(2);
+        level2.setLevel(2L);
         level2.setLabel("Intermediate");
-        level2.setPointsRequired(200);
-        level2.setCreatedAt(LocalDateTime.now());
+        level2.setPointsRequired(200L);
+        level2.setCreatedAt(ZonedDateTime.now());
         level2 = ladderLevelRepository.save(level2);
 
         // Create test user
@@ -82,8 +82,8 @@ public class LadderStatusIntegrationTest {
         testUser.setPasswordHash("hashedpassword");
         testUser.setRole(UserRole.EMPLOYEE);
         testUser.setDepartment("IT");
-        testUser.setEarnedPoints(100);
-        testUser.setAvailablePoints(50);
+        testUser.setEarnedPoints(100L);
+        testUser.setAvailablePoints(50L);
         testUser = userRepository.save(testUser);
 
         // Create user ladder status
@@ -92,7 +92,7 @@ public class LadderStatusIntegrationTest {
         status.setCurrentLevel(level1);
         status.setEarnedPoints(testUser.getEarnedPoints());
         status.setPointsToNextLevel(level2.getPointsRequired() - testUser.getEarnedPoints());
-        status.setUpdatedAt(LocalDateTime.now());
+        status.setUpdatedAt(ZonedDateTime.now());
         userLadderStatusRepository.save(status);
     }
 
@@ -133,7 +133,7 @@ public class LadderStatusIntegrationTest {
     @Test
     public void testLevelUp() throws Exception {
         // Arrange - Update user points to level up
-        testUser.setEarnedPoints(250); // Above level 2 threshold
+        testUser.setEarnedPoints(250L); // Above level 2 threshold
         userRepository.save(testUser);
 
         // Get the user's ladder status
@@ -141,9 +141,9 @@ public class LadderStatusIntegrationTest {
         assertNotNull(status);
         
         // Update the ladder status directly
-        status.setEarnedPoints(250);
+        status.setEarnedPoints(250L);
         status.setCurrentLevel(level2);
-        status.setPointsToNextLevel(0);
+        status.setPointsToNextLevel(0L);
         userLadderStatusRepository.save(status);
 
         // Get updated status

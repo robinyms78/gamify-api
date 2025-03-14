@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -46,18 +46,18 @@ private User user;
     private String department;
     
     @Column(name = "earned_points", nullable = false)
-    private int earnedPoints;
+    private Long earnedPoints;
     
     @ManyToOne
     @JoinColumn(name = "current_level", nullable = false)
     private LadderLevel currentLevel;
     
     @Column(name = "rank", nullable = false)
-    private int rank;
+    private Long rank;
     
     @CreationTimestamp
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
     
     /**
      * Constructs a Leaderboard entry with the provided details.
@@ -67,7 +67,7 @@ private User user;
      * @param currentLevel The user's current level.
      * @param rank The user's rank on the leaderboard.
      */
-    public Leaderboard(User user, int earnedPoints, LadderLevel currentLevel, int rank) {
+    public Leaderboard(User user, Long earnedPoints, LadderLevel currentLevel, Long rank) {
         this.user = user;
         this.id = user.getId(); // Set the ID from the user
         this.username = user.getUsername();
@@ -82,7 +82,7 @@ private User user;
      * 
      * @param newRank The new rank for the user.
      */
-    public void updateRank(int newRank) {
+    public void updateRank(Long newRank) {
         this.rank = newRank;
     }
     
@@ -104,7 +104,7 @@ private User user;
      * @param level The user's current level.
      * @param earnedPoints The total points earned by the user.
      */
-    public void updateLevelAndPoints(LadderLevel level, int earnedPoints) {
+    public void updateLevelAndPoints(LadderLevel level, Long earnedPoints) {
         this.currentLevel = level;
         this.earnedPoints = earnedPoints;
         // Also sync other user data to ensure consistency

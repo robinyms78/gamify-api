@@ -1,6 +1,6 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,11 +92,11 @@ public class LadderStatusServiceImpl implements LadderStatusService {
         LadderLevel nextLevel = findNextLevel(levels, newLevel);
         
         // Calculate points to next level using the strategy
-        int pointsToNextLevel = pointsCalculationStrategy.calculatePointsToNextLevel(
-                user.getEarnedPoints(), newLevel, nextLevel);
+        Long pointsToNextLevel = (long) pointsCalculationStrategy.calculatePointsToNextLevel(
+                user.getEarnedPoints().intValue(), newLevel, nextLevel);
         
         status.setPointsToNextLevel(pointsToNextLevel);
-        status.setUpdatedAt(LocalDateTime.now());
+        status.setUpdatedAt(ZonedDateTime.now());
         
         UserLadderStatus updatedStatus = userLadderStatusRepository.save(status);
         
@@ -141,10 +141,10 @@ public class LadderStatusServiceImpl implements LadderStatusService {
         if (firstLevel == null) {
             // Create a default first level if none exists
             firstLevel = new LadderLevel();
-            firstLevel.setLevel(1);
+            firstLevel.setLevel(1L);
             firstLevel.setLabel("Beginner");
-            firstLevel.setPointsRequired(0);
-            firstLevel.setCreatedAt(LocalDateTime.now());
+            firstLevel.setPointsRequired(0L);
+            firstLevel.setCreatedAt(ZonedDateTime.now());
             firstLevel = ladderLevelRepository.save(firstLevel);
         }
         
@@ -159,11 +159,11 @@ public class LadderStatusServiceImpl implements LadderStatusService {
         LadderLevel nextLevel = findNextLevel(levels, firstLevel);
         
         // Calculate points to next level using the strategy
-        int pointsToNextLevel = pointsCalculationStrategy.calculatePointsToNextLevel(
-                user.getEarnedPoints(), firstLevel, nextLevel);
+        Long pointsToNextLevel = (long) pointsCalculationStrategy.calculatePointsToNextLevel(
+                user.getEarnedPoints().intValue(), firstLevel, nextLevel);
         
         status.setPointsToNextLevel(pointsToNextLevel);
-        status.setUpdatedAt(LocalDateTime.now());
+        status.setUpdatedAt(ZonedDateTime.now());
         
         return userLadderStatusRepository.save(status);
     }
@@ -192,10 +192,10 @@ public class LadderStatusServiceImpl implements LadderStatusService {
      */
     private LadderStatusDTO convertToDTO(UserLadderStatus status) {
         return LadderStatusDTO.builder()
-                .currentLevel(status.getCurrentLevel().getLevel())
+                .currentLevel(status.getCurrentLevel().getLevel().intValue())
                 .levelLabel(status.getCurrentLevel().getLabel())
-                .earnedPoints(status.getEarnedPoints())
-                .pointsToNextLevel(status.getPointsToNextLevel())
+                .earnedPoints(status.getEarnedPoints().intValue())
+                .pointsToNextLevel(status.getPointsToNextLevel().intValue())
                 .build();
     }
 }

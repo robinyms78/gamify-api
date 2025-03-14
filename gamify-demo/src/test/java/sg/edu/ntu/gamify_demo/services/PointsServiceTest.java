@@ -19,8 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.LadderService;
-import sg.edu.ntu.gamify_demo.Services.PointsService;
+import sg.edu.ntu.gamify_demo.interfaces.LadderStatusService;
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;
@@ -42,7 +41,7 @@ public class PointsServiceTest {
     private EventPublisher eventPublisher;
     private DomainEventPublisher domainEventPublisher;
     private ObjectMapper objectMapper;
-    private LadderService ladderService;
+    private LadderStatusService ladderService;
     private User testUser;
     private JsonNode testMetadata;
 
@@ -54,14 +53,14 @@ public class PointsServiceTest {
         eventPublisher = mock(EventPublisher.class);
         domainEventPublisher = mock(DomainEventPublisher.class);
         objectMapper = new ObjectMapper();
-        ladderService = mock(LadderService.class);
+        ladderService = mock(LadderStatusService.class);
 
         // Create test user
         testUser = new User();
         testUser.setId("user123");
         testUser.setUsername("testuser");
-        testUser.setEarnedPoints(100);
-        testUser.setAvailablePoints(100);
+        testUser.setEarnedPoints(100L);
+        testUser.setAvailablePoints(100L);
 
         // Create test metadata
         ObjectNode metadata = objectMapper.createObjectNode();
@@ -85,11 +84,11 @@ public class PointsServiceTest {
     @Test
     public void testAwardPoints_PublishesDomainEvent() {
         // Arrange
-        int pointsToAward = 50;
+        long pointsToAward = 50L;
         String source = "TEST_SOURCE";
 
         // Act
-        int newPoints = pointsService.awardPoints("user123", pointsToAward, source, testMetadata);
+        long newPoints = pointsService.awardPoints("user123", pointsToAward, source, testMetadata);
 
         // Assert
         assertEquals(150, newPoints); // 100 + 50 = 150
@@ -118,7 +117,7 @@ public class PointsServiceTest {
     @Test
     public void testSpendPoints_PublishesDomainEvent() {
         // Arrange
-        int pointsToSpend = 30;
+        long pointsToSpend = 30L;
         String source = "TEST_SPEND";
 
         // Act
@@ -148,7 +147,7 @@ public class PointsServiceTest {
     @Test
     public void testSpendPoints_InsufficientPoints() {
         // Arrange
-        int pointsToSpend = 150; // More than available (100)
+        long pointsToSpend = 150L; // More than available (100)
         String source = "TEST_SPEND";
 
         // Act

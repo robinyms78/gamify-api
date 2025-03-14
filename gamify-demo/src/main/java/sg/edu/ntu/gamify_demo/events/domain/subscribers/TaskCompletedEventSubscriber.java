@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import sg.edu.ntu.gamify_demo.Services.PointsService;
+import sg.edu.ntu.gamify_demo.services.PointsService;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEvent;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventSubscriber;
 import sg.edu.ntu.gamify_demo.events.domain.TaskCompletedEvent;

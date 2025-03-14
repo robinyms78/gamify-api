@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.PointsService;
-import sg.edu.ntu.gamify_demo.Services.TaskEventService;
+import sg.edu.ntu.gamify_demo.services.PointsService;
+import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
@@ -96,7 +96,7 @@ public class GamificationFacade {
         // If this is a task completion event, award points
         if ("TASK_COMPLETED".equals(eventType)) {
             // Calculate points based on task priority
-            int points = pointsCalculationStrategy.calculatePoints(taskId, eventData);
+            Long points = (long) pointsCalculationStrategy.calculatePoints(taskId, eventData);
             
             // Create metadata for the points transaction
             ObjectNode metadata = objectMapper.createObjectNode();
@@ -167,7 +167,7 @@ public class GamificationFacade {
      * @return The user's new total earned points.
      */
     @Transactional
-    public int awardPoints(String userId, int points, String source, JsonNode metadata) {
+    public Long awardPoints(String userId, Long points, String source, JsonNode metadata) {
         return pointsService.awardPoints(userId, points, source, metadata);
     }
     

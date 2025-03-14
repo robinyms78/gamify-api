@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -46,7 +46,7 @@ public class UserAchievement {
     private Achievement achievement;
     
     @Column(name = "earned_at")
-    private LocalDateTime earnedAt;
+    private ZonedDateTime earnedAt;
     
     @Type(JsonType.class)
     @Column(name = "metadata", columnDefinition = "json")
@@ -62,7 +62,7 @@ public class UserAchievement {
     public UserAchievement(User user, Achievement achievement, JsonNode metadata) {
         this.user = user;
         this.achievement = achievement;
-        this.earnedAt = LocalDateTime.now();
+        this.earnedAt = ZonedDateTime.now();
         this.metadata = metadata;
     }
 }

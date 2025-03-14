@@ -13,15 +13,15 @@ import sg.edu.ntu.gamify_demo.models.LadderLevel;
 public class DefaultPointsCalculationStrategy implements PointsCalculationStrategy {
 
     @Override
-    public int calculatePointsToNextLevel(int currentPoints, LadderLevel currentLevel, LadderLevel nextLevel) {
+    public long calculatePointsToNextLevel(long currentPoints, LadderLevel currentLevel, LadderLevel nextLevel) {
         if (nextLevel == null) {
             // User is at the maximum level
             return 0;
         }
         
-        int pointsToNextLevel = nextLevel.getPointsRequired() - currentPoints;
+        long pointsToNextLevel = nextLevel.getPointsRequired() - currentPoints;
         
         // Ensure we don't return a negative value
-        return Math.max(0, pointsToNextLevel);
+        return (long) Math.max(0, pointsToNextLevel);
     }
 }

@@ -1,6 +1,6 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,9 +41,9 @@ public class LadderService {
      * 
      * @return A map of level numbers to points required.
      */
-    public Map<Integer, Integer> getLadderLevels() {
+    public Map<Long, Long> getLadderLevels() {
         List<LadderLevel> levels = ladderLevelRepository.findAll();
-        Map<Integer, Integer> ladderLevels = new HashMap<>();
+        Map<Long, Long> ladderLevels = new HashMap<>();
         
         for (LadderLevel level : levels) {
             ladderLevels.put(level.getLevel(), level.getPointsRequired());
@@ -89,10 +89,10 @@ public class LadderService {
         if (firstLevel == null) {
             // Create a default first level if none exists
             firstLevel = new LadderLevel();
-            firstLevel.setLevel(1);
+            firstLevel.setLevel(1L);
             firstLevel.setLabel("Beginner");
-            firstLevel.setPointsRequired(0);
-            firstLevel.setCreatedAt(LocalDateTime.now());
+            firstLevel.setPointsRequired(0L);
+            firstLevel.setCreatedAt(ZonedDateTime.now());
             firstLevel = ladderLevelRepository.save(firstLevel);
         }
         
@@ -103,13 +103,13 @@ public class LadderService {
         status.setEarnedPoints(user.getEarnedPoints());
         
         // Calculate points to next level
-        LadderLevel nextLevel = ladderLevelRepository.findByLevel(firstLevel.getLevel() + 1);
-        int pointsToNextLevel = nextLevel != null ? 
+        LadderLevel nextLevel = ladderLevelRepository.findByLevel(firstLevel.getLevel().intValue() + 1);
+        Long pointsToNextLevel = nextLevel != null ? 
                 nextLevel.getPointsRequired() - user.getEarnedPoints() : 
-                Integer.MAX_VALUE;
+                Long.MAX_VALUE;
         
-        status.setPointsToNextLevel(Math.max(0, pointsToNextLevel));
-        status.setUpdatedAt(LocalDateTime.now());
+        status.setPointsToNextLevel(Math.max(0L, pointsToNextLevel));
+        status.setUpdatedAt(ZonedDateTime.now());
         
         return userLadderStatusRepository.save(status);
     }
@@ -162,12 +162,12 @@ public class LadderService {
             }
         }
         
-        int pointsToNextLevel = nextLevel != null ? 
+        Long pointsToNextLevel = nextLevel != null ? 
                 nextLevel.getPointsRequired() - user.getEarnedPoints() : 
-                Integer.MAX_VALUE;
+                Long.MAX_VALUE;
         
-        status.setPointsToNextLevel(Math.max(0, pointsToNextLevel));
-        status.setUpdatedAt(LocalDateTime.now());
+        status.setPointsToNextLevel(Math.max(0L, pointsToNextLevel));
+        status.setUpdatedAt(ZonedDateTime.now());
         
         return userLadderStatusRepository.save(status);
     }
@@ -194,10 +194,10 @@ public class LadderService {
     @Transactional
     public LadderLevel createLadderLevel(int level, String label, int pointsRequired) {
         LadderLevel ladderLevel = new LadderLevel();
-        ladderLevel.setLevel(level);
+        ladderLevel.setLevel((long)level);
         ladderLevel.setLabel(label);
-        ladderLevel.setPointsRequired(pointsRequired);
-        ladderLevel.setCreatedAt(LocalDateTime.now());
+        ladderLevel.setPointsRequired((long)pointsRequired);
+        ladderLevel.setCreatedAt(ZonedDateTime.now());
         
         return ladderLevelRepository.save(ladderLevel);
     }
@@ -219,7 +219,7 @@ public class LadderService {
         }
         
         ladderLevel.setLabel(label);
-        ladderLevel.setPointsRequired(pointsRequired);
+        ladderLevel.setPointsRequired((long)pointsRequired);
         
         return ladderLevelRepository.save(ladderLevel);
     }

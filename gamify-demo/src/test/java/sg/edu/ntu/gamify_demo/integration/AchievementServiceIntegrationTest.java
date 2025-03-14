@@ -73,8 +73,8 @@ public class AchievementServiceIntegrationTest {
         testUser.setEmail("test@example.com");
         testUser.setPasswordHash("hashedpassword");
         testUser.setRole(UserRole.EMPLOYEE);
-        testUser.setEarnedPoints(100);
-        testUser.setAvailablePoints(100);
+        testUser.setEarnedPoints(100L);
+        testUser.setAvailablePoints(100L);
         userRepository.save(testUser);
     }
     

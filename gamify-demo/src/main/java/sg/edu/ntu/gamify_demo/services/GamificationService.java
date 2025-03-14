@@ -1,4 +1,4 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
 import java.util.List;
 
@@ -43,9 +43,9 @@ public class GamificationService {
      * @param userId The ID of the user.
      * @return The user's earned points.
      */
-    public int getUserPoints(String userId) {
+    public Long getUserPoints(String userId) {
         User user = userService.getUserById(userId);
-        return user != null ? user.getEarnedPoints() : 0;
+        return user != null ? user.getEarnedPoints() : 0L;
     }
     
     /**
@@ -58,16 +58,16 @@ public class GamificationService {
      * @return The user's new total earned points.
      */
     @Transactional
-    public int awardPoints(String userId, int points, String eventType, JsonNode eventData) {
+    public Long awardPoints(String userId, Long points, String eventType, JsonNode eventData) {
         User user = userService.getUserById(userId);
         
         if (user == null) {
-            return 0;
+            return 0L;
         }
         
         // Update user's points
-        int currentPoints = user.getEarnedPoints();
-        int newPoints = currentPoints + points;
+        Long currentPoints = user.getEarnedPoints();
+        Long newPoints = currentPoints + points;
         user.setEarnedPoints(newPoints);
         user.setAvailablePoints(user.getAvailablePoints() + points);
         userService.updateUser(user.getId(), user);
@@ -126,14 +126,14 @@ public class GamificationService {
      * @return True if the points were successfully spent, false if the user doesn't have enough points.
      */
     @Transactional
-    public boolean spendPoints(String userId, int points, String eventType, JsonNode eventData) {
+    public boolean spendPoints(String userId, Long points, String eventType, JsonNode eventData) {
         User user = userService.getUserById(userId);
         
         if (user == null) {
             return false;
         }
         
-        int availablePoints = user.getAvailablePoints();
+        Long availablePoints = user.getAvailablePoints();
         
         if (availablePoints < points) {
             return false;

@@ -22,15 +22,16 @@ import sg.edu.ntu.gamify_demo.repositories.RewardRepository;
 @Component
 public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemptionService {
 
-    private UserService userService;
+    private final UserService userService;
     private final RewardRepository rewardRepository;
     private final RewardRedemptionRepository rewardRedemptionRepository;
     private final Logger logger = LoggerFactory.getLogger(RewardService.class);
 
     // Constructor
-    public RewardServiceWithLoggingImpl(RewardRepository rewardRepository, RewardRedemptionRepository rewardRedemptionRepository) {
+    public RewardServiceWithLoggingImpl(RewardRepository rewardRepository, RewardRedemptionRepository rewardRedemptionRepository, UserService userService) {
         this.rewardRepository = rewardRepository;
         this.rewardRedemptionRepository = rewardRedemptionRepository;
+        this.userService = userService;
     }
 
     // Method
@@ -128,12 +129,12 @@ public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemp
     public RedemptionResult redeemReward(String userId, String rewardId) {
         User user = userService.getUserById(userId);
         Reward reward = rewardRepository.findById(rewardId).get();
-        int userPoints = user.getEarnedPoints();
-        int rewardPoints = reward.getCostInPoints();
+        Long userPoints = user.getEarnedPoints();
+        Long rewardPoints = reward.getCostInPoints();
         if(userPoints < rewardPoints) {
             return new RedemptionResult(false, "Insufficient points");
         } else {
-            userService.deductPoints(userId, rewardPoints);
+            userService.deductPoints(userId, rewardPoints.intValue());
             createRedemptionRecord(user, reward);
             return new RedemptionResult(true, "Reward redeemed successfully");
         }

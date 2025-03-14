@@ -24,8 +24,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import sg.edu.ntu.gamify_demo.Services.UserServiceImpl;
-import sg.edu.ntu.gamify_demo.Services.UserValidator;
+import sg.edu.ntu.gamify_demo.services.UserServiceImpl;
+import sg.edu.ntu.gamify_demo.services.UserValidator;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
 import sg.edu.ntu.gamify_demo.models.User;
@@ -64,8 +64,8 @@ public class UserServiceTest {
                 .passwordHash("hashedpassword1")
                 .role(UserRole.EMPLOYEE)
                 .department("Engineering")
-                .earnedPoints(100)
-                .availablePoints(100)
+                .earnedPoints(100L)
+                .availablePoints(100L)
                 .build();
 
         testUser2 = User.builder()
@@ -75,8 +75,8 @@ public class UserServiceTest {
                 .passwordHash("hashedpassword2")
                 .role(UserRole.MANAGER)
                 .department("Marketing")
-                .earnedPoints(200)
-                .availablePoints(150)
+                .earnedPoints(200L)
+                .availablePoints(150L)
                 .build();
     }
 
@@ -196,8 +196,8 @@ public class UserServiceTest {
                 .passwordHash(testUser1.getPasswordHash())
                 .role(testUser1.getRole())
                 .department("Research") // Updated department
-                .earnedPoints(150) // Updated points
-                .availablePoints(120) // Updated points
+                .earnedPoints(150L) // Updated points
+                .availablePoints(120L) // Updated points to match the type
                 .build();
 
         // Call the service method

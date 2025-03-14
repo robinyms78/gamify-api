@@ -65,8 +65,8 @@ public class UserIntegrationTest {
                 .passwordHash("hashedpassword")
                 .role(UserRole.EMPLOYEE)
                 .department("Testing")
-                .earnedPoints(100)
-                .availablePoints(100)
+                .earnedPoints(100L)
+                .availablePoints(100L)
                 .build();
     }
 
@@ -129,8 +129,8 @@ public class UserIntegrationTest {
                 .passwordHash("hashedpassword")
                 .role(UserRole.MANAGER)
                 .department("Management")
-                .earnedPoints(200)
-                .availablePoints(150)
+                .earnedPoints(200L)
+                .availablePoints(150L)
                 .build();
         
         userRepository.save(testUser);
@@ -160,8 +160,8 @@ public class UserIntegrationTest {
                 .passwordHash(testUser.getPasswordHash()) // Same password hash
                 .role(testUser.getRole()) // Same role
                 .department("Updated Department") // Updated department
-                .earnedPoints(150) // Updated points
-                .availablePoints(120) // Updated points
+                .earnedPoints(150L) // Updated points
+                .availablePoints(120L) // Updated points
                 .build();
 
         // Perform PUT request to update user

@@ -1,6 +1,7 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 import java.util.List;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,7 +29,6 @@ import lombok.Setter;
 public class Reward {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private String id;
 
@@ -38,17 +38,17 @@ public class Reward {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "costInPoints")
-    private int costInPoints;
+    @Column(name = "cost_in_points")
+    private Long costInPoints;
 
     @Column(name = "available")
     private boolean available;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     @OneToMany(mappedBy = "reward")
     private List<Redemption> redemptions;
@@ -63,4 +63,17 @@ public class Reward {
      * @param createdAt The timestamp of when the reward was created.
      * @param updatedAt The timestamp of when the reward was last updated.
      */
+     
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        if (id == null) {
+            id = UUID.randomUUID().toString();
+        }
+        if (createdAt == null) {
+            createdAt = ZonedDateTime.now();
+        }
+        if (updatedAt == null) {
+            updatedAt = ZonedDateTime.now();
+        }
+    }
 }

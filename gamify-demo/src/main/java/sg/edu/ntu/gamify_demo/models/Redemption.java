@@ -1,6 +1,7 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,7 +31,6 @@ import lombok.Setter;
 public class Redemption {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private String id;
     
@@ -38,10 +38,10 @@ public class Redemption {
     private String status;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
 
     @JsonIgnoreProperties("redemptions")
     @ManyToOne(optional = false)
@@ -63,10 +63,24 @@ public class Redemption {
      * @param updatedAt The timestamp of when the redemption was last updated.
      */
     public Redemption(User user, Reward reward, String status) {
+        this.id = UUID.randomUUID().toString();
         this.user = user;
         this.reward = reward;
         this.status = status;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+        this.createdAt = ZonedDateTime.now();
+        this.updatedAt = ZonedDateTime.now();
+    }
+    
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        if (id == null) {
+            id = UUID.randomUUID().toString();
+        }
+        if (createdAt == null) {
+            createdAt = ZonedDateTime.now();
+        }
+        if (updatedAt == null) {
+            updatedAt = ZonedDateTime.now();
+        }
     }
 }

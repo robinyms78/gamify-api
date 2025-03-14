@@ -1,13 +1,13 @@
 package sg.edu.ntu.gamify_demo.commands;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.PointsService;
+import sg.edu.ntu.gamify_demo.services.PointsService;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.TaskCompletedEvent;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
@@ -71,15 +71,14 @@ public class TaskCompletedCommand implements TaskEventCommand {
         taskEvent.setTaskId(taskId);
         taskEvent.setEventType("TASK_COMPLETED");
         taskEvent.setMetadata(eventData);
-        taskEvent.setCreatedAt(LocalDateTime.now());
         taskEvent.setStatus(TaskStatus.COMPLETED);
-        taskEvent.setCompletionTime(LocalDateTime.now());
+        taskEvent.setCompletionTime(ZonedDateTime.now());
         
         // Save the task event
         TaskEvent savedEvent = taskEventRepository.save(taskEvent);
         
         // Calculate points based on task priority
-        int points = pointsCalculationStrategy.calculatePoints(taskId, eventData);
+        Long points = (long) pointsCalculationStrategy.calculatePoints(taskId, eventData);
         
         // Create metadata for the points transaction
         ObjectNode metadata = objectMapper.createObjectNode();
@@ -100,7 +99,7 @@ public class TaskCompletedCommand implements TaskEventCommand {
                     "TASK_COMPLETED",
                     user,
                     savedEvent,
-                    points,
+                    points.intValue(),
                     eventData);
             
             domainEventPublisher.publish(domainEvent);

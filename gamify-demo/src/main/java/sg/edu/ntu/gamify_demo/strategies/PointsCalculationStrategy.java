@@ -16,5 +16,5 @@ public interface PointsCalculationStrategy {
      * @param nextLevel The next ladder level, or null if at max level.
      * @return The points needed to reach the next level, or 0 if at max level.
      */
-    int calculatePointsToNextLevel(int currentPoints, LadderLevel currentLevel, LadderLevel nextLevel);
+    long calculatePointsToNextLevel(long currentPoints, LadderLevel currentLevel, LadderLevel nextLevel);
 }

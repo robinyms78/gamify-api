@@ -53,7 +53,7 @@ public class AchievementMapper {
                 .id(achievement.getAchievementId())
                 .name(achievement.getName())
                 .description(achievement.getDescription())
-                .earnedAt(userAchievement.getEarnedAt())
+                .earnedAt(userAchievement.getEarnedAt().toLocalDateTime())
                 .metadata(userAchievement.getMetadata())
                 .earned(true)
                 .build();

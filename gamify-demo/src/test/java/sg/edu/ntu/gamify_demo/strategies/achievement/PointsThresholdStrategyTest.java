@@ -3,6 +3,7 @@ package sg.edu.ntu.gamify_demo.strategies.achievement;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,7 +29,7 @@ public class PointsThresholdStrategyTest {
     public void testEvaluate_UserMeetsThreshold_ReturnsTrue() {
         // Arrange
         User user = new User();
-        user.setEarnedPoints(100);
+        user.setEarnedPoints(100L);
         
         ObjectNode criteria = objectMapper.createObjectNode();
         criteria.put("type", "POINTS_THRESHOLD");
@@ -45,7 +46,7 @@ public class PointsThresholdStrategyTest {
     public void testEvaluate_UserBelowThreshold_ReturnsFalse() {
         // Arrange
         User user = new User();
-        user.setEarnedPoints(30);
+        user.setEarnedPoints(30L);
         
         ObjectNode criteria = objectMapper.createObjectNode();
         criteria.put("type", "POINTS_THRESHOLD");
@@ -62,7 +63,7 @@ public class PointsThresholdStrategyTest {
     public void testEvaluate_UserEqualsThreshold_ReturnsTrue() {
         // Arrange
         User user = new User();
-        user.setEarnedPoints(50);
+        user.setEarnedPoints(50L);
         
         ObjectNode criteria = objectMapper.createObjectNode();
         criteria.put("type", "POINTS_THRESHOLD");
@@ -79,7 +80,7 @@ public class PointsThresholdStrategyTest {
     public void testEvaluate_NullCriteria_ReturnsFalse() {
         // Arrange
         User user = new User();
-        user.setEarnedPoints(100);
+        user.setEarnedPoints(100L);
         
         // Act
         boolean result = strategy.evaluate(user, null);
@@ -92,7 +93,7 @@ public class PointsThresholdStrategyTest {
     public void testEvaluate_MissingThreshold_ReturnsFalse() {
         // Arrange
         User user = new User();
-        user.setEarnedPoints(100);
+        user.setEarnedPoints(100L);
         
         ObjectNode criteria = objectMapper.createObjectNode();
         criteria.put("type", "POINTS_THRESHOLD");

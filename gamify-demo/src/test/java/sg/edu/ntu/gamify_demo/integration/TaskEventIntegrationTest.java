@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.Services.LadderService;
-import sg.edu.ntu.gamify_demo.Services.TaskEventService;
+import sg.edu.ntu.gamify_demo.services.LadderService;
+import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.config.TestIntegrationConfig;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
@@ -80,21 +80,21 @@ public class TaskEventIntegrationTest {
         testUser.setEmail("taskuser@example.com");
         testUser.setPasswordHash("password");
         testUser.setRole(sg.edu.ntu.gamify_demo.models.enums.UserRole.EMPLOYEE);
-        testUser.setEarnedPoints(0);
-        testUser.setAvailablePoints(0);
+        testUser.setEarnedPoints(0L);
+        testUser.setAvailablePoints(0L);
         testUser = userRepository.save(testUser);
         
         // Create ladder levels
         level1 = new LadderLevel();
-        level1.setLevel(1);
+        level1.setLevel(1L);
         level1.setLabel("Beginner");
-        level1.setPointsRequired(0);
+        level1.setPointsRequired(0L);
         level1 = ladderLevelRepository.save(level1);
         
         level2 = new LadderLevel();
-        level2.setLevel(2);
+        level2.setLevel(2L);
         level2.setLabel("Intermediate");
-        level2.setPointsRequired(50);
+        level2.setPointsRequired(50L);
         level2 = ladderLevelRepository.save(level2);
         
         // Initialize user ladder status

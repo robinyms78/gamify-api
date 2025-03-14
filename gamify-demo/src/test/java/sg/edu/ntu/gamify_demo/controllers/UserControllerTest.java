@@ -66,8 +66,8 @@ public class UserControllerTest {
                 .passwordHash("hashedpassword1")
                 .role(UserRole.EMPLOYEE)
                 .department("Engineering")
-                .earnedPoints(100)
-                .availablePoints(100)
+                .earnedPoints(100L)
+                .availablePoints(100L)
                 .build();
 
         testUser2 = User.builder()
@@ -77,8 +77,8 @@ public class UserControllerTest {
                 .passwordHash("hashedpassword2")
                 .role(UserRole.MANAGER)
                 .department("Marketing")
-                .earnedPoints(200)
-                .availablePoints(150)
+                .earnedPoints(200L)
+                .availablePoints(150L)
                 .build();
     }
 
@@ -174,8 +174,8 @@ public class UserControllerTest {
                 .passwordHash(testUser1.getPasswordHash())
                 .role(testUser1.getRole())
                 .department("Research") // Updated department
-                .earnedPoints(150) // Updated points
-                .availablePoints(120) // Updated points
+                .earnedPoints(150L) // Updated points
+                .availablePoints(120L) // Updated points
                 .build();
 
         // Mock service to return the updated user

@@ -1,6 +1,6 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +12,7 @@ import sg.edu.ntu.gamify_demo.events.EventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;
 import sg.edu.ntu.gamify_demo.events.domain.PointsSpentEvent;
+import sg.edu.ntu.gamify_demo.interfaces.LadderStatusService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.PointsTransaction;
 import sg.edu.ntu.gamify_demo.models.User;
@@ -29,7 +30,7 @@ public class PointsService {
     private final EventPublisher eventPublisher;
     private final DomainEventPublisher domainEventPublisher;
     private final ObjectMapper objectMapper;
-    private final LadderService ladderService;
+    private final LadderStatusService ladderService;
     
     /**
      * Constructor for dependency injection.
@@ -40,7 +41,7 @@ public class PointsService {
             EventPublisher eventPublisher,
             DomainEventPublisher domainEventPublisher,
             ObjectMapper objectMapper,
-            LadderService ladderService) {
+            LadderStatusService ladderService) {
         this.userService = userService;
         this.pointsTransactionRepository = pointsTransactionRepository;
         this.eventPublisher = eventPublisher;
@@ -55,9 +56,9 @@ public class PointsService {
      * @param userId The ID of the user.
      * @return The user's earned points.
      */
-    public int getUserPoints(String userId) {
+    public Long getUserPoints(String userId) {
         User user = userService.getUserById(userId);
-        return user != null ? user.getEarnedPoints() : 0;
+        return user != null ? user.getEarnedPoints() : 0L;
     }
     
     /**
@@ -70,23 +71,23 @@ public class PointsService {
      * @return The user's new total earned points.
      */
     @Transactional
-    public int awardPoints(String userId, int points, String source, JsonNode metadata) {
+    public Long awardPoints(String userId, Long points, String source, JsonNode metadata) {
         User user = userService.getUserById(userId);
         
         if (user == null) {
-            return 0;
+            return 0L;
         }
         
         // Update user's points
-        int currentPoints = user.getEarnedPoints();
-        int newPoints = currentPoints + points;
+        Long currentPoints = user.getEarnedPoints();
+        Long newPoints = currentPoints + points;
         user.setEarnedPoints(newPoints);
         user.setAvailablePoints(user.getAvailablePoints() + points);
         userService.updateUser(user.getId(), user);
         
         // Create a points transaction
         PointsTransaction transaction = new PointsTransaction(user, source, points, metadata);
-        transaction.setCreatedAt(LocalDateTime.now());
+        transaction.setCreatedAt(ZonedDateTime.now());
         pointsTransactionRepository.save(transaction);
         
         // Update the user's ladder status
@@ -94,7 +95,7 @@ public class PointsService {
         
         // Publish points earned event using domain events
         if (domainEventPublisher != null) {
-            PointsEarnedEvent event = new PointsEarnedEvent(user, points, newPoints, source, metadata);
+            PointsEarnedEvent event = new PointsEarnedEvent(user, points.intValue(), newPoints.intValue(), source, metadata);
             domainEventPublisher.publish(event);
         }
         // Legacy event publishing (will be handled by DomainEventPublisher's legacy forwarding)
@@ -112,14 +113,14 @@ public class PointsService {
      * @return True if the points were successfully spent, false if the user doesn't have enough points.
      */
     @Transactional
-    public boolean spendPoints(String userId, int points, String source, JsonNode metadata) {
+    public boolean spendPoints(String userId, Long points, String source, JsonNode metadata) {
         User user = userService.getUserById(userId);
         
         if (user == null) {
             return false;
         }
         
-        int availablePoints = user.getAvailablePoints();
+        Long availablePoints = user.getAvailablePoints();
         
         if (availablePoints < points) {
             return false;
@@ -131,12 +132,12 @@ public class PointsService {
         
         // Create a points transaction (negative points for spending)
         PointsTransaction transaction = new PointsTransaction(user, source, -points, metadata);
-        transaction.setCreatedAt(LocalDateTime.now());
+        transaction.setCreatedAt(ZonedDateTime.now());
         pointsTransactionRepository.save(transaction);
         
         // Publish points spent event using domain events
         if (domainEventPublisher != null) {
-            PointsSpentEvent event = new PointsSpentEvent(user, points, user.getAvailablePoints(), source, metadata);
+            PointsSpentEvent event = new PointsSpentEvent(user, points.intValue(), user.getAvailablePoints().intValue(), source, metadata);
             domainEventPublisher.publish(event);
         }
         // Legacy event publishing (will be handled by DomainEventPublisher's legacy forwarding)

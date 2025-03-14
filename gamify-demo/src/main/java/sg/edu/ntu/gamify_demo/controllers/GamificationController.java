@@ -27,8 +27,8 @@ import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.UserAchievement;
-import sg.edu.ntu.gamify_demo.Services.GamificationService;
-import sg.edu.ntu.gamify_demo.Services.LadderService;
+import sg.edu.ntu.gamify_demo.services.GamificationService;
+import sg.edu.ntu.gamify_demo.services.LadderService;
 
 /**
  * REST controller for gamification-related endpoints.
@@ -66,7 +66,7 @@ public class GamificationController {
     public ResponseEntity<ObjectNode> getUserPoints(
         @Parameter(description = "User ID", example = "uuid-1234") 
         @PathVariable String userId) {
-        int points = gamificationService.getUserPoints(userId);
+        Long points = gamificationService.getUserPoints(userId);
         
         ObjectNode result = objectMapper.createObjectNode();
         result.put("userId", userId);
@@ -87,11 +87,11 @@ public class GamificationController {
             @PathVariable String userId,
             @RequestBody JsonNode pointsData) {
         
-        int points = pointsData.get("points").asInt();
+        Long points = pointsData.get("points").asLong();
         String eventType = pointsData.get("eventType").asText();
         JsonNode eventData = pointsData.get("eventData");
         
-        int newPoints = gamificationService.awardPoints(userId, points, eventType, eventData);
+        Long newPoints = gamificationService.awardPoints(userId, points, eventType, eventData);
         
         // Update the user's ladder status
         ladderService.updateUserLadderStatus(userId);
@@ -116,7 +116,7 @@ public class GamificationController {
             @PathVariable String userId,
             @RequestBody JsonNode pointsData) {
         
-        int points = pointsData.get("points").asInt();
+        Long points = pointsData.get("points").asLong();
         String eventType = pointsData.get("eventType").asText();
         JsonNode eventData = pointsData.get("eventData");
         

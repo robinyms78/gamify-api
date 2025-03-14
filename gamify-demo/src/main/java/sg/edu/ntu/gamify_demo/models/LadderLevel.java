@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -28,17 +28,17 @@ import lombok.Setter;
 public class LadderLevel {
     @Id
     @Column(name = "level")
-    private int level;
+    private Long level;
     
     @Column(name = "label", nullable = false)
     private String label;
     
     @Column(name = "points_required", nullable = false)
-    private int pointsRequired;
+    private Long pointsRequired;
     
     @CreationTimestamp
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
     
     /**
      * Constructs a LadderLevel with the provided details.
@@ -47,7 +47,7 @@ public class LadderLevel {
      * @param label The human-readable label for this level.
      * @param pointsRequired The points required to reach this level.
      */
-    public LadderLevel(int level, String label, int pointsRequired) {
+    public LadderLevel(Long level, String label, Long pointsRequired) {
         this.level = level;
         this.label = label;
         this.pointsRequired = pointsRequired;

@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id).orElse(null);
 
         if (user != null) {
-            int updatedPoints = user.getEarnedPoints() - points;
+            Long updatedPoints = user.getEarnedPoints() - points;
             user.setEarnedPoints(updatedPoints);
             userRepository.save(user);
         }

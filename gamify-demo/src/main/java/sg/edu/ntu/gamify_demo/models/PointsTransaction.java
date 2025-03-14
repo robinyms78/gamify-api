@@ -1,5 +1,5 @@
 package sg.edu.ntu.gamify_demo.models;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -44,10 +44,10 @@ public class PointsTransaction {
     private String eventType;
     
     @Column(name = "points", nullable = false)
-    private int points;
+    private Long points;
     
     @Column(name = "timestamp")
-    private LocalDateTime timestamp;
+    private ZonedDateTime timestamp;
     
     @Type(JsonType.class)
     @Column(name = "metadata", columnDefinition = "json")
@@ -55,7 +55,7 @@ public class PointsTransaction {
     
     @CreationTimestamp
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
     
     /**
      * Constructs a PointsTransaction with the provided details.
@@ -65,12 +65,12 @@ public class PointsTransaction {
      * @param points The number of points (positive for earnings, negative for redemptions).
      * @param metadata Additional data about the transaction.
      */
-    public PointsTransaction(User user, String eventType, int points, JsonNode metadata) {
+    public PointsTransaction(User user, String eventType, Long points, JsonNode metadata) {
         this.transactionId = UUID.randomUUID().toString();
         this.user = user;
         this.eventType = eventType;
         this.points = points;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = ZonedDateTime.now();
         this.metadata = metadata;
     }
 }

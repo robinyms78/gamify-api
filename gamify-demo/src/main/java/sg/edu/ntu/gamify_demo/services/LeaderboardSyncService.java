@@ -1,4 +1,4 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +67,7 @@ public class LeaderboardSyncService {
      * @return The updated Leaderboard entry, or null if the user doesn't exist.
      */
     @Transactional
-    public Leaderboard updateUserRank(String userId, int newRank) {
+    public Leaderboard updateUserRank(String userId, long newRank) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
             return null;

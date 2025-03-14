@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import sg.edu.ntu.gamify_demo.Services.AuthenticationService;
+import sg.edu.ntu.gamify_demo.services.AuthenticationService;
 import sg.edu.ntu.gamify_demo.config.TestSecurityConfig;
 import sg.edu.ntu.gamify_demo.dtos.LoginRequest;
 import sg.edu.ntu.gamify_demo.dtos.RegistrationRequest;
@@ -65,8 +65,8 @@ public class AuthControllerTest {
                 .passwordHash("hashedpassword")
                 .role(UserRole.EMPLOYEE)
                 .department("Testing")
-                .earnedPoints(0)
-                .availablePoints(0)
+                .earnedPoints(0L)
+                .availablePoints(0L)
                 .build();
 
         // Create registration request

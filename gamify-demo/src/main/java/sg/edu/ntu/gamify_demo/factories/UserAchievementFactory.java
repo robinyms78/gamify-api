@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.factories;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import org.springframework.stereotype.Component;
 
@@ -29,7 +29,7 @@ public class UserAchievementFactory {
         UserAchievement userAchievement = new UserAchievement();
         userAchievement.setUser(user);
         userAchievement.setAchievement(achievement);
-        userAchievement.setEarnedAt(LocalDateTime.now());
+        userAchievement.setEarnedAt(ZonedDateTime.now());
         userAchievement.setMetadata(metadata);
         
         return userAchievement;
@@ -44,7 +44,7 @@ public class UserAchievementFactory {
      * @param metadata Additional data about how the achievement was earned.
      * @return The created UserAchievement.
      */
-    public UserAchievement createUserAchievementWithTime(User user, Achievement achievement, LocalDateTime earnedAt, JsonNode metadata) {
+    public UserAchievement createUserAchievementWithTime(User user, Achievement achievement, ZonedDateTime earnedAt, JsonNode metadata) {
         UserAchievement userAchievement = new UserAchievement();
         userAchievement.setUser(user);
         userAchievement.setAchievement(achievement);

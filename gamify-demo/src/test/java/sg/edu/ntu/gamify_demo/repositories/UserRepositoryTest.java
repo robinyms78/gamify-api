@@ -43,8 +43,8 @@ public class UserRepositoryTest {
                 .passwordHash("hashedpassword1")
                 .role(UserRole.EMPLOYEE)
                 .department("Engineering")
-                .earnedPoints(100)
-                .availablePoints(100)
+                .earnedPoints(100L)
+                .availablePoints(100L)
                 .build();
 
         testUser2 = User.builder()
@@ -54,8 +54,8 @@ public class UserRepositoryTest {
                 .passwordHash("hashedpassword2")
                 .role(UserRole.MANAGER)
                 .department("Marketing")
-                .earnedPoints(200)
-                .availablePoints(150)
+                .earnedPoints(200L)
+                .availablePoints(150L)
                 .build();
     }
 
@@ -139,8 +139,8 @@ public class UserRepositoryTest {
 
         // Update the user
         savedUser.setDepartment("Research");
-        savedUser.setEarnedPoints(150);
-        savedUser.setAvailablePoints(120);
+        savedUser.setEarnedPoints(150L);
+        savedUser.setAvailablePoints(120L);
         userRepository.save(savedUser);
 
         // Retrieve the updated user

@@ -1,6 +1,7 @@
 package sg.edu.ntu.gamify_demo.models;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -40,7 +41,6 @@ import sg.edu.ntu.gamify_demo.models.enums.UserRole;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private String id;
 
@@ -61,18 +61,18 @@ public class User {
     private String department;
 
     @Column(name = "earned_points", nullable = false)
-    private int earnedPoints;
+    private Long earnedPoints;
 
     @Column(name = "available_points", nullable = false)
-    private int availablePoints;
+    private Long availablePoints;
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private ZonedDateTime updatedAt;
     
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserLadderStatus ladderStatus;
@@ -97,11 +97,14 @@ public class User {
      */
     @PrePersist
     protected void onCreate() {
-        if (earnedPoints == 0) {
-            earnedPoints = 0;
+        if (id == null) {
+            id = UUID.randomUUID().toString();
         }
-        if (availablePoints == 0) {
-            availablePoints = 0;
+        if (earnedPoints == null) {
+            earnedPoints = 0L;
+        }
+        if (availablePoints == null) {
+            availablePoints = 0L;
         }
     }
     

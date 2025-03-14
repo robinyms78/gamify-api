@@ -66,8 +66,8 @@ public class DomainEventPublisherTest {
         testUser = new User();
         testUser.setId("user123");
         testUser.setUsername("testuser");
-        testUser.setEarnedPoints(100);
-        testUser.setAvailablePoints(100);
+        testUser.setEarnedPoints(100L);
+        testUser.setAvailablePoints(100L);
     }
 
     @Test

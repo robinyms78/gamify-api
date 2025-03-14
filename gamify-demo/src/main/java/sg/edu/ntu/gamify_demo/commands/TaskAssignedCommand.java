@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.commands;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -49,14 +49,13 @@ public class TaskAssignedCommand implements TaskEventCommand {
         taskEvent.setTaskId(taskId);
         taskEvent.setEventType("TASK_ASSIGNED");
         taskEvent.setMetadata(eventData);
-        taskEvent.setCreatedAt(LocalDateTime.now());
         taskEvent.setStatus(TaskStatus.ASSIGNED);
-        taskEvent.setAssignedAt(LocalDateTime.now());
+        taskEvent.setAssignedAt(ZonedDateTime.now());
         
         // Set due date if provided
         if (eventData.has("dueDate")) {
             String dueDateStr = eventData.get("dueDate").asText();
-            taskEvent.setDueDate(LocalDateTime.parse(dueDateStr));
+            taskEvent.setDueDate(ZonedDateTime.parse(dueDateStr));
         }
         
         // Save the task event
