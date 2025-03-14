@@ -1,11 +1,9 @@
-package sg.edu.ntu.gamify_demo.Services;
+package sg.edu.ntu.gamify_demo.services;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
@@ -62,5 +60,16 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException("User not found with id: " + id);
         }
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public void deductPoints(String id, int points) {
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user != null) {
+            int updatedPoints = user.getEarnedPoints() - points;
+            user.setEarnedPoints(updatedPoints);
+            userRepository.save(user);
+        }
     }
 }

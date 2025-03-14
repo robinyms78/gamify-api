@@ -32,7 +32,7 @@ public class Redemption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    private String id;
     
     @Column(name = "status")
     private String status;
@@ -54,12 +54,19 @@ public class Redemption {
     private Reward reward;
 
     /**
-     * Constructs a Redemption object with the provided details.
-     * @param id The unique identifier of the redemption.
+     * Constructs a Redemption object with required details.
+     * 
      * @param user The user who made the redemption.
      * @param reward The reward that was redeemed.
      * @param status The redemption status.
      * @param createdAt The timestamp of when the redemption was created.
      * @param updatedAt The timestamp of when the redemption was last updated.
      */
+    public Redemption(User user, Reward reward, String status) {
+        this.user = user;
+        this.reward = reward;
+        this.status = status;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

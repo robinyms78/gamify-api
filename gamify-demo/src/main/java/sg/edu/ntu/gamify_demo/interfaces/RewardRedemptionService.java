@@ -1,6 +1,8 @@
 package sg.edu.ntu.gamify_demo.interfaces;
 
 import java.util.List;
+
+import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 
 public interface RewardRedemptionService {
@@ -8,13 +10,13 @@ public interface RewardRedemptionService {
 
     RewardRedemption saveRedemption(RewardRedemption redemption);
 
-    RewardRedemption getRedemption(Long id);
+    RewardRedemption getRedemption(String rewardId);
 
-    RewardRedemption updateRedemption(Long id, RewardRedemption redemption);
+    RewardRedemption updateRedemption(String rewardId, RewardRedemption redemption);
     
-    void deleteRedemption(Long id);
+    void deleteRedemption(String rewardId);
 
-    String redeemReward(Long userId,Long id);
+    RedemptionResult redeemReward(String userId, String rewardId);
 
-    Integer countRedemptions();
+    int countRedemptions();
 }

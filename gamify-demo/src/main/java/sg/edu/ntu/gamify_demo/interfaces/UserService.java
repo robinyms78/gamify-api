@@ -12,4 +12,5 @@ public interface UserService {
     List<User> getAllUsers();
     User updateUser(String id, User user) throws UserNotFoundException, UserValidationException;
     void deleteUser(String id) throws UserNotFoundException;
+    void deductPoints(String id, int points);
 }
