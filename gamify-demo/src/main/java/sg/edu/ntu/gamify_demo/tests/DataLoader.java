@@ -4,20 +4,26 @@ import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 import sg.edu.ntu.gamify_demo.models.Rewards;
 import sg.edu.ntu.gamify_demo.repositories.RewardRepository;
+import sg.edu.ntu.gamify_demo.repositories.RewardRedemptionRepository;
 import java.time.ZonedDateTime;
 
 @Component
 public class DataLoader {
     private RewardRepository rewardRepository;
+    private RewardRedemptionRepository redemptionRepository;
 
     // Constructor injection
-    public DataLoader(RewardRepository rewardRepository) {
+    public DataLoader(RewardRepository rewardRepository, RewardRedemptionRepository redemptionRepository) {
         this.rewardRepository = rewardRepository;
+        this.redemptionRepository = redemptionRepository;
     }
 
     @PostConstruct
     public void loadData() {
-        // clear the database first
+        // clear the redemptions first to avoid foreign key constraint violations
+        redemptionRepository.deleteAll();
+        
+        // then clear the rewards
         rewardRepository.deleteAll();
 
         // load data here
