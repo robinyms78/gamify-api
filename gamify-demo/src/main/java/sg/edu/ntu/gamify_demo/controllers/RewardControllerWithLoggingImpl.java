@@ -10,8 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-
 import java.util.List;
 import java.util.ArrayList;
 import org.springframework.http.HttpStatus;
@@ -43,7 +41,7 @@ public class RewardControllerWithLoggingImpl {
     // Save reward
     @PostMapping("")
     public ResponseEntity<Reward> createReward(@RequestBody Reward reward) {
-        Reward newReward = rewardService.createReward(reward);
+        Reward newReward = rewardService.saveReward(reward);
         return new ResponseEntity<>(newReward, HttpStatus.CREATED);
     } 
 
