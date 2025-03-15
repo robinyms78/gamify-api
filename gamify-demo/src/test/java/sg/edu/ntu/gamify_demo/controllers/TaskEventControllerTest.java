@@ -1,6 +1,7 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
+import org.mockito.Mock;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -18,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,19 +49,19 @@ public class TaskEventControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     
-    @MockBean
+    @Mock
     private TaskEventService taskEventService;
     
-    @MockBean
+    @Mock
     private UserService userService;
     
-    @MockBean
+    @Mock
     private GamificationService gamificationService;
     
-    @MockBean
+    @Mock
     private LadderService ladderService;
     
-    @MockBean
+    @Mock
     private TaskEventMapper taskEventMapper;
     
     private User testUser;
