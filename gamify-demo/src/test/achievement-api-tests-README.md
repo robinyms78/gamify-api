@@ -21,16 +21,19 @@ This directory contains test scripts for the Achievement and UserAchievement API
 ## Running the Bash Script
 
 1. Make the script executable:
+
+   ```bash
+
    ```bash
    chmod +x achievement-api-tests.sh
-   ```
-
 2. Run the script:
+
    ```bash
    ./achievement-api-tests.sh
    ```
 
 The script will:
+
 1. Register a test user (Sarah)
 2. Create ladder levels
 3. Create achievements
