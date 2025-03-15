@@ -34,6 +34,13 @@ public class WebSecurityConfig {
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
+                    "/swagger-ui/index.html",
+                    "/swagger-ui/swagger-initializer.js",
+                    "/swagger-ui/swagger-ui.css",
+                    "/swagger-ui/swagger-ui-bundle.js",
+                    "/swagger-ui/swagger-ui-standalone-preset.js",
+                    "/swagger-ui/favicon-32x32.png",
+                    "/swagger-ui/favicon-16x16.png",
                     "/error/**",
                     "/auth/register",
                     "/auth/login"
