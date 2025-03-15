@@ -1,6 +1,7 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,6 +27,7 @@ import sg.edu.ntu.gamify_demo.interfaces.UserService;
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "User Management", description = "Endpoints for user CRUD operations")
+@SecurityRequirement(name = "bearerAuth")
 public class UserController {
 
     private final UserService userService;
@@ -40,8 +42,12 @@ public class UserController {
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "User created successfully",
             content = @Content(schema = @Schema(implementation = User.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid user data"),
-        @ApiResponse(responseCode = "409", description = "Username or email already exists")
+        @ApiResponse(responseCode = "400", description = "Invalid user data",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "409", description = "Username/email exists",
+            content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+            content = @Content(schema = @Schema(hidden = true)))
     })
     public User createUser(
         @Parameter(description = "User object to create", required = true,

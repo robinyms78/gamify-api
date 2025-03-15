@@ -30,8 +30,13 @@ public class WebSecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // Disable CSRF for API endpoints
             .authorizeHttpRequests(auth -> auth
-                // Temporarily permit all requests to fix test failures
-                .requestMatchers("/**").permitAll()
+                .requestMatchers(
+                    "/v3/api-docs/**",
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/error/**"
+                ).permitAll()
+                .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 // Use stateless session management for REST APIs

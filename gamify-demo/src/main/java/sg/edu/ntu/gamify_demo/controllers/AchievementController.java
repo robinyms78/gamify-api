@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,6 +41,7 @@ import sg.edu.ntu.gamify_demo.models.User;
 @RestController
 @RequestMapping("/api/achievements")
 @Tag(name = "Achievements", description = "Endpoints for managing achievements and user achievement tracking")
+@SecurityRequirement(name = "bearerAuth")
 public class AchievementController {
     
     private final AchievementService achievementService;
@@ -109,7 +111,10 @@ public class AchievementController {
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Achievement created successfully",
                     content = @Content(schema = @Schema(implementation = Achievement.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid achievement data")
+        @ApiResponse(responseCode = "400", description = "Invalid achievement data",
+                    content = @Content(schema = @Schema(hidden = true))),
+        @ApiResponse(responseCode = "401", description = "Unauthorized",
+                    content = @Content(schema = @Schema(hidden = true)))
     })
     public ResponseEntity<Achievement> createAchievement(
         @Parameter(description = "Achievement data in JSON format", required = true,
