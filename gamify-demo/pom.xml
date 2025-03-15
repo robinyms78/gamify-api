@@ -28,7 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
-		<lombok.version>1.18.30</lombok.version> <!-- Explicitly define Lombok version -->
+		<lombok.version>1.18.32</lombok.version> <!-- Explicitly define Lombok version -->
 	</properties>
     <dependencies>
         <dependency>
@@ -138,11 +138,6 @@
     		<version>3.7.3</version>
 		</dependency>
 
-		<dependency>
-    		<groupId>io.hypersistence</groupId>
-    		<artifactId>hypersistence-utils-hibernate-60</artifactId>
-    		<version>3.5.1</version>
-		</dependency>
 
 	</dependencies>
 
