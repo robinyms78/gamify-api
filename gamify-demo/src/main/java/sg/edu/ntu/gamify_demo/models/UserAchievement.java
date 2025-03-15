@@ -2,8 +2,6 @@ package sg.edu.ntu.gamify_demo.models;
 
 import java.time.ZonedDateTime;
 
-import org.hibernate.annotations.CreationTimestamp;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import org.hibernate.annotations.Type;

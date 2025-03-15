@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,8 +21,7 @@ import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 import sg.edu.ntu.gamify_demo.models.Rewards;
-import sg.edu.ntu.gamify_demo.models.User;
-import sg.edu.ntu.gamify_demo.models.enums.RedemptionStatus;
+
 import sg.edu.ntu.gamify_demo.observers.RedemptionObserver;
 import sg.edu.ntu.gamify_demo.repositories.RewardRedemptionRepository;
 import sg.edu.ntu.gamify_demo.repositories.RewardRepository;

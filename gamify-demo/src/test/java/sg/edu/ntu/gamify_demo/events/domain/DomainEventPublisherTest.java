@@ -95,7 +95,8 @@ public class DomainEventPublisherTest {
         verify(testSubscriber, times(1)).onEvent(event);
         
         // Verify metrics
-        ArgumentCaptor<Iterable<Tag>> tagsCaptor = ArgumentCaptor.forClass(Iterable.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Iterable<Tag>> tagsCaptor = ArgumentCaptor.forClass((Class<Iterable<Tag>>) (Class<?>) Iterable.class);
         verify(meterRegistry).counter(eq("events.processed"), tagsCaptor.capture());
         
         verify(eventsProcessedCounter).increment();
