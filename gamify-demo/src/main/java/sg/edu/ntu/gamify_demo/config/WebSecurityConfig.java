@@ -34,7 +34,9 @@ public class WebSecurityConfig {
                     "/v3/api-docs/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
-                    "/error/**"
+                    "/error/**",
+                    "/auth/register",
+                    "/auth/login"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

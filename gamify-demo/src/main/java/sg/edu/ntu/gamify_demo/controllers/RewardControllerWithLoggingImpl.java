@@ -111,6 +111,13 @@ public class RewardControllerWithLoggingImpl {
      * @return The result of the redemption operation
      */
     @PostMapping("/redeem")
+    @Operation(summary = "Redeem reward", description = "Redeems a reward for a user")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Redemption successful",
+                    content = @Content(schema = @Schema(implementation = RedemptionResult.class))),
+        @ApiResponse(responseCode = "400", description = "Redemption failed",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> redeemReward(@RequestBody RewardRedemptionRequest request) {
         RedemptionResult result = rewardRedemptionService.redeemReward(request.getUserId(), request.getRewardId());
         if (result.isSuccess()) {

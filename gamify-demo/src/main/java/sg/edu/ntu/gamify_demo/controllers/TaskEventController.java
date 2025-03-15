@@ -58,7 +58,7 @@ public class TaskEventController {
                description = "Processes a task-related event and updates user progress")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Task event processed successfully",
-                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
+                    content = @Content(schema = @Schema(implementation = TaskEventResponseDTO.class))),
         @ApiResponse(responseCode = "400", description = "Invalid request format/missing fields"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })

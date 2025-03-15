@@ -36,6 +36,7 @@ import sg.edu.ntu.gamify_demo.services.AuthenticationService;
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "Authentication", description = "Endpoints for user registration and login")
+@SecurityRequirement(name = "bearerAuth")
 public class AuthController {
 
     private final UserRepository userRepository;
