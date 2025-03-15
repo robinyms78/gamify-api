@@ -49,7 +49,7 @@ private User user;
     private Long earnedPoints;
     
     @ManyToOne
-    @JoinColumn(name = "current_level", nullable = false)
+    @JoinColumn(name = "current_level_id", nullable = false)
     private LadderLevel currentLevel;
     
     @Column(name = "rank", nullable = false)
