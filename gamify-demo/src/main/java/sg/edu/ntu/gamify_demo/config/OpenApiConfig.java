@@ -14,6 +14,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
+                .openapi("3.0.3")  // Specify OpenAPI version
                 .info(new Info()
                         .title("Gamify API")
                         .version("1.0")
