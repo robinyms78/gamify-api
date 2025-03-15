@@ -3,6 +3,14 @@
 
 package sg.edu.ntu.gamify_demo.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -117,8 +125,12 @@ public class RewardControllerWithLoggingImpl {
                     content = @Content(schema = @Schema(implementation = RedemptionResult.class))),
         @ApiResponse(responseCode = "400", description = "Redemption failed",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<?> redeemReward(@RequestBody RewardRedemptionRequest request) {
+    public ResponseEntity<?> redeemReward(
+        @Parameter(description = "Redemption request details", required = true,
+                  content = @Content(schema = @Schema(implementation = RewardRedemptionRequest.class)))
+        @RequestBody RewardRedemptionRequest request) {
         RedemptionResult result = rewardRedemptionService.redeemReward(request.getUserId(), request.getRewardId());
         if (result.isSuccess()) {
             return ResponseEntity.ok(result);
