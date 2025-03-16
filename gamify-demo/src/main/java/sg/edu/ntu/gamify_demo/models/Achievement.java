@@ -59,7 +59,7 @@ public class Achievement {
      * @param criteria The criteria for earning this achievement.
      */
     public Achievement(String name, String description, JsonNode criteria) {
-        this.achievementId = UUID.randomUUID().toString();
+        // Let Hibernate generate the ID
         this.name = name;
         this.description = description;
         this.criteria = criteria;

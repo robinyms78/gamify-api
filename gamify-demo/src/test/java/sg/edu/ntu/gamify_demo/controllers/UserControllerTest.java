@@ -22,7 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -50,7 +50,7 @@ public class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Mock
+    @MockBean
     private UserService userService;
 
     private User testUser1;
@@ -190,8 +190,8 @@ public class UserControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(updatedUser.getId())))
                 .andExpect(jsonPath("$.department", is(updatedUser.getDepartment())))
-                .andExpect(jsonPath("$.earnedPoints", is(updatedUser.getEarnedPoints())))
-                .andExpect(jsonPath("$.availablePoints", is(updatedUser.getAvailablePoints())));
+                .andExpect(jsonPath("$.earnedPoints", is(updatedUser.getEarnedPoints().intValue())))
+                .andExpect(jsonPath("$.availablePoints", is(updatedUser.getAvailablePoints().intValue())));
     }
 
     @Test

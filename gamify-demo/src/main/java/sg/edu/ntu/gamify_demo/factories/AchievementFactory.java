@@ -25,7 +25,7 @@ public class AchievementFactory {
      */
     public Achievement createAchievement(String name, String description, JsonNode criteria) {
         Achievement achievement = new Achievement();
-        achievement.setAchievementId(UUID.randomUUID().toString());
+        // Let Hibernate generate the ID
         achievement.setName(name);
         achievement.setDescription(description);
         achievement.setCriteria(criteria);
@@ -35,6 +35,9 @@ public class AchievementFactory {
     
     /**
      * Creates a new Achievement with the provided details and a specific ID.
+     * Note: This method should only be used in specific cases where the ID needs to be set manually,
+     * such as in tests or data migration. For normal operations, use createAchievement() instead
+     * to let Hibernate generate the ID.
      * 
      * @param achievementId The ID for the achievement.
      * @param name The name of the achievement.
