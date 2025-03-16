@@ -1,8 +1,6 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.Mock;
-
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -17,9 +15,11 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,20 +49,23 @@ public class TaskEventControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
     
-    @Mock
+    @MockBean
     private TaskEventService taskEventService;
     
-    @Mock
+    @MockBean
     private UserService userService;
     
-    @Mock
+    @MockBean
     private GamificationService gamificationService;
     
-    @Mock
+    @MockBean
     private LadderService ladderService;
     
-    @Mock
+    @MockBean
     private TaskEventMapper taskEventMapper;
+    
+    @InjectMocks
+    private TaskEventController taskEventController;
     
     private User testUser;
     private TaskEvent testTaskEvent;
@@ -167,7 +170,28 @@ public class TaskEventControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").exists())
-                .andExpect(jsonPath("$.message").exists());
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Missing required fields: userId, taskId, and event_type"));
+    }
+    
+    @Test
+    public void testInvalidEventType() throws Exception {
+        // Create request body with invalid event type
+        ObjectNode requestBody = objectMapper.createObjectNode();
+        requestBody.put("userId", "user123");
+        requestBody.put("taskId", "task123");
+        requestBody.put("event_type", "INVALID_EVENT");
+        
+        // Mock service to throw exception for invalid event type
+        when(taskEventService.processTaskEvent(any(JsonNode.class)))
+            .thenThrow(new IllegalArgumentException("Invalid event type: INVALID_EVENT"));
+        
+        // Perform request and verify response
+        mockMvc.perform(post("/tasks/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Invalid event type: INVALID_EVENT"));
     }
 }

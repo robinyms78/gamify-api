@@ -40,7 +40,7 @@ public class UserLadderStatus {
     private User user;
     
     @ManyToOne
-    @JoinColumn(name = "current_level_id", nullable = false)
+    @JoinColumn(name = "current_level", nullable = false)
     private LadderLevel currentLevel;
     
     @Column(name = "earned_points", nullable = false)
