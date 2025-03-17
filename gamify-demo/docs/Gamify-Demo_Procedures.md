@@ -43,3 +43,25 @@
    <img src = "./docs/images/mvnw_spring-boot_run.jpg>
 5. You have successfully run the project using WSL terminal.
    <img src = "./docs/images/run_spring_boot_app_successful.jpg">
+
+# Download and Install DBeaver App in your computer
+## Part 5: Download DBeaver from DBeaver Community Webpage
+1. Open internet browser (Edge / Chrome) and go to DBeaver's Community webpage: https://dbeaver.io/download/
+2. Download the installer file according to the operating system that your computer is using.
+   <img src = "./docs/images/Download DBeaver.jpg">
+
+## Part 6: Install DBeaver onto your computer
+1. Run the installer file and follow the on - screen instructions to complete the installation.
+2. You can watch this youtube video if you are unsure of the installation procedure: https://www.youtube.com/watch?v=r_YAbQDkL_o
+
+## Setup a new Database Connection from JDBC URL Link
+## Part 7: Setup new Database Connection
+1. Open the DBeaver application and click on the database tab.
+2. Click new database connection and select PostgreSQL.
+   <img src = "./docs/images/SelectPostgreSQL.jpg">
+3. In the connection settings dialog box, type in the URL link of the postgreSQL database you are connecting to.
+   <img src = "docs/images/Connection Settings.jpg">
+4. In  the Authentication section, type in the username (gamify-api-owner) and password to access the database.
+5. Click Ok button once this is done.
+6. You have successfully connect to the gamify - api database using DBeaver
+   <img src = "./docs/images/Connection Success.jpg"> 
