@@ -3,7 +3,7 @@ package sg.edu.ntu.gamify_demo.strategies.achievement;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +27,7 @@ public class TaskCompletionStrategy implements AchievementCriteriaStrategy {
      * 
      * @param taskEventRepository Repository for task events.
      */
-    @Autowired
+    //@Autowired
     public TaskCompletionStrategy(TaskEventRepository taskEventRepository) {
         this.taskEventRepository = taskEventRepository;
     }

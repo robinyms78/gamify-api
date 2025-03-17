@@ -3,6 +3,14 @@
 
 package sg.edu.ntu.gamify_demo.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
 import sg.edu.ntu.gamify_demo.dtos.RewardRedemptionRequest;
+import sg.edu.ntu.gamify_demo.dtos.ErrorResponse;
 import sg.edu.ntu.gamify_demo.interfaces.RewardRedemptionService;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
@@ -111,7 +120,18 @@ public class RewardControllerWithLoggingImpl {
      * @return The result of the redemption operation
      */
     @PostMapping("/redeem")
-    public ResponseEntity<?> redeemReward(@RequestBody RewardRedemptionRequest request) {
+    @Operation(summary = "Redeem reward", description = "Redeems a reward for a user")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Redemption successful",
+                    content = @Content(schema = @Schema(implementation = RedemptionResult.class))),
+        @ApiResponse(responseCode = "400", description = "Redemption failed",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<?> redeemReward(
+        @Parameter(description = "Redemption request details", required = true,
+                  content = @Content(schema = @Schema(implementation = RewardRedemptionRequest.class)))
+        @RequestBody RewardRedemptionRequest request) {
         RedemptionResult result = rewardRedemptionService.redeemReward(request.getUserId(), request.getRewardId());
         if (result.isSuccess()) {
             return ResponseEntity.ok(result);

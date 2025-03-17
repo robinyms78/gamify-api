@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventDTO;
+import sg.edu.ntu.gamify_demo.dtos.TaskEventResponseDTO;
 import sg.edu.ntu.gamify_demo.mappers.TaskEventMapper;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 
@@ -58,7 +59,7 @@ public class TaskEventController {
                description = "Processes a task-related event and updates user progress")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Task event processed successfully",
-                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
+                    content = @Content(schema = @Schema(implementation = TaskEventResponseDTO.class))),
         @ApiResponse(responseCode = "400", description = "Invalid request format/missing fields"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })

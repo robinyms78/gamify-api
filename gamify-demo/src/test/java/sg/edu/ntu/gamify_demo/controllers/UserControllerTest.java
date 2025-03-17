@@ -190,8 +190,8 @@ public class UserControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(updatedUser.getId())))
                 .andExpect(jsonPath("$.department", is(updatedUser.getDepartment())))
-                .andExpect(jsonPath("$.earnedPoints", is(updatedUser.getEarnedPoints())))
-                .andExpect(jsonPath("$.availablePoints", is(updatedUser.getAvailablePoints())));
+                .andExpect(jsonPath("$.earnedPoints", is(updatedUser.getEarnedPoints().intValue())))
+                .andExpect(jsonPath("$.availablePoints", is(updatedUser.getAvailablePoints().intValue())));
     }
 
     @Test

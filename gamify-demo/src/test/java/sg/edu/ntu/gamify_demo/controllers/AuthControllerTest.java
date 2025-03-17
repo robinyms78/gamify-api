@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,6 +36,7 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
  */
 @WebMvcTest(AuthController.class)
 @Import(TestSecurityConfig.class)
+@WithMockUser(username = "testadmin", roles = {"ADMIN"})
 public class AuthControllerTest {
 
     @Autowired
@@ -96,6 +99,7 @@ public class AuthControllerTest {
 
         // Perform POST request
         mockMvc.perform(post("/auth/register")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registrationRequest)))
                 .andExpect(status().isCreated())
@@ -111,6 +115,7 @@ public class AuthControllerTest {
 
         // Perform POST request
         mockMvc.perform(post("/auth/register")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registrationRequest)))
                 .andExpect(status().isConflict())
@@ -127,6 +132,7 @@ public class AuthControllerTest {
 
         // Perform POST request
         mockMvc.perform(post("/auth/register")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registrationRequest)))
                 .andExpect(status().isConflict())
@@ -144,6 +150,7 @@ public class AuthControllerTest {
 
         // Perform POST request
         mockMvc.perform(post("/auth/login")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
@@ -161,6 +168,7 @@ public class AuthControllerTest {
 
         // Perform POST request
         mockMvc.perform(post("/auth/login")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isUnauthorized())
@@ -177,6 +185,7 @@ public class AuthControllerTest {
 
         // Perform POST request
         mockMvc.perform(post("/auth/login")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isUnauthorized())

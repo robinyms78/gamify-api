@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.lang.NonNull;
 
 import sg.edu.ntu.gamify_demo.models.User;
 
@@ -17,5 +18,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     // Method to fetch all users sorted by ID in ascending order
     @Override
-    List<User> findAll(Sort sort);
+    @NonNull
+    List<User> findAll(@NonNull Sort sort);
 }

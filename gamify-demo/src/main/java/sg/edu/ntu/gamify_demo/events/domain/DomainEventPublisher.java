@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -16,7 +15,7 @@ import io.micrometer.core.instrument.Tag;
 import java.util.Arrays;
 
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
-import sg.edu.ntu.gamify_demo.models.User;
+
 
 /**
  * Publisher for domain events.
@@ -33,7 +32,7 @@ public class DomainEventPublisher {
     /**
      * Constructor for dependency injection.
      */
-    @Autowired
+    //@Autowired
     public DomainEventPublisher(EventPublisher legacyEventPublisher, ObjectMapper objectMapper, MeterRegistry meterRegistry) {
         this.legacyEventPublisher = legacyEventPublisher;
         this.objectMapper = objectMapper;
