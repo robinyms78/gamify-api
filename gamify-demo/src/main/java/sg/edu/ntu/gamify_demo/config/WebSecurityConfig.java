@@ -26,7 +26,7 @@ public class WebSecurityConfig {
      */
     @Bean
     @Profile("!test") // Only active when not in test profile
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain customSecurityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable()) // Disable CSRF for API endpoints
             .authorizeHttpRequests(auth -> auth
