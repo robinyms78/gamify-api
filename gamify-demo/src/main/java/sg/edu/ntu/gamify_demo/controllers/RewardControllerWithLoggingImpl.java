@@ -92,7 +92,7 @@ public class RewardControllerWithLoggingImpl {
         return new ResponseEntity<>(allRedemptions, HttpStatus.OK);
     }
 
-    // Get one reward redemption by redemption Id
+    // Get one reward redemption by reward Id
     @GetMapping("/redemption/{id}")
     public ResponseEntity<RewardRedemption> getRedemption(@PathVariable String rewardId) {
         RewardRedemption foundRedemption = rewardRedemptionService.getRedemption(rewardId);
