@@ -4,12 +4,14 @@ import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -30,14 +32,14 @@ import lombok.Setter;
 @Entity
 @Table(name = "user_ladder_status")
 public class UserLadderStatus {
-    @Id
-    @Column(name = "user_id")
-    private String id;
-    
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id")
-    private User user;
+@Id
+@Column(name = "id")
+private String id;
+
+@OneToOne(fetch = FetchType.EAGER)
+@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+@JsonBackReference
+private User user;
     
     @ManyToOne
     @JoinColumn(name = "current_level", nullable = false)
@@ -70,6 +72,30 @@ public class UserLadderStatus {
         this.currentLevel = currentLevel;
         this.earnedPoints = earnedPoints;
         this.pointsToNextLevel = pointsToNextLevel;
+    }
+    
+    /**
+     * Ensures the ID is set from the user.
+     * This method is called before persisting the entity.
+     */
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        if (this.id == null && this.user != null) {
+            this.id = this.user.getId();
+            // Add logging for debugging
+            System.out.println("Setting UserLadderStatus ID from user: " + this.id);
+        }
+    }
+    
+    /**
+     * Additional check before update to ensure ID is always set.
+     */
+    @jakarta.persistence.PreUpdate
+    protected void onUpdate() {
+        if (this.id == null && this.user != null) {
+            this.id = this.user.getId();
+            System.out.println("Setting UserLadderStatus ID from user during update: " + this.id);
+        }
     }
     
     /**

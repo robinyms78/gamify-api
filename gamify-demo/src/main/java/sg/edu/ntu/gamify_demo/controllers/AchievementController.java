@@ -34,6 +34,7 @@ import sg.edu.ntu.gamify_demo.interfaces.UserAchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;
+import sg.edu.ntu.gamify_demo.models.UserAchievement;
 
 /**
  * REST controller for achievement-related endpoints.
@@ -288,6 +289,95 @@ public class AchievementController {
         errorJson.put("message", ex.getMessage());
         
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorJson);
+    }
+    
+    /**
+     * Award an achievement to a user.
+     * 
+     * @param achievementId The ID of the achievement to award.
+     * @param userId The ID of the user to award the achievement to.
+     * @param metadata Additional metadata about the achievement award.
+     * @return Success response.
+     */
+    @PostMapping("/{achievementId}/award/{userId}")
+    @Operation(summary = "Award achievement to user", 
+              description = "Manually awards an achievement to a user")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Achievement awarded successfully",
+                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
+        @ApiResponse(responseCode = "404", description = "User or achievement not found")
+    })
+    public ResponseEntity<ObjectNode> awardAchievement(
+        @Parameter(description = "ID of the achievement to award", required = true)
+        @PathVariable String achievementId,
+        @Parameter(description = "ID of the user to award the achievement to", required = true)
+        @PathVariable String userId,
+        @Parameter(description = "Additional metadata about the achievement award")
+        @RequestBody(required = false) JsonNode metadata) {
+        
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException(userId);
+        }
+        
+        Achievement achievement = achievementService.getAchievementById(achievementId);
+        if (achievement == null) {
+            throw new AchievementNotFoundException(achievementId);
+        }
+        
+        // Check if the user already has this achievement
+        if (userAchievementService.hasAchievement(user, achievement)) {
+            ObjectNode resultJson = objectMapper.createObjectNode();
+            resultJson.put("success", false);
+            resultJson.put("message", "User already has this achievement");
+            return ResponseEntity.ok(resultJson);
+        }
+        
+        // Use empty metadata if none provided
+        if (metadata == null) {
+            metadata = objectMapper.createObjectNode();
+            ((ObjectNode) metadata).put("awardedManually", true);
+        }
+        
+        // Award the achievement
+        UserAchievement userAchievement = userAchievementService.awardAchievement(user, achievement, metadata);
+        
+        ObjectNode resultJson = objectMapper.createObjectNode();
+        resultJson.put("success", true);
+        resultJson.put("message", "Achievement awarded successfully");
+        resultJson.put("userId", userId);
+        resultJson.put("achievementId", achievementId);
+        resultJson.put("achievementName", achievement.getName());
+        
+        return ResponseEntity.ok(resultJson);
+    }
+    
+    /**
+     * Get users who have earned a specific achievement.
+     * 
+     * @param achievementId The ID of the achievement.
+     * @return A list of users who have earned the achievement.
+     */
+    @GetMapping("/{achievementId}/users")
+    @Operation(summary = "Get users with achievement", 
+              description = "Retrieves all users who have earned a specific achievement")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved users",
+                    content = @Content(schema = @Schema(implementation = List.class))),
+        @ApiResponse(responseCode = "404", description = "Achievement not found")
+    })
+    public ResponseEntity<List<User>> getAchievementUsers(
+        @Parameter(description = "ID of the achievement", example = "achieve-123")
+        @PathVariable String achievementId) {
+        
+        Achievement achievement = achievementService.getAchievementById(achievementId);
+        
+        List<UserAchievement> userAchievements = userAchievementService.getAchievementUsers(achievement);
+        List<User> users = userAchievements.stream()
+                .map(UserAchievement::getUser)
+                .collect(java.util.stream.Collectors.toList());
+        
+        return ResponseEntity.ok(users);
     }
     
     /**

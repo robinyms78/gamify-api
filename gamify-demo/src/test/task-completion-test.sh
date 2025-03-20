@@ -32,7 +32,8 @@ test_task_completion() {
         "event_type": "TASK_COMPLETED",
         "data": {
             "priority": "'$priority'",
-            "description": "Test task completion"
+            "description": "Test task completion",
+            "skip_ladder_update": true
         }
     }'
     

@@ -69,6 +69,7 @@ public class RedeemRewardCommand {
             return RedemptionResult.builder()
                 .success(false)
                 .message("Reward is not available")
+                .updatedPointsBalance(user.getAvailablePoints())
                 .timestamp(ZonedDateTime.now())
                 .build();
         }
@@ -84,6 +85,11 @@ public class RedeemRewardCommand {
                 .build();
         }
         
+        // Update user's available points
+        Long updatedPoints = user.getAvailablePoints() - rewardCost;
+        user.setAvailablePoints(updatedPoints);
+        userRepository.save(user);
+        
         // Create redemption record
         RewardRedemption redemption = redemptionFactory.createRedemption(user, reward, RedemptionStatus.PROCESSING);
         RewardRedemption savedRedemption = redemptionRepository.save(redemption);
@@ -94,6 +100,7 @@ public class RedeemRewardCommand {
         metadata.put("rewardId", reward.getId());
         metadata.put("rewardName", reward.getName());
         
+        // Record the points transaction
         pointsTransactionService.recordPointsSpent(
             user, 
             rewardCost, 

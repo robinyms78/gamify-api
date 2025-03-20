@@ -4,6 +4,8 @@ import java.time.ZonedDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -37,6 +39,7 @@ private String id;
 @OneToOne
 @MapsId
 @JoinColumn(name = "user_id")
+@JsonBackReference
 private User user;
     
     @Column(name = "username", nullable = false)

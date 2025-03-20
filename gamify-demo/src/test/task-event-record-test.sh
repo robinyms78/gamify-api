@@ -50,8 +50,39 @@ else
     exit 1
 fi
 
-# Step 2: Send a task completion event
-echo -e "\n${YELLOW}Step 2: Sending task completion event${NC}"
+# Step 2: Login to get JWT token
+echo -e "\n${YELLOW}Step 2: Logging in to get JWT token${NC}"
+
+# Create login payload
+login_data='{
+  "username": "'$username'",
+  "password": "password123"
+}'
+
+echo -e "\n${YELLOW}Sending login request:${NC}"
+echo "$login_data"
+
+# Send login request
+login_response=$(curl -s -X POST "$BASE_URL/auth/login" \
+    -H "Content-Type: application/json" \
+    -d "$login_data")
+
+echo -e "\n${YELLOW}Login Response:${NC}"
+echo "$login_response"
+
+# Extract JWT token
+if echo "$login_response" | grep -q '"token"'; then
+    echo -e "\n${GREEN}✓ Login successful${NC}"
+    # Extract the JWT token
+    jwt_token=$(echo "$login_response" | grep -o '"token":"[^"]*"' | cut -d':' -f2 | tr -d '"')
+    echo -e "${GREEN}JWT Token: $jwt_token${NC}"
+else
+    echo -e "\n${RED}✗ Login failed${NC}"
+    exit 1
+fi
+
+# Step 3: Send a task completion event
+echo -e "\n${YELLOW}Step 3: Sending task completion event${NC}"
 
 # Create a task ID with timestamp to ensure uniqueness
 task_id="task-event-record-$(date +%s)"
@@ -63,16 +94,18 @@ task_data='{
   "event_type": "TASK_COMPLETED",
   "data": {
     "priority": "MEDIUM",
-    "description": "Test task completion event record"
+    "description": "Test task completion event record",
+    "skip_ladder_update": true
   }
 }'
 
 echo -e "\n${YELLOW}Sending task completion request:${NC}"
 echo "$task_data"
 
-# Send the request
+# Send the request with JWT token
 task_response=$(curl -s -X POST "$BASE_URL/tasks/events" \
     -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $jwt_token" \
     -d "$task_data")
 
 # Check if task completion was successful
@@ -93,8 +126,9 @@ echo -e "\n${YELLOW}Step 3: Verify task_events record using getTaskEventById API
 # Extract eventId from the task completion response
 event_id=$(echo "$task_response" | grep -o '"eventId":"[^"]*"' | cut -d':' -f2 | tr -d '"')
 
-# Query task event by eventId
-query_response=$(curl -X GET "$BASE_URL/tasks/events/$event_id") # Removed -s for full response
+# Query task event by eventId with JWT token
+query_response=$(curl -s -X GET "$BASE_URL/tasks/events/$event_id" \
+    -H "Authorization: Bearer $jwt_token")
 
 # Display full query response
 echo -e "\n${YELLOW}Task Event Details Response:${NC}"

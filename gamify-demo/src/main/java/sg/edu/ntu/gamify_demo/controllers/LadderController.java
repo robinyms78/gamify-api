@@ -2,7 +2,8 @@ package sg.edu.ntu.gamify_demo.controllers;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired; 
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,8 +20,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.services.LadderService;
+import sg.edu.ntu.gamify_demo.services.LadderService; 
+import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
+import sg.edu.ntu.gamify_demo.mappers.LadderStatusMapper;
+import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.facades.GamificationFacade;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
@@ -47,6 +51,9 @@ public class LadderController {
     
     @Autowired
     private GamificationFacade gamificationFacade;
+    
+    @Autowired
+    private UserService userService;
     
     @Autowired
     private ObjectMapper objectMapper;
@@ -76,19 +83,58 @@ public class LadderController {
               description = "Retrieve a user's current ladder position and progress")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Successfully retrieved user status",
-                    content = @Content(schema = @Schema(implementation = UserLadderStatus.class))),
-        @ApiResponse(responseCode = "404", description = "User not found")
+                    content = @Content(schema = @Schema(implementation = LadderStatusDTO.class))),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "500", description = "Server error")
     })
-    public ResponseEntity<UserLadderStatus> getUserLadderStatus(
+    public ResponseEntity<?> getUserLadderStatus(
         @Parameter(description = "User ID to retrieve status for", required = true, example = "user-123")
         @PathVariable String userId) {
-        UserLadderStatus status = ladderService.getUserLadderStatus(userId);
-        
-        if (status == null) {
-            throw new UserNotFoundException(userId);
+        try {
+            System.out.println("LadderController: Getting ladder status for user: " + userId);
+            UserLadderStatus status = ladderService.getUserLadderStatus(userId);
+            
+            if (status == null) {
+                System.out.println("LadderController: User ladder status not found for: " + userId);
+                
+                // Try to recover by checking if the user exists
+                User user = userService.getUserById(userId);
+                if (user != null) {
+                    System.out.println("LadderController: User exists, attempting to initialize ladder status");
+                    // User exists but no ladder status, try to initialize it
+                    status = ladderService.initializeUserLadderStatus(user);
+                    if (status != null) {
+                        System.out.println("LadderController: Successfully initialized ladder status for: " + userId);
+                        LadderStatusDTO dto = LadderStatusMapper.INSTANCE.toDTO(status);
+                        return ResponseEntity.ok(dto);
+                    }
+                }
+                
+                throw new UserNotFoundException(userId);
+            }
+            
+            System.out.println("LadderController: Successfully retrieved ladder status for: " + userId);
+            LadderStatusDTO dto = LadderStatusMapper.INSTANCE.toDTO(status);
+            return ResponseEntity.ok(dto);
+        } catch (UserNotFoundException e) {
+            throw e; // Let the exception handler deal with this
+        } catch (DataAccessException e) {
+            System.err.println("LadderController: Database error getting ladder status: " + e.getMessage());
+            e.printStackTrace();
+            
+            ObjectNode errorJson = objectMapper.createObjectNode();
+            errorJson.put("error", "Database error");
+            errorJson.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorJson);
+        } catch (Exception e) {
+            System.err.println("LadderController: Unexpected error getting ladder status: " + e.getMessage());
+            e.printStackTrace();
+            
+            ObjectNode errorJson = objectMapper.createObjectNode();
+            errorJson.put("error", "Server error");
+            errorJson.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorJson);
         }
-        
-        return ResponseEntity.ok(status);
     }
     
     /**
@@ -129,10 +175,10 @@ public class LadderController {
               description = "Recalculate and update a user's ladder position")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Status updated successfully",
-                    content = @Content(schema = @Schema(implementation = UserLadderStatus.class))),
+                    content = @Content(schema = @Schema(implementation = LadderStatusDTO.class))),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<UserLadderStatus> updateUserLadderStatus(
+    public ResponseEntity<LadderStatusDTO> updateUserLadderStatus(
         @Parameter(description = "User ID to update", required = true, example = "user-789")
         @PathVariable String userId) {
         UserLadderStatus status = ladderService.updateUserLadderStatus(userId);
@@ -141,7 +187,8 @@ public class LadderController {
             throw new UserNotFoundException(userId);
         }
         
-        return ResponseEntity.ok(status);
+        LadderStatusDTO dto = LadderStatusMapper.INSTANCE.toDTO(status);
+        return ResponseEntity.ok(dto);
     }
     
     /**

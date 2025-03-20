@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.interfaces.LadderStatusService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
+import sg.edu.ntu.gamify_demo.mappers.LadderStatusMapper;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.UserLadderStatus;
@@ -133,39 +135,135 @@ public class LadderStatusServiceImpl implements LadderStatusService {
      * @param user The user to initialize.
      * @return The initialized ladder status.
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     private UserLadderStatus initializeUserLadderStatus(User user) {
-        // Get the first ladder level
-        LadderLevel firstLevel = ladderLevelRepository.findByLevel(1);
-        
-        if (firstLevel == null) {
-            // Create a default first level if none exists
-            firstLevel = new LadderLevel();
-            firstLevel.setLevel(1L);
-            firstLevel.setLabel("Beginner");
-            firstLevel.setPointsRequired(0L);
-            firstLevel.setCreatedAt(ZonedDateTime.now());
-            firstLevel = ladderLevelRepository.save(firstLevel);
+        try {
+            // Add transaction boundary logging
+            System.out.println("LadderStatusServiceImpl: Starting transaction for user ladder status initialization: " + 
+                (user != null ? user.getId() : "null user"));
+            
+            // Ensure user is not null and has a valid ID
+            if (user == null || user.getId() == null) {
+                throw new IllegalArgumentException("User or user ID is null");
+            }
+            
+            // Get the first ladder level
+            LadderLevel firstLevel = ladderLevelRepository.findByLevel(1);
+            
+            if (firstLevel == null) {
+                // Create a default first level if none exists
+                System.out.println("LadderStatusServiceImpl: First ladder level not found, creating default level");
+                firstLevel = new LadderLevel();
+                firstLevel.setLevel(1L);
+                firstLevel.setLabel("Beginner");
+                firstLevel.setPointsRequired(0L);
+                firstLevel.setCreatedAt(ZonedDateTime.now());
+                
+                try {
+                    firstLevel = ladderLevelRepository.save(firstLevel);
+                    System.out.println("LadderStatusServiceImpl: Created default ladder level: " + firstLevel.getLevel());
+                    
+                    // Verify the level was saved correctly
+                    LadderLevel verifyLevel = ladderLevelRepository.findByLevel(1);
+                    if (verifyLevel == null) {
+                        System.err.println("LadderStatusServiceImpl: ERROR: Failed to save default ladder level!");
+                    } else {
+                        System.out.println("LadderStatusServiceImpl: Verified default ladder level exists with ID: " + verifyLevel.getLevel());
+                    }
+                } catch (Exception e) {
+                    System.err.println("LadderStatusServiceImpl: Error saving default ladder level: " + e.getMessage());
+                    e.printStackTrace();
+                    
+                    // Try one more time with a direct constructor
+                    firstLevel = new LadderLevel(1L, "Beginner", 0L);
+                    firstLevel = ladderLevelRepository.save(firstLevel);
+                }
+            } else {
+                System.out.println("LadderStatusServiceImpl: Found existing ladder level: " + firstLevel.getLevel());
+            }
+            
+            // Create a new ladder status for the user with explicit ID assignment
+            UserLadderStatus status = new UserLadderStatus();
+            status.setId(user.getId()); // Explicit ID assignment
+            status.setUser(user);
+            status.setCurrentLevel(firstLevel);
+            status.setEarnedPoints(user.getEarnedPoints() != null ? user.getEarnedPoints() : 0L);
+            status.setPointsToNextLevel(100L); // Default points to next level
+            
+            // Find the next level
+            List<LadderLevel> levels = ladderLevelRepository.findAllByOrderByLevelAsc();
+            LadderLevel nextLevel = findNextLevel(levels, firstLevel);
+            
+            // Calculate points to next level using the strategy
+            if (nextLevel != null) {
+                Long pointsToNextLevel = (long) pointsCalculationStrategy.calculatePointsToNextLevel(
+                        user.getEarnedPoints() != null ? user.getEarnedPoints().intValue() : 0, 
+                        firstLevel, 
+                        nextLevel);
+                status.setPointsToNextLevel(pointsToNextLevel);
+            }
+            
+            status.setUpdatedAt(ZonedDateTime.now());
+            
+            // Double-check ID is set before saving
+            if (status.getId() == null) {
+                System.out.println("LadderStatusServiceImpl: WARNING: ID is still null after explicit assignment, setting from user ID");
+                status.setId(user.getId());
+            }
+            
+            System.out.println("LadderStatusServiceImpl: Saving UserLadderStatus with ID: " + status.getId());
+            UserLadderStatus savedStatus = userLadderStatusRepository.save(status);
+            System.out.println("LadderStatusServiceImpl: Successfully saved UserLadderStatus with ID: " + savedStatus.getId());
+            
+            return savedStatus;
+        } catch (Exception e) {
+            // Log the exception for debugging
+            System.err.println("Error initializing UserLadderStatus: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Create a minimal valid status to avoid constraint violations
+            if (user == null || user.getId() == null) {
+                throw new IllegalArgumentException("User or user ID is null");
+            }
+            
+            // Get or create a default level
+            LadderLevel defaultLevel = ensureDefaultLevelExists();
+            
+            // Create using constructor to ensure ID is set
+            UserLadderStatus status = new UserLadderStatus(
+                user,
+                defaultLevel,
+                0L,
+                100L
+            );
+            
+            status.setUpdatedAt(ZonedDateTime.now());
+            
+            // Double-check ID is set before saving
+            if (status.getId() == null) {
+                status.setId(user.getId());
+            }
+            
+            return userLadderStatusRepository.save(status);
         }
-        
-        // Create a new ladder status for the user
-        UserLadderStatus status = new UserLadderStatus();
-        status.setUser(user);
-        status.setCurrentLevel(firstLevel);
-        status.setEarnedPoints(user.getEarnedPoints());
-        
-        // Find the next level
-        List<LadderLevel> levels = ladderLevelRepository.findAllByOrderByLevelAsc();
-        LadderLevel nextLevel = findNextLevel(levels, firstLevel);
-        
-        // Calculate points to next level using the strategy
-        Long pointsToNextLevel = (long) pointsCalculationStrategy.calculatePointsToNextLevel(
-                user.getEarnedPoints().intValue(), firstLevel, nextLevel);
-        
-        status.setPointsToNextLevel(pointsToNextLevel);
-        status.setUpdatedAt(ZonedDateTime.now());
-        
-        return userLadderStatusRepository.save(status);
+    }
+    
+    /**
+     * Ensures that a default ladder level exists and returns it.
+     * 
+     * @return The default ladder level.
+     */
+    private LadderLevel ensureDefaultLevelExists() {
+        LadderLevel defaultLevel = ladderLevelRepository.findByLevel(1);
+        if (defaultLevel == null) {
+            defaultLevel = new LadderLevel();
+            defaultLevel.setLevel(1L);
+            defaultLevel.setLabel("Beginner");
+            defaultLevel.setPointsRequired(0L);
+            defaultLevel.setCreatedAt(ZonedDateTime.now());
+            defaultLevel = ladderLevelRepository.save(defaultLevel);
+        }
+        return defaultLevel;
     }
     
     /**
@@ -191,11 +289,6 @@ public class LadderStatusServiceImpl implements LadderStatusService {
      * @return The converted DTO.
      */
     private LadderStatusDTO convertToDTO(UserLadderStatus status) {
-        return LadderStatusDTO.builder()
-                .currentLevel(status.getCurrentLevel().getLevel().intValue())
-                .levelLabel(status.getCurrentLevel().getLabel())
-                .earnedPoints(status.getEarnedPoints().intValue())
-                .pointsToNextLevel(status.getPointsToNextLevel().intValue())
-                .build();
+        return LadderStatusMapper.INSTANCE.toDTO(status);
     }
 }

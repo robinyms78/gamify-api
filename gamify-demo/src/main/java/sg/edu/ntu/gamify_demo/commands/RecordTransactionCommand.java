@@ -84,11 +84,21 @@ public class RecordTransactionCommand implements TaskEventCommand {
         // Update user's points
         user.addPointsTransaction(savedTransaction);
         
-        // Publish a domain event for points earned
-        int newTotal = user.getAvailablePoints().intValue();
-        PointsEarnedEvent pointsEarnedEvent = new PointsEarnedEvent(
-                user, points.intValue(), newTotal, "TASK_COMPLETED", eventData);
-        domainEventPublisher.publish(pointsEarnedEvent);
+        // Check if ladder status update should be skipped
+        boolean skipLadderUpdate = false;
+        if (eventData != null && eventData.has("skip_ladder_update")) {
+            skipLadderUpdate = eventData.get("skip_ladder_update").asBoolean(false);
+        } else if (eventData != null && eventData.has("data") && eventData.get("data").has("skip_ladder_update")) {
+            skipLadderUpdate = eventData.get("data").get("skip_ladder_update").asBoolean(false);
+        }
+        
+        // Publish a domain event for points earned only if ladder update is not skipped
+        if (!skipLadderUpdate) {
+            int newTotal = user.getAvailablePoints().intValue();
+            PointsEarnedEvent pointsEarnedEvent = new PointsEarnedEvent(
+                    user, points.intValue(), newTotal, "TASK_COMPLETED", eventData);
+            domainEventPublisher.publish(pointsEarnedEvent);
+        }
         
         // Return null as we're not creating a task event
         return null;

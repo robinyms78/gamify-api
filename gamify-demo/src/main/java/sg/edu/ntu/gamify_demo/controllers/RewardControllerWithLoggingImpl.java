@@ -132,11 +132,16 @@ public class RewardControllerWithLoggingImpl {
         @Parameter(description = "Redemption request details", required = true,
                   content = @Content(schema = @Schema(implementation = RewardRedemptionRequest.class)))
         @RequestBody RewardRedemptionRequest request) {
-        RedemptionResult result = rewardRedemptionService.redeemReward(request.getUserId(), request.getRewardId());
-        if (result.isSuccess()) {
-            return ResponseEntity.ok(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        try {
+            RedemptionResult result = rewardRedemptionService.redeemReward(request.getUserId(), request.getRewardId());
+            if (result.isSuccess()) {
+                return ResponseEntity.ok(result);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+            }
+        } catch (Exception e) {
+            ErrorResponse errorResponse = new ErrorResponse("Server error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
     

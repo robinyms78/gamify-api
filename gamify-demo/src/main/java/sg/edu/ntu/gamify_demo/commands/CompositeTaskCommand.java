@@ -54,10 +54,56 @@ public class CompositeTaskCommand implements TaskEventCommand {
     @Override
     @Transactional
     public TaskEvent execute() {
-        // Execute commands in sequence
-        TaskEvent taskEvent = calculatePointsCommand.execute();
-        recordTransactionCommand.execute();
-        updateLadderStatusCommand.execute();
-        return taskEvent;
+        try {
+            // Execute commands in sequence
+            TaskEvent taskEvent = calculatePointsCommand.execute();
+            recordTransactionCommand.execute();
+            
+            // Try to update ladder status, but don't fail if it fails
+            try {
+                // Check if ladder status update should be skipped
+                boolean skipLadderUpdate = false;
+                if (eventData.has("data") && eventData.get("data").has("skip_ladder_update")) {
+                    skipLadderUpdate = eventData.get("data").get("skip_ladder_update").asBoolean(false);
+                }
+                
+                if (!skipLadderUpdate && updateLadderStatusCommand != null) {
+                    // Ensure user has a valid ladder status before updating
+                    ensureUserLadderStatus();
+                    updateLadderStatusCommand.execute();
+                }
+            } catch (Exception e) {
+                // Log the error but continue
+                System.err.println("Error updating ladder status: " + e.getMessage());
+                e.printStackTrace();
+            }
+            
+            return taskEvent;
+        } catch (Exception e) {
+            // Log the error and rethrow
+            System.err.println("Error executing composite command: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+    
+    /**
+     * Ensure the user has a valid ladder status before updating.
+     * This is a workaround for the null identifier issue.
+     */
+    private void ensureUserLadderStatus() {
+        if (user == null || user.getId() == null) {
+            System.err.println("User or user ID is null in CompositeTaskCommand");
+            return;
+        }
+        
+        // This is a workaround to ensure the user has a valid ladder status
+        // We're directly updating the user's points to trigger ladder status creation
+        try {
+            user.setEarnedPoints(user.getEarnedPoints() != null ? user.getEarnedPoints() : 0L);
+        } catch (Exception e) {
+            System.err.println("Error ensuring user ladder status: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

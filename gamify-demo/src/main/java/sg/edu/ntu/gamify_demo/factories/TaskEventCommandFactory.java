@@ -88,15 +88,20 @@ public class TaskEventCommandFactory {
                         domainEventPublisher,
                         objectMapper);
                 
-                UpdateLadderStatusCommand updateLadderStatusCommand = new UpdateLadderStatusCommand(
-                        user,
-                        ladderStatusService);
+                // Check if ladder status update should be skipped
+                boolean skipLadderUpdate = false;
+                if (eventData.has("skip_ladder_update")) {
+                    skipLadderUpdate = eventData.get("skip_ladder_update").asBoolean(false);
+                }
+                
+                UpdateLadderStatusCommand updateLadderStatusCommand = skipLadderUpdate ? null : 
+                        new UpdateLadderStatusCommand(user, ladderStatusService);
                 
                 // Create and return a composite command that executes all commands in a transaction
                 return new CompositeTaskCommand(
                         calculatePointsCommand,
                         recordTransactionCommand,
-                        updateLadderStatusCommand,
+                        updateLadderStatusCommand, // Include ladder status update if not skipped
                         user,
                         taskId,
                         eventData);

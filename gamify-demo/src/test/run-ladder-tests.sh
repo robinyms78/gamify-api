@@ -119,6 +119,11 @@ if [[ $run_manual =~ ^[Yy]$ ]]; then
             echo -e "\n${BLUE}Running ladder status tests...${NC}"
             chmod +x "$(pwd)/src/test/ladder-status-test.sh"
             bash "$(pwd)/src/test/ladder-status-test.sh"
+            
+            # Run the ladder-status-update-test.sh script
+            echo -e "\n${BLUE}Running ladder status update tests...${NC}"
+            chmod +x "$(pwd)/src/test/ladder-status-update-test.sh"
+            bash "$(pwd)/src/test/ladder-status-update-test.sh"
         else
             echo -e "${RED}✗ ladder-status-test.sh script not found${NC}"
             

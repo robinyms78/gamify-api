@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Web security configuration for the application.
@@ -24,6 +25,12 @@ public class WebSecurityConfig {
      * @return The configured SecurityFilterChain
      * @throws Exception If an error occurs during configuration
      */
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    
+    public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
     @Bean
     @Profile("!test") // Only active when not in test profile
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -43,14 +50,18 @@ public class WebSecurityConfig {
                     "/swagger-ui/favicon-16x16.png",
                     "/error/**",
                     "/auth/register",
-                    "/auth/login"
+                    "/auth/login",
+                    "/api/debug/**",  // Allow access to debug endpoints
+                    "/debug/**"       // Allow access to new debug endpoints
                 ).permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
                 // Use stateless session management for REST APIs
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
+            )
+            // Add JWT authentication filter before UsernamePasswordAuthenticationFilter
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }

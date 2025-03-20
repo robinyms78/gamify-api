@@ -51,6 +51,37 @@ else
     exit 1
 fi
 
+# Step 2: Login to get JWT token
+echo -e "\n${YELLOW}Step 2: Logging in to get JWT token${NC}"
+
+# Create login payload
+login_data='{
+  "username": "'$username'",
+  "password": "password123"
+}'
+
+echo -e "\n${YELLOW}Sending login request:${NC}"
+echo "$login_data"
+
+# Send login request
+login_response=$(curl -s -X POST "$BASE_URL/auth/login" \
+    -H "Content-Type: application/json" \
+    -d "$login_data")
+
+echo -e "\n${YELLOW}Login Response:${NC}"
+echo "$login_response"
+
+# Extract JWT token
+if echo "$login_response" | grep -q '"token"'; then
+    echo -e "\n${GREEN}✓ Login successful${NC}"
+    # Extract the JWT token
+    jwt_token=$(echo "$login_response" | grep -o '"token":"[^"]*"' | cut -d':' -f2 | tr -d '"')
+    echo -e "${GREEN}JWT Token: $jwt_token${NC}"
+else
+    echo -e "\n${RED}✗ Login failed${NC}"
+    exit 1
+fi
+
 # Function to test task completion with a specific priority
 test_priority() {
     local priority=$1
@@ -68,16 +99,18 @@ test_priority() {
       "event_type": "TASK_COMPLETED",
       "data": {
         "priority": "'$priority'",
-        "description": "Test task with '$priority' priority"
+        "description": "Test task with '$priority' priority",
+        "skip_ladder_update": true
       }
     }'
     
     echo -e "\n${YELLOW}Sending task completion request:${NC}"
     echo "$task_data"
     
-    # Send the request
+    # Send the request with JWT token
     task_response=$(curl -s -X POST "$BASE_URL/tasks/events" \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $jwt_token" \
         -d "$task_data")
     
     # Display response
@@ -131,16 +164,18 @@ task_data='{
   "taskId": "'$task_id'",
   "event_type": "TASK_COMPLETED",
   "data": {
-    "description": "Test task with no priority specified"
+    "description": "Test task with no priority specified",
+    "skip_ladder_update": true
   }
 }'
 
 echo -e "\n${YELLOW}Sending task completion request:${NC}"
 echo "$task_data"
 
-# Send the request
+# Send the request with JWT token
 task_response=$(curl -s -X POST "$BASE_URL/tasks/events" \
     -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $jwt_token" \
     -d "$task_data")
 
 # Display response

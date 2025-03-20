@@ -18,7 +18,7 @@ echo "========================================"
 echo -e "\n${YELLOW}Testing HIGH priority task completion:${NC}"
 
 # Create a properly formatted JSON payload
-json_data='{"userId":"user123","taskId":"task-high-123","event_type":"TASK_COMPLETED","data":{"priority":"HIGH","description":"Test task completion"}}'
+json_data='{"userId":"user123","taskId":"task-high-123","event_type":"TASK_COMPLETED","data":{"priority":"HIGH","description":"Test task completion","skip_ladder_update":true}}'
 
 echo -e "\n${YELLOW}Sending request:${NC}"
 echo "$json_data"

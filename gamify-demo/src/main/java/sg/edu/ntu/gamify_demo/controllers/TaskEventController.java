@@ -85,11 +85,15 @@ public class TaskEventController {
                 return ResponseEntity.badRequest().body(errorResponse);
             }
             
-            ObjectNode response = taskEventService.processTaskEvent(eventData);
+            // Sanitize the event data to remove any control characters
+            String sanitizedJson = eventData.toString().replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
+            JsonNode sanitizedEventData = objectMapper.readTree(sanitizedJson);
+            
+            ObjectNode response = taskEventService.processTaskEvent(sanitizedEventData);
             
             // Add priority to response if available
-            if (eventData.has("data") && eventData.get("data").has("priority")) {
-                response.put("priority", eventData.get("data").get("priority").asText());
+            if (sanitizedEventData.has("data") && sanitizedEventData.get("data").has("priority")) {
+                response.put("priority", sanitizedEventData.get("data").get("priority").asText());
             }
             
             return ResponseEntity.ok(response);
@@ -101,7 +105,7 @@ public class TaskEventController {
         } catch (Exception e) {
             ObjectNode errorResponse = objectMapper.createObjectNode();
             errorResponse.put("error", "Internal Server Error");
-            errorResponse.put("message", "An unexpected error occurred");
+            errorResponse.put("message", "An unexpected error occurred: " + e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
         }
     }

@@ -122,11 +122,56 @@ public class UserAchievementServiceImpl implements UserAchievementService {
                 continue;
             }
             
-            // Check if the achievement criteria matches the event
+            // Get the achievement criteria
             JsonNode criteria = achievement.getCriteria();
-            if (criteria != null && criteria.has("eventType") && 
-                criteria.get("eventType").asText().equals(eventType)) {
+            if (criteria == null) {
+                continue;
+            }
+            
+            // Check if this is a level-based achievement and the event is LEVEL_UP
+            if (criteria.has("requiredLevel") && eventType.equals("LEVEL_UP")) {
+                // Add type field if it doesn't exist
+                if (!criteria.has("type")) {
+                    ((ObjectNode) criteria).put("type", "LEVEL_BASED");
+                }
                 
+                // Check if the user meets the criteria
+                if (checkAchievementCriteria(user, achievement)) {
+                    // Create metadata for the achievement
+                    ObjectNode metadata = objectMapper.createObjectNode();
+                    metadata.put("eventType", eventType);
+                    metadata.set("eventData", eventData);
+                    
+                    // Award the achievement
+                    UserAchievement userAchievement = awardAchievement(user, achievement, metadata);
+                    if (userAchievement != null) {
+                        newAchievements.add(userAchievement);
+                    }
+                }
+            }
+            // Check if this is a task completion achievement and the event is TASK_COMPLETED
+            else if (criteria.has("taskCount") && eventType.equals("TASK_COMPLETED")) {
+                // Add type field if it doesn't exist
+                if (!criteria.has("type")) {
+                    ((ObjectNode) criteria).put("type", "TASK_COMPLETION_COUNT");
+                }
+                
+                // Check if the user meets the criteria
+                if (checkAchievementCriteria(user, achievement)) {
+                    // Create metadata for the achievement
+                    ObjectNode metadata = objectMapper.createObjectNode();
+                    metadata.put("eventType", eventType);
+                    metadata.set("eventData", eventData);
+                    
+                    // Award the achievement
+                    UserAchievement userAchievement = awardAchievement(user, achievement, metadata);
+                    if (userAchievement != null) {
+                        newAchievements.add(userAchievement);
+                    }
+                }
+            }
+            // Check if the achievement criteria has an eventType that matches the current event
+            else if (criteria.has("eventType") && criteria.get("eventType").asText().equals(eventType)) {
                 // Check if the user meets the criteria
                 if (checkAchievementCriteria(user, achievement)) {
                     // Create metadata for the achievement

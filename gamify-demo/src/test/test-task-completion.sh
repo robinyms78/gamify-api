@@ -67,7 +67,8 @@ task_data='{
   "event_type": "TASK_COMPLETED",
   "data": {
     "priority": "HIGH",
-    "description": "Test task completion"
+    "description": "Test task completion",
+    "skip_ladder_update": true
   }
 }'
 

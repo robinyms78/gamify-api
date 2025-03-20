@@ -47,11 +47,11 @@ fi
 
 # Run only User-related tests as an example
 print_header "Running User-related tests"
-run_command "mvn test -Dtest.group=UserRepo -Dtest=\"sg.edu.ntu.gamify_demo.repositories.UserRepositoryTest\"" "User Repository Tests"
-run_command "mvn test -Dtest.group=UserService -Dtest=\"sg.edu.ntu.gamify_demo.services.UserServiceTest\"" "User Service Tests"
-run_command "mvn test -Dtest.group=UserController -Dtest=\"sg.edu.ntu.gamify_demo.controllers.UserControllerTest\"" "User Controller Tests"
-run_command "mvn test -Dtest.group=UserIntegration -Dtest=\"sg.edu.ntu.gamify_demo.integration.UserIntegrationTest\"" "User Integration Tests"
-run_command "mvn test -Dtest.group=AuthTests -Dtest=\"sg.edu.ntu.gamify_demo.controllers.AuthControllerTest,sg.edu.ntu.gamify_demo.integration.AuthIntegrationTest\"" "Auth Tests"
+run_command "mvn test -Dtest.group=UserRepo -Dtest=\"sg.edu.ntu.gamify_demo.repositories.UserRepositoryTest\" -Dspring.profiles.active=test -Dskip.ladder.update=true -Dspring.main.allow-bean-definition-overriding=true" "User Repository Tests"
+run_command "mvn test -Dtest.group=UserService -Dtest=\"sg.edu.ntu.gamify_demo.services.UserServiceTest\" -Dspring.profiles.active=test -Dskip.ladder.update=true -Dspring.main.allow-bean-definition-overriding=true" "User Service Tests"
+run_command "mvn test -Dtest.group=UserController -Dtest=\"sg.edu.ntu.gamify_demo.controllers.UserControllerTest\" -Dspring.profiles.active=test -Dskip.ladder.update=true -Dspring.main.allow-bean-definition-overriding=true" "User Controller Tests"
+run_command "mvn test -Dtest.group=UserIntegration -Dtest=\"sg.edu.ntu.gamify_demo.integration.UserIntegrationTest\" -Dspring.profiles.active=test -Dskip.ladder.update=true -Dspring.main.allow-bean-definition-overriding=true" "User Integration Tests"
+run_command "mvn test -Dtest.group=AuthTests -Dtest=\"sg.edu.ntu.gamify_demo.controllers.AuthControllerTest,sg.edu.ntu.gamify_demo.integration.AuthIntegrationTest\" -Dspring.profiles.active=test -Dskip.ladder.update=true -Dspring.main.allow-bean-definition-overriding=true" "Auth Tests"
 
 # Generate test summary report for this batch
 print_header "Generating test summary report"

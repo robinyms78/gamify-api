@@ -100,11 +100,8 @@ public class PointsTransactionService {
         transaction.setTimestamp(ZonedDateTime.now());
         transaction.setMetadata(metadata);
         
-        // Update user points (only available points, earned points remain unchanged)
-        user.setAvailablePoints(user.getAvailablePoints() - points);
-        userRepository.save(user);
-        
-        // Save transaction
+        // Save transaction without updating user points again
+        // (points are already updated in RedeemRewardCommand)
         PointsTransaction savedTransaction = pointsTransactionRepository.save(transaction);
         
         // Send notification

@@ -139,13 +139,19 @@ public class TaskEventService {
      */
     private void handleTaskCompletedEvent(User user, TaskEvent taskEvent, String taskId, 
                                          JsonNode additionalData, ObjectNode response) {
-        int pointsAwarded = calculatePointsForTask(taskId, additionalData);
-        response.put("pointsAwarded", pointsAwarded);
+        try {
+            int pointsAwarded = calculatePointsForTask(taskId, additionalData);
+            response.put("pointsAwarded", pointsAwarded);
 
-        // Create and publish a domain event for task completion
-        TaskCompletedEvent completedEvent = new TaskCompletedEvent(
-                "TASK_COMPLETED", user, taskEvent, pointsAwarded, additionalData
-        );
-        domainEventPublisher.publish(completedEvent);
+            // Create and publish a domain event for task completion
+            TaskCompletedEvent completedEvent = new TaskCompletedEvent(
+                    "TASK_COMPLETED", user, taskEvent, pointsAwarded, additionalData
+            );
+            domainEventPublisher.publish(completedEvent);
+        } catch (Exception e) {
+            // Log the error but don't fail the task completion
+            response.put("pointsAwarded", 0);
+            response.put("warning", "Failed to process points: " + e.getMessage());
+        }
     }
 }

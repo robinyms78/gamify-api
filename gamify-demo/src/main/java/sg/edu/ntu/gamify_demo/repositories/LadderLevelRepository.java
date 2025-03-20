@@ -12,7 +12,7 @@ import sg.edu.ntu.gamify_demo.models.LadderLevel;
  * Provides CRUD operations and custom queries for ladder levels.
  */
 @Repository
-public interface LadderLevelRepository extends JpaRepository<LadderLevel, Integer> {
+public interface LadderLevelRepository extends JpaRepository<LadderLevel, Long> {
     
     /**
      * Find a ladder level by its level number.

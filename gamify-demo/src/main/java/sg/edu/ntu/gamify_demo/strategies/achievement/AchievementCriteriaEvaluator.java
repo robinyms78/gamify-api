@@ -29,12 +29,14 @@ public final class AchievementCriteriaEvaluator {
     public AchievementCriteriaEvaluator(
             PointsThresholdStrategy pointsThresholdStrategy,
             TaskCompletionStrategy taskCompletionStrategy,
-            ConsecutiveDaysStrategy consecutiveDaysStrategy) {
+            ConsecutiveDaysStrategy consecutiveDaysStrategy,
+            LevelBasedStrategy levelBasedStrategy) {
         
         // Register strategies
         registerStrategy("POINTS_THRESHOLD", pointsThresholdStrategy);
         registerStrategy("TASK_COMPLETION_COUNT", taskCompletionStrategy);
         registerStrategy("CONSECUTIVE_DAYS", consecutiveDaysStrategy);
+        registerStrategy("LEVEL_BASED", levelBasedStrategy);
     }
     
     /**
