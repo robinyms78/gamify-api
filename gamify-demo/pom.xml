@@ -138,7 +138,12 @@
     		<version>3.7.3</version>
 		</dependency>
 
-
+		<dependency>
+     		<groupId>org.mybatis.spring.boot</groupId>
+     		<artifactId>mybatis-spring-boot-starter</artifactId>
+     		<version>3.0.3</version>
+ 		</dependency>
+		
 	</dependencies>
 
 	<build>
