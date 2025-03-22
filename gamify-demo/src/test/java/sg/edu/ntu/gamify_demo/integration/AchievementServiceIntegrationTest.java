@@ -38,7 +38,6 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
  */
 @SpringBootTest
 @ActiveProfiles("test") // Use test profile for database testing
-@Transactional
 public class AchievementServiceIntegrationTest {
     
     @Autowired
@@ -71,20 +70,27 @@ public class AchievementServiceIntegrationTest {
         achievementRepository.deleteAll();
         userRepository.deleteAll();
         
-        // Create user with service-generated ID
+        // Generate unique user identifiers
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8);
         testUser = userRepository.save(User.builder()
-            .username("testuser")
-            .email("test@example.com")
+            .username("testuser-" + uniqueId)
+            .email("test-" + uniqueId + "@example.com")
             .passwordHash("hashedpassword")
             .role(UserRole.EMPLOYEE)
             .earnedPoints(100L)
             .availablePoints(100L)
             .build());
         
-        // Base criteria for test achievements
         baseCriteria = objectMapper.createObjectNode();
         baseCriteria.put("type", "POINTS_THRESHOLD");
         baseCriteria.put("threshold", 50);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        userAchievementRepository.deleteAll();
+        achievementRepository.deleteAll();
+        userRepository.deleteAll();
     }
     
     @Test
