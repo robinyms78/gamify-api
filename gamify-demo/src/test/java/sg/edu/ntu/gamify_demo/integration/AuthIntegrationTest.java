@@ -130,7 +130,7 @@ public class AuthIntegrationTest {
             .andExpectAll(
                 status().isBadRequest(),
                 jsonPath("$.error").value("Validation error"),
-                jsonPath("$.details").value(containsString(expectedError))
+                jsonPath("$.details[0]").value(containsString(expectedError))
             );
     }
 
@@ -158,9 +158,10 @@ public class AuthIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(registrationRequest)))
             .andExpectAll(
+                header().string("Content-Security-Policy", "default-src 'self'"),
                 header().string("X-Content-Type-Options", "nosniff"),
-                header().string("X-Frame-Options", "DENY"),
-                header().string("Content-Security-Policy", containsString("default-src 'self'"))
+                header().string("X-Frame-Options", "DENY")
+            )
             );
     }
 

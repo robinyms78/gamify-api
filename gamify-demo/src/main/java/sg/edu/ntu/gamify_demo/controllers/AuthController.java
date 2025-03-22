@@ -75,7 +75,7 @@ public class AuthController {
             @Parameter(description = "Registration request containing user details",
                 required = true,
                 content = @Content(schema = @Schema(implementation = RegistrationRequest.class)))
-            @RequestBody RegistrationRequest request) {
+            @Valid @RequestBody RegistrationRequest request) {
         // Check if username already exists
         if (userRepository.existsByUsername(request.username())) {
             throw new DuplicateUserException("Username already exists");

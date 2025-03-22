@@ -27,7 +27,7 @@ public class SecurityConfig {
                     .deny()
                 )
                 .xssProtection(xss -> xss
-                    .disable()
+                    .enable()
                 )
             );
         
