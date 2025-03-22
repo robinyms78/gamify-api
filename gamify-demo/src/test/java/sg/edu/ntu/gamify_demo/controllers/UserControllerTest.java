@@ -3,6 +3,7 @@ package sg.edu.ntu.gamify_demo.controllers;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -184,7 +185,12 @@ public class UserControllerTest {
                 .availablePoints(120L) 
                 .build();
 
-        User updatedUser = testUser1.toBuilder()
+        User updatedUser = User.builder()
+                .id(testUser1.getId())
+                .username(testUser1.getUsername())
+                .email(testUser1.getEmail())
+                .passwordHash(testUser1.getPasswordHash())
+                .role(testUser1.getRole())
                 .department("Research")
                 .earnedPoints(150L)
                 .availablePoints(120L)
