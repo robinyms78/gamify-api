@@ -30,8 +30,6 @@ public class SecurityConfig {
                 .xssProtection(xss -> xss
                     .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
                 )
-                // Add CSP report-only header if needed
-                .addHeaderWriter(new StaticHeadersWriter("Content-Security-Policy", "default-src 'self'"))
             );
         
         return http.build();
