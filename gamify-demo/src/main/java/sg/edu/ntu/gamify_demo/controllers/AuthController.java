@@ -1,6 +1,8 @@
 package sg.edu.ntu.gamify_demo.controllers;
 import java.util.Optional;
+import java.net.URI;
 import java.util.UUID;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import jakarta.validation.Valid;
 
@@ -103,12 +105,15 @@ public class AuthController {
         // Save user to database
         User savedUser = userRepository.save(newUser);
 
-        // Return success response
-        RegistrationResponse response = new RegistrationResponse(
-                "User registered successfully", 
-                savedUser.getId());
-        
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        // Build location URI with full context path
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/users/{id}")
+                .buildAndExpand(savedUser.getId())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(new RegistrationResponse("User registered successfully", savedUser.getId()));
     }
 
     /**

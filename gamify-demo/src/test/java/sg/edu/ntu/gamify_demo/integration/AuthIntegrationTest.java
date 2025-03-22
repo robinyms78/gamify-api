@@ -42,7 +42,10 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test") // Use test profile for database testing
-@Import(TestIntegrationConfig.class)
+@Import({
+    TestIntegrationConfig.class,
+    SecurityConfig.class // Add this line
+})
 public class AuthIntegrationTest {
 
     @Autowired
@@ -136,17 +139,38 @@ public class AuthIntegrationTest {
 
     private static Stream<Arguments> invalidRegistrationPayloads() {
         return Stream.of(
+            // Test case 1: Missing username but valid password
             Arguments.of(
-                new RegistrationRequest(null, "valid@email.com", "pass", UserRole.EMPLOYEE, "Dept"),
-                "Username is required"
+                new RegistrationRequest(
+                    null, 
+                    "valid@email.com", 
+                    "ValidPass123!", // Valid password
+                    UserRole.EMPLOYEE, 
+                    "Dept"
+                ),
+                "username: Username is required"
             ),
+            // Test case 2: Invalid email with valid password
             Arguments.of(
-                new RegistrationRequest("user", "invalid-email", "pass", UserRole.EMPLOYEE, "Dept"),
-                "Valid email is required"
+                new RegistrationRequest(
+                    "user", 
+                    "invalid-email", 
+                    "ValidPass123!", // Valid password
+                    UserRole.EMPLOYEE, 
+                    "Dept"
+                ),
+                "email: Must be a valid email address"
             ),
+            // Test case 3: Short password with valid email
             Arguments.of(
-                new RegistrationRequest("user", "valid@email.com", "short", UserRole.EMPLOYEE, "Dept"),
-                "Password must be at least 8 characters"
+                new RegistrationRequest(
+                    "user", 
+                    "valid@email.com", 
+                    "short", 
+                    UserRole.EMPLOYEE, 
+                    "Dept"
+                ),
+                "password: Password must be at least 8 characters"
             )
         );
     }
