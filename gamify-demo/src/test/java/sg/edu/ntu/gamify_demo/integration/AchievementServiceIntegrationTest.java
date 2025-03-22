@@ -3,11 +3,16 @@ package sg.edu.ntu.gamify_demo.integration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import org.springframework.dao.DataIntegrityViolationException;
+
+import sg.edu.ntu.gamify_demo.exceptions.AchievementNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -58,28 +63,69 @@ public class AchievementServiceIntegrationTest {
     private ObjectMapper objectMapper;
     
     private User testUser;
+    private ObjectNode baseCriteria;
     
     @BeforeEach
     public void setUp() {
-        // Clean up repositories
         userAchievementRepository.deleteAll();
         achievementRepository.deleteAll();
         userRepository.deleteAll();
         
-        // Create test user
-        testUser = new User();
-        testUser.setId("test-user-id");
-        testUser.setUsername("testuser");
-        testUser.setEmail("test@example.com");
-        testUser.setPasswordHash("hashedpassword");
-        testUser.setRole(UserRole.EMPLOYEE);
-        testUser.setEarnedPoints(100L);
-        testUser.setAvailablePoints(100L);
-        userRepository.save(testUser);
+        // Create user with service-generated ID
+        testUser = userRepository.save(User.builder()
+            .username("testuser")
+            .email("test@example.com")
+            .passwordHash("hashedpassword")
+            .role(UserRole.EMPLOYEE)
+            .earnedPoints(100L)
+            .availablePoints(100L)
+            .build());
+        
+        // Base criteria for test achievements
+        baseCriteria = objectMapper.createObjectNode();
+        baseCriteria.put("type", "POINTS_THRESHOLD");
+        baseCriteria.put("threshold", 50);
     }
     
     @Test
     public void testCreateAndGetAchievement() {
+        Achievement created = achievementService.createAchievement(
+            "Test Achievement", "Test Desc", baseCriteria);
+        
+        Achievement retrieved = achievementService.getAchievementById(
+            created.getAchievementId());
+        
+        // Verify full JSON structure match
+        Assertions.assertEquals(baseCriteria.toString(), 
+            retrieved.getCriteria().toString());
+    }
+    
+    @Test
+    public void testUpdateAchievement_InvalidIdShouldFail() {
+        Assertions.assertThrows(AchievementNotFoundException.class, () -> {
+            achievementService.updateAchievement(
+                "invalid-id", "New Name", "New Desc", baseCriteria);
+        });
+    }
+    
+    @Test
+    public void testDuplicateAchievementPrevention() {
+        achievementService.createAchievement("Unique", "Desc", baseCriteria);
+        
+        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
+            // Attempt duplicate using repository directly
+            achievementRepository.save(
+                new Achievement(null, "Unique", "Desc", baseCriteria)
+            );
+        });
+    }
+    
+    @Test
+    public void testGetAchievement_InvalidIdShouldThrow() {
+        Assertions.assertThrows(AchievementNotFoundException.class, () -> {
+            achievementService.getAchievementById("non-existent-id");
+        });
+    }
         // Arrange
         String name = "Test Achievement";
         String description = "Test Description";
@@ -128,29 +174,22 @@ public class AchievementServiceIntegrationTest {
     
     @Test
     public void testUpdateAchievement() {
-        // Arrange
-        String name = "Original Name";
-        String description = "Original Description";
-        ObjectNode criteria = objectMapper.createObjectNode();
-        criteria.put("type", "POINTS_THRESHOLD");
-        criteria.put("threshold", 50);
+        Achievement original = achievementService.createAchievement(
+            "Original", "Desc", baseCriteria);
         
-        Achievement achievement = achievementService.createAchievement(name, description, criteria);
+        ObjectNode updatedCriteria = baseCriteria.deepCopy();
+        updatedCriteria.put("threshold", 100);
         
-        String newName = "Updated Name";
-        String newDescription = "Updated Description";
-        ObjectNode newCriteria = objectMapper.createObjectNode();
-        newCriteria.put("type", "POINTS_THRESHOLD");
-        newCriteria.put("threshold", 100);
+        Achievement updated = achievementService.updateAchievement(
+            original.getAchievementId(), "Updated", "New Desc", updatedCriteria);
         
-        // Act
-        Achievement updatedAchievement = achievementService.updateAchievement(
-                achievement.getAchievementId(), newName, newDescription, newCriteria);
-        
-        // Assert
-        assertEquals(newName, updatedAchievement.getName());
-        assertEquals(newDescription, updatedAchievement.getDescription());
-        assertEquals(newCriteria.get("threshold").asInt(), updatedAchievement.getCriteria().get("threshold").asInt());
+        // Verify all fields including full criteria
+        Assertions.assertAll(
+            () -> assertEquals("Updated", updated.getName()),
+            () -> assertEquals("New Desc", updated.getDescription()),
+            () -> assertEquals(updatedCriteria.toString(), 
+                             updated.getCriteria().toString())
+        );
     }
     
     @Test
