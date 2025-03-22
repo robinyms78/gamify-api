@@ -123,20 +123,19 @@ public class AchievementServiceIntegrationTest {
     @Test
     public void testDuplicateAchievementPrevention() {
         // Create first achievement through service
-        achievementService.createAchievement("Unique", "Desc", baseCriteria);
-        
-        // Force flush to ensure constraint check
+        Achievement existing = achievementService.createAchievement("Unique", "Desc", baseCriteria);
         achievementRepository.flush();
 
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            // Attempt duplicate
+            // Build duplicate with different ID but same name
             Achievement duplicate = Achievement.builder()
-                .name("Unique")
+                .achievementId(UUID.randomUUID().toString()) // Explicit ID
+                .name("Unique") // Same name
                 .description("Desc")
                 .criteria(baseCriteria)
                 .build();
             
-            achievementRepository.saveAndFlush(duplicate); // Use saveAndFlush
+            achievementRepository.saveAndFlush(duplicate);
         });
     }
     
