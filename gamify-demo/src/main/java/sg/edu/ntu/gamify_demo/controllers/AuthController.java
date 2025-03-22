@@ -2,6 +2,8 @@ package sg.edu.ntu.gamify_demo.controllers;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
