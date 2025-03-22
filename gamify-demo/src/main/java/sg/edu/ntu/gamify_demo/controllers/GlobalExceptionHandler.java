@@ -2,6 +2,7 @@ package sg.edu.ntu.gamify_demo.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,10 +13,30 @@ import sg.edu.ntu.gamify_demo.exceptions.DuplicateUserException;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("error", "Validation error");
+        response.put("message", "Invalid request content");
+        response.put("details", ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(err -> err.getField() + ": " + err.getDefaultMessage())
+            .collect(Collectors.toList()));
+        
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ObjectNode> handleIllegalArgumentException(IllegalArgumentException ex) {
