@@ -156,9 +156,11 @@ public class AuthController {
         // Generate JWT token
         String token = authService.generateToken(user);
 
-        // Return token and user details
+        // Return token and user details with header
         AuthResponse response = new AuthResponse(token, user);
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+            .body(response);
     }
 }

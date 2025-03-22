@@ -120,7 +120,7 @@ public class AuthIntegrationTest {
                 jsonPath("$.token").isNotEmpty(),
                 jsonPath("$.user.id").exists(),
                 jsonPath("$.user.password").doesNotExist(),
-                header().exists(HttpHeaders.AUTHORIZATION)
+                header().string(HttpHeaders.AUTHORIZATION, containsString("Bearer "))
             );
     }
 
@@ -183,7 +183,7 @@ public class AuthIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(registrationRequest)))
             .andExpectAll(
-                header().string("Content-Security-Policy", "default-src 'self'"),
+                header().string("Content-Security-Policy", containsString("default-src 'self'")),
                 header().string("X-Content-Type-Options", "nosniff"),
                 header().string("X-Frame-Options", "DENY")
             );

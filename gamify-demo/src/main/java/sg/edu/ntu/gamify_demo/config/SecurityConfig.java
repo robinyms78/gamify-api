@@ -27,10 +27,11 @@ public class SecurityConfig {
                 .frameOptions(frame -> frame
                     .deny()
                 )
-                // Add XSS protection header explicitly
                 .xssProtection(xss -> xss
                     .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
                 )
+                // Add CSP report-only header if needed
+                .addHeaderWriter(new StaticHeadersWriter("Content-Security-Policy", "default-src 'self'"))
             );
         
         return http.build();
