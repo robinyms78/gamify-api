@@ -122,17 +122,21 @@ public class AchievementServiceIntegrationTest {
     
     @Test
     public void testDuplicateAchievementPrevention() {
+        // Create first achievement through service
         achievementService.createAchievement("Unique", "Desc", baseCriteria);
         
+        // Force flush to ensure constraint check
+        achievementRepository.flush();
+
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            // Use the builder pattern instead of direct constructor
-            achievementRepository.save(
-                Achievement.builder()
-                    .name("Unique")
-                    .description("Desc")
-                    .criteria(baseCriteria)
-                    .build()
-            );
+            // Attempt duplicate
+            Achievement duplicate = Achievement.builder()
+                .name("Unique")
+                .description("Desc")
+                .criteria(baseCriteria)
+                .build();
+            
+            achievementRepository.saveAndFlush(duplicate); // Use saveAndFlush
         });
     }
     
