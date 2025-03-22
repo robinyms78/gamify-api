@@ -117,9 +117,13 @@ public class AchievementServiceIntegrationTest {
         achievementService.createAchievement("Unique", "Desc", baseCriteria);
         
         Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            // Attempt duplicate using repository directly
+            // Use the builder pattern instead of direct constructor
             achievementRepository.save(
-                new Achievement(null, "Unique", "Desc", baseCriteria)
+                Achievement.builder()
+                    .name("Unique")
+                    .description("Desc")
+                    .criteria(baseCriteria)
+                    .build()
             );
         });
     }
