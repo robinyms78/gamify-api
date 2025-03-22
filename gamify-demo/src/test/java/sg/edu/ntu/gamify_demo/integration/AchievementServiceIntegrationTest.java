@@ -89,15 +89,19 @@ public class AchievementServiceIntegrationTest {
     
     @Test
     public void testCreateAndGetAchievement() {
-        Achievement created = achievementService.createAchievement(
-            "Test Achievement", "Test Desc", baseCriteria);
+        // Arrange
+        String name = "Test Achievement";
+        String description = "Test Description";
         
-        Achievement retrieved = achievementService.getAchievementById(
-            created.getAchievementId());
+        // Act
+        Achievement created = achievementService.createAchievement(name, description, baseCriteria);
+        Achievement retrieved = achievementService.getAchievementById(created.getAchievementId());
         
-        // Verify full JSON structure match
-        Assertions.assertEquals(baseCriteria.toString(), 
-            retrieved.getCriteria().toString());
+        // Assert
+        assertNotNull(retrieved);
+        assertEquals(name, retrieved.getName());
+        assertEquals(description, retrieved.getDescription());
+        assertEquals(baseCriteria.toString(), retrieved.getCriteria().toString());
     }
     
     @Test
@@ -125,24 +129,6 @@ public class AchievementServiceIntegrationTest {
         Assertions.assertThrows(AchievementNotFoundException.class, () -> {
             achievementService.getAchievementById("non-existent-id");
         });
-    }
-        // Arrange
-        String name = "Test Achievement";
-        String description = "Test Description";
-        ObjectNode criteria = objectMapper.createObjectNode();
-        criteria.put("type", "POINTS_THRESHOLD");
-        criteria.put("threshold", 50);
-        
-        // Act
-        Achievement createdAchievement = achievementService.createAchievement(name, description, criteria);
-        Achievement retrievedAchievement = achievementService.getAchievementById(createdAchievement.getAchievementId());
-        
-        // Assert
-        assertNotNull(retrievedAchievement);
-        assertEquals(name, retrievedAchievement.getName());
-        assertEquals(description, retrievedAchievement.getDescription());
-        assertEquals(criteria.get("type").asText(), retrievedAchievement.getCriteria().get("type").asText());
-        assertEquals(criteria.get("threshold").asInt(), retrievedAchievement.getCriteria().get("threshold").asInt());
     }
     
     @Test
