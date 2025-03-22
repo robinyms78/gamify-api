@@ -28,8 +28,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import sg.edu.ntu.gamify_demo.config.SecurityConfig;
 
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
@@ -53,6 +56,12 @@ public class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private PasswordEncoder passwordEncoder;
+
+    @MockBean(name = "securityConfig")
+    private SecurityConfig securityConfig;
 
     private User testUser1;
     private User testUser2;
