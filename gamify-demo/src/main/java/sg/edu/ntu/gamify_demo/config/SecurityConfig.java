@@ -22,7 +22,7 @@ public class SecurityConfig {
         http
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp
-                    .policyDirectives("default-src 'self'")
+                    .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'")
                 )
                 .frameOptions(frame -> frame
                     .deny()
@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .xssProtection(xss -> xss
                     .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
                 )
+                .contentTypeOptions()
             );
         
         return http.build();
