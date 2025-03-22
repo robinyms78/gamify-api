@@ -161,7 +161,6 @@ public class AuthIntegrationTest {
                 header().string("Content-Security-Policy", "default-src 'self'"),
                 header().string("X-Content-Type-Options", "nosniff"),
                 header().string("X-Frame-Options", "DENY")
-            )
             );
     }
 
