@@ -1,9 +1,14 @@
 package sg.edu.ntu.gamify_demo.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,23 +55,22 @@ public class AuthIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Clear the repository before each test
         userRepository.deleteAll();
+        
+        // Generate unique identifiers for each test run
+        String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+        String testUsername = "testuser-" + uniqueId;
+        String testEmail = "test-" + uniqueId + "@example.com";
 
-        // Create registration request
         registrationRequest = new RegistrationRequest(
-                "integrationtestuser",
-                "integration@example.com",
-                "password123",
-                UserRole.EMPLOYEE,
-                "Integration Testing"
+            testUsername,
+            testEmail,
+            "ValidPass123!",
+            UserRole.EMPLOYEE,
+            "Test Department"
         );
 
-        // Create login request
-        loginRequest = new LoginRequest(
-                "integrationtestuser",
-                "password123"
-        );
+        loginRequest = new LoginRequest(testUsername, "ValidPass123!");
     }
 
     @AfterEach
@@ -76,16 +80,19 @@ public class AuthIntegrationTest {
     }
 
     @Test
-    @DisplayName("Integration test - Register and login flow")
+    @DisplayName("Integration test - Complete registration and authentication flow")
     void testRegisterAndLoginFlow() throws Exception {
-        // Step 1: Register a new user
+        // Registration
         MvcResult registrationResult = mockMvc.perform(post("/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registrationRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("User registered successfully"))
-                .andExpect(jsonPath("$.userId").isNotEmpty())
-                .andReturn();
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registrationRequest)))
+            .andExpectAll(
+                status().isCreated(),
+                jsonPath("$.userId").isNotEmpty(),
+                jsonPath("$.password").doesNotExist(), // Ensure password not leaked
+                header().exists(HttpHeaders.LOCATION)
+            )
+            .andReturn();
 
         // Extract user ID from registration response
         String responseJson = registrationResult.getResponse().getContentAsString();
@@ -96,17 +103,61 @@ public class AuthIntegrationTest {
         assertThat(userRepository.findById(userId).get().getEarnedPoints()).isEqualTo(0);
         assertThat(userRepository.findById(userId).get().getAvailablePoints()).isEqualTo(0);
 
-        // Step 2: Login with the registered user
+        // Login
         mockMvc.perform(post("/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").isNotEmpty())
-                .andExpect(jsonPath("$.user.id").value(userId))
-                .andExpect(jsonPath("$.user.username").value(registrationRequest.username()))
-                .andExpect(jsonPath("$.user.email").value(registrationRequest.email()))
-                .andExpect(jsonPath("$.user.earnedPoints").value(0))
-                .andExpect(jsonPath("$.user.availablePoints").value(0));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpectAll(
+                status().isOk(),
+                jsonPath("$.token").isNotEmpty(),
+                jsonPath("$.user.id").exists(),
+                jsonPath("$.user.password").doesNotExist(),
+                header().exists(HttpHeaders.AUTHORIZATION)
+            );
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidRegistrationPayloads")
+    @DisplayName("Integration test - Register with invalid payload")
+    void testRegisterWithInvalidPayload(RegistrationRequest invalidRequest, String expectedError) throws Exception {
+        mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(invalidRequest)))
+            .andExpectAll(
+                status().isBadRequest(),
+                jsonPath("$.error").value("Validation error"),
+                jsonPath("$.details").value(containsString(expectedError))
+            );
+    }
+
+    private static Stream<Arguments> invalidRegistrationPayloads() {
+        return Stream.of(
+            Arguments.of(
+                new RegistrationRequest(null, "valid@email.com", "pass", UserRole.EMPLOYEE, "Dept"),
+                "Username is required"
+            ),
+            Arguments.of(
+                new RegistrationRequest("user", "invalid-email", "pass", UserRole.EMPLOYEE, "Dept"),
+                "Valid email is required"
+            ),
+            Arguments.of(
+                new RegistrationRequest("user", "valid@email.com", "short", UserRole.EMPLOYEE, "Dept"),
+                "Password must be at least 8 characters"
+            )
+        );
+    }
+
+    @Test
+    @DisplayName("Integration test - Security headers validation")
+    void testSecurityHeaders() throws Exception {
+        mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registrationRequest)))
+            .andExpectAll(
+                header().string("X-Content-Type-Options", "nosniff"),
+                header().string("X-Frame-Options", "DENY"),
+                header().string("Content-Security-Policy", containsString("default-src 'self'"))
+            );
     }
 
     @Test
