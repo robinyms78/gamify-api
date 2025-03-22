@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import sg.edu.ntu.gamify_demo.config.SecurityConfig;
 import sg.edu.ntu.gamify_demo.config.TestIntegrationConfig;
 import sg.edu.ntu.gamify_demo.dtos.LoginRequest;
 import sg.edu.ntu.gamify_demo.dtos.RegistrationRequest;
