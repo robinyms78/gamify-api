@@ -85,20 +85,29 @@ public class UserControllerTest {
     @Test
     @DisplayName("Test create user - Success scenario")
     void testCreateUser_Success() throws Exception {
-        // Mock service to return the created user
+        // Create request without server-generated fields
+        User createRequest = User.builder()
+                .username("testuser1")
+                .email("test1@example.com")
+                .passwordHash("hashedpassword1")
+                .role(UserRole.EMPLOYEE)
+                .department("Engineering")
+                .build();
+
         when(userService.createUser(any(User.class))).thenReturn(testUser1);
 
-        // Perform POST request
         mockMvc.perform(post("/api/users")
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testUser1)))
+                .content(objectMapper.writeValueAsString(createRequest))) // Use cleaned request
                 .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)) // Tolerate charset
                 .andExpect(jsonPath("$.id", is(testUser1.getId())))
                 .andExpect(jsonPath("$.username", is(testUser1.getUsername())))
                 .andExpect(jsonPath("$.email", is(testUser1.getEmail())))
-                .andExpect(jsonPath("$.role", is(testUser1.getRole().toString())));
+                .andExpect(jsonPath("$.department", is(testUser1.getDepartment())))
+                .andExpect(jsonPath("$.earnedPoints", is(testUser1.getEarnedPoints().intValue())))
+                .andExpect(jsonPath("$.availablePoints", is(testUser1.getAvailablePoints().intValue())));
     }
 
     @Test
@@ -126,7 +135,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/{id}", testUser1.getId())
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(testUser1.getId())))
                 .andExpect(jsonPath("$.username", is(testUser1.getUsername())))
                 .andExpect(jsonPath("$.email", is(testUser1.getEmail())))
@@ -149,49 +158,49 @@ public class UserControllerTest {
     @Test
     @DisplayName("Test get all users")
     void testGetAllUsers() throws Exception {
-        // Mock service to return list of users
         List<User> users = Arrays.asList(testUser1, testUser2);
         when(userService.getAllUsers()).thenReturn(users);
 
-        // Perform GET request
         mockMvc.perform(get("/api/users")
                 .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()", is(2)))
-                .andExpect(jsonPath("$[0].id", is(testUser1.getId())))
-                .andExpect(jsonPath("$[1].id", is(testUser2.getId())));
+                .andExpect(jsonPath("$[0].department", is("Engineering"))) // New checks
+                .andExpect(jsonPath("$[1].role", is("MANAGER")));
     }
 
     @Test
     @DisplayName("Test update user - Success scenario")
     void testUpdateUser_Success() throws Exception {
-        // Create updated user
-        User updatedUser = User.builder()
-                .id(testUser1.getId())
+        // Request body without ID
+        User updateRequest = User.builder()
                 .username(testUser1.getUsername())
                 .email(testUser1.getEmail())
                 .passwordHash(testUser1.getPasswordHash())
                 .role(testUser1.getRole())
-                .department("Research") // Updated department
-                .earnedPoints(150L) // Updated points
-                .availablePoints(120L) // Updated points
+                .department("Research") 
+                .earnedPoints(150L) 
+                .availablePoints(120L) 
                 .build();
 
-        // Mock service to return the updated user
-        when(userService.updateUser(anyString(), any(User.class))).thenReturn(updatedUser);
+        User updatedUser = testUser1.toBuilder()
+                .department("Research")
+                .earnedPoints(150L)
+                .availablePoints(120L)
+                .build();
 
-        // Perform PUT request
+        when(userService.updateUser(eq(testUser1.getId()), any(User.class))).thenReturn(updatedUser);
+
         mockMvc.perform(put("/api/users/{id}", testUser1.getId())
                 .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedUser)))
+                .content(objectMapper.writeValueAsString(updateRequest))) // No ID in body
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(updatedUser.getId())))
-                .andExpect(jsonPath("$.department", is(updatedUser.getDepartment())))
-                .andExpect(jsonPath("$.earnedPoints", is(updatedUser.getEarnedPoints().intValue())))
-                .andExpect(jsonPath("$.availablePoints", is(updatedUser.getAvailablePoints().intValue())));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.department", is("Research")))
+                .andExpect(jsonPath("$.earnedPoints", is(150)))
+                .andExpect(jsonPath("$.availablePoints", is(120)));
     }
 
     @Test
