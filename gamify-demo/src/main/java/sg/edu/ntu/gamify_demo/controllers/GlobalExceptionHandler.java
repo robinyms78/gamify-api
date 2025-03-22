@@ -28,7 +28,6 @@ public class GlobalExceptionHandler {
         
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("error", "Validation error");
-        response.put("message", "Invalid request content");
         response.put("details", ex.getBindingResult()
             .getFieldErrors()
             .stream()
