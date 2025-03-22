@@ -26,9 +26,6 @@ public class SecurityConfig {
                 .frameOptions(frame -> frame
                     .deny()
                 )
-                .xssProtection(xss -> xss
-                    .enable()
-                )
             );
         
         return http.build();
