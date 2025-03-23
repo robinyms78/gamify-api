@@ -144,9 +144,9 @@ public class GamificationController {
                       "userId": "user-123",
                       "pointsAwarded": 100,
                       "newTotal": 1600
-                    }"""),
-                links = {@Link(name = "ladder-update", operationId = "updateUserLadderStatus")}
-            )
+                    }""")
+            ),
+            links = {@Link(name = "ladder-update", operationId = "updateUserLadderStatus")}
         ),
         @ApiResponse(
             responseCode = "404", 

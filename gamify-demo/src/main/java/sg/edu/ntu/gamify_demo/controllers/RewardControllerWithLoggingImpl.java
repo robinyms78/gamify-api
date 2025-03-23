@@ -140,7 +140,7 @@ public class RewardControllerWithLoggingImpl {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
             }
         } catch (Exception e) {
-            ErrorResponse errorResponse = new ErrorResponse("Server error", e.getMessage());
+            ErrorResponse errorResponse = new ErrorResponse("Server error", e.getMessage(), java.time.Instant.now());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }

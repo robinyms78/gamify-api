@@ -18,14 +18,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventDTO;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventResponseDTO;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventRequestDTO;
 import sg.edu.ntu.gamify_demo.dtos.ErrorResponseDTO;
+import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import sg.edu.ntu.gamify_demo.mappers.TaskEventMapper;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 
@@ -63,19 +65,42 @@ public class TaskEventController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Task event processed successfully",
                     content = @Content(schema = @Schema(implementation = TaskEventResponseDTO.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid request format/missing fields"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
+        @ApiResponse(responseCode = "400", description = "Invalid request format/missing fields",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
+        @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
-    public ResponseEntity<?> processTaskEvent(
+    public ResponseEntity<Object> processTaskEvent(
         @Parameter(description = "Event data in JSON format", required = true,
                   content = @Content(schema = @Schema(implementation = TaskEventRequestDTO.class)))
         @RequestBody @Valid TaskEventRequestDTO eventRequest) {
         try {
-            TaskEventResponseDTO response = taskEventService.processTaskEvent(eventRequest);
+            // Convert DTO to JsonNode for service processing
+            ObjectNode eventNode = objectMapper.createObjectNode();
+            eventNode.put("userId", eventRequest.getUserId());
+            eventNode.put("taskId", eventRequest.getTaskId());
+            eventNode.put("event_type", eventRequest.getEventType());
+            
+            if (eventRequest.getData() != null) {
+                eventNode.set("data", eventRequest.getData());
+            }
+            
+            // Process the event
+            ObjectNode serviceResponse = taskEventService.processTaskEvent(eventNode);
+            
+            // Map the service response to DTO
+            TaskEventResponseDTO response = new TaskEventResponseDTO();
+            response.setSuccess(serviceResponse.get("success").asBoolean());
+            response.setEventId(serviceResponse.get("eventId").asText());
+            response.setUserId(serviceResponse.get("userId").asText());
+            response.setTaskId(serviceResponse.get("taskId").asText());
+            response.setEventType(serviceResponse.get("eventType").asText());
+            response.setStatus(TaskStatus.fromValue(serviceResponse.get("status").asText()));
             
             // Add priority to response if available
-            if (eventRequest.getData() != null && eventRequest.getData().has("priority")) {
-                response.setPriority(eventRequest.getData().get("priority").asText());
+            JsonNode data = eventRequest.getData();
+            if (data != null && data.has("priority")) {
+                response.setPriority(data.get("priority").asText());
             }
             
             return ResponseEntity.ok(response);
@@ -104,14 +129,18 @@ public class TaskEventController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Successfully retrieved task event",
                     content = @Content(schema = @Schema(implementation = TaskEventDTO.class))),
-        @ApiResponse(responseCode = "404", description = "Task event not found")
+        @ApiResponse(responseCode = "404", description = "Task event not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
-    public ResponseEntity<TaskEventDTO> getTaskEvent(
+    public ResponseEntity<?> getTaskEvent(
         @Parameter(description = "ID of the event to retrieve", example = "event-12345")
         @PathVariable String eventId) {
         TaskEvent taskEvent = taskEventService.getTaskEventById(eventId);
         if (taskEvent == null) {
-            return ResponseEntity.notFound().build();
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO();
+            errorResponse.setError("Not Found");
+            errorResponse.setMessage("Task event with ID " + eventId + " not found");
+            return ResponseEntity.status(404).body(errorResponse);
         }
         TaskEventDTO taskEventDTO = taskEventMapper.toDTO(taskEvent);
         return ResponseEntity.ok(taskEventDTO);

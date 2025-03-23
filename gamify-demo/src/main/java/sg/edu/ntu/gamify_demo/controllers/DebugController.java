@@ -19,6 +19,7 @@ import sg.edu.ntu.gamify_demo.repositories.UserLadderStatusRepository;
 import sg.edu.ntu.gamify_demo.services.LadderService;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * Debug controller for diagnosing issues with the ladder status system.

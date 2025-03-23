@@ -2,6 +2,7 @@ package sg.edu.ntu.gamify_demo.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;
 
 @Data
 @Schema(name = "TaskEventResponse", description = "Response structure for task event processing")
@@ -22,7 +23,7 @@ public class TaskEventResponseDTO {
     private String eventType;
     
     @Schema(description = "Resulting task status", example = "COMPLETED")
-    private String status;
+    private TaskStatus status;
     
     @Schema(description = "Priority level if available", example = "HIGH")
     private String priority;

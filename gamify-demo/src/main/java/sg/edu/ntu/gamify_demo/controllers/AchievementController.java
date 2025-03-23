@@ -20,11 +20,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import sg.edu.ntu.gamify_demo.dtos.AchievementDTO;
+import sg.edu.ntu.gamify_demo.dtos.AchievementCheckResponse;
 import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.exceptions.AchievementNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
@@ -97,7 +101,7 @@ public class AchievementController {
         List<Achievement> achievements = gamificationFacade.getAllAchievements();
         List<AchievementDTO> dtos = achievements.stream()
             .map(achievement -> AchievementDTO.builder()
-                .id(achievement.getId())
+                .id(achievement.getAchievementId())
                 .name(achievement.getName())
                 .description(achievement.getDescription())
                 .criteria(achievement.getCriteria())
@@ -267,10 +271,12 @@ public class AchievementController {
         
         boolean hasAchievement = userAchievementService.hasAchievement(user, achievement);
         
-        ObjectNode result = objectMapper.createObjectNode();
-        result.put("hasAchievement", hasAchievement);
+        // Create a proper AchievementCheckResponse object
+        AchievementCheckResponse response = new AchievementCheckResponse();
+        response.setHasAchievement(hasAchievement);
+        response.setProgress(hasAchievement ? 1.0 : 0.0); // Simplified progress
         
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(response);
     }
     
     /**
