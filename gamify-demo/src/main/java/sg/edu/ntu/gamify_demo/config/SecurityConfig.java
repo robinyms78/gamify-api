@@ -25,7 +25,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-     @Bean
+    @Bean
     public SecurityFilterChain customSecurityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())  // If CSRF is enabled, make sure the request includes a CSRF token

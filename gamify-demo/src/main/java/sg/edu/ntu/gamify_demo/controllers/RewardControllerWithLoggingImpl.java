@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
 import sg.edu.ntu.gamify_demo.dtos.RewardRedemptionRequest;
+import sg.edu.ntu.gamify_demo.dtos.RewardsDTO;
 import sg.edu.ntu.gamify_demo.dtos.ErrorResponse;
 import sg.edu.ntu.gamify_demo.interfaces.RewardRedemptionService;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
@@ -58,21 +58,41 @@ public class RewardControllerWithLoggingImpl {
     }
 
     // Get one reward by rewardId
-    @GetMapping("/{id}")
+    @GetMapping("/{rewardId}")
+    @Operation(summary = "Get reward by reward Id", 
+              description = "Retrieves reward by reward Id")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved reward",
+                    content = @Content(schema = @Schema(implementation = RewardsDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Reward not found")
+    })
     public ResponseEntity<Rewards> getReward(@PathVariable String rewardId) {
         Rewards foundReward = rewardService.getReward(rewardId);
         return new ResponseEntity<>(foundReward, HttpStatus.OK);
     }
 
     // Update reward
-    @PutMapping("/{id}")
+    @PutMapping("/{rewardId}")
+    @Operation(summary = "Update reward", 
+              description = "Update reward by reward Id")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Status updated successfully",
+                    content = @Content(schema = @Schema(implementation = RewardsDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Reward not found")
+    })
     public ResponseEntity<Rewards> updateReward(@PathVariable String rewardId, @RequestBody Rewards reward) {
         Rewards updateReward = rewardService.updateReward(rewardId, reward);
         return new ResponseEntity<>(updateReward, HttpStatus.OK);
     }
 
     // Delete reward
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{rewardId}")
+    @Operation(summary = "Delete reward", 
+               description = "Remove a reward by Id")
+    @ApiResponses({
+    @ApiResponse(responseCode = "204", description = "Reward deleted successfully"),
+    @ApiResponse(responseCode = "404", description = "Reward not found"),
+                })
     public ResponseEntity<HttpStatus> deleteReward(@PathVariable String rewardId) {
         rewardService.deleteReward(rewardId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -93,21 +113,21 @@ public class RewardControllerWithLoggingImpl {
     }
 
     // Get one reward redemption by redemption Id
-    @GetMapping("/redemption/{id}")
+    @GetMapping("/redemption/{rewardId}")
     public ResponseEntity<RewardRedemption> getRedemption(@PathVariable String rewardId) {
         RewardRedemption foundRedemption = rewardRedemptionService.getRedemption(rewardId);
         return new ResponseEntity<>(foundRedemption, HttpStatus.OK);
     }
 
     // Update reward redemption
-    @PutMapping("/redemption/{id}")
+    @PutMapping("/redemption/{rewardId}")
     public ResponseEntity<RewardRedemption> updateRedemption(@PathVariable String rewardId, @RequestBody RewardRedemption redemption) {
         RewardRedemption updateRedemption = rewardRedemptionService.updateRedemption(rewardId, redemption);
         return new ResponseEntity<>(updateRedemption, HttpStatus.OK);
     }
 
     // Delete reward redemption
-    @DeleteMapping("/redemption/{id}")
+    @DeleteMapping("/redemption/{rewardId}")
     public ResponseEntity<HttpStatus> deleteRedemption(@PathVariable String rewardId) {
         rewardRedemptionService.deleteRedemption(rewardId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -151,7 +171,7 @@ public class RewardControllerWithLoggingImpl {
      * @param redemptionId The ID of the redemption to complete
      * @return The result of the operation
      */
-    @PostMapping("/redemption/{id}/complete")
+    @PostMapping("/redemption/{redemptionId}/complete")
     public ResponseEntity<?> completeRedemption(@PathVariable("id") String redemptionId) {
         RedemptionResult result = rewardRedemptionService.completeRedemption(redemptionId);
         if (result.isSuccess()) {
@@ -167,7 +187,7 @@ public class RewardControllerWithLoggingImpl {
      * @param redemptionId The ID of the redemption to cancel
      * @return The result of the operation
      */
-    @PostMapping("/redemption/{id}/cancel")
+    @PostMapping("/redemption/{redemptionId}/cancel")
     public ResponseEntity<?> cancelRedemption(@PathVariable("id") String redemptionId) {
         RedemptionResult result = rewardRedemptionService.cancelRedemption(redemptionId);
         if (result.isSuccess()) {
