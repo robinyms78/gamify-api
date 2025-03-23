@@ -74,30 +74,25 @@ public class AchievementController {
      */
     @GetMapping
     @Operation(summary = "Get all achievements", description = "Retrieves a list of all available achievements")
-    @ApiResponse(responseCode = "200", description = "Success",
-               content = @Content(array = @ArraySchema(
-                   schema = @Schema(implementation = AchievementDTO.class))),
-               examples = @ExampleObject("""
-                   [
-                     {
-                       "id": "achieve-123",
-                       "name": "Marathon Runner",
-                       "description": "Complete 100 tasks",
-                       "criteria": {"tasksCompleted": 100},
-                       "metadata": {"difficulty": "medium"},
-                       "earned": false,
-                       "earnedAt": null
-                     },
-                     {
-                       "id": "achieve-456", 
-                       "name": "Speed Demon",
-                       "description": "Complete 5 tasks in 1 hour",
-                       "criteria": {"tasksInHour": 5},
-                       "metadata": {"difficulty": "hard"},
-                       "earned": true,
-                       "earnedAt": "2024-03-20T14:30:00Z"
-                     }
-                   ]""")))
+    @ApiResponse(
+        responseCode = "200", 
+        description = "Success",
+        content = @Content(
+            array = @ArraySchema(schema = @Schema(implementation = AchievementDTO.class)),
+            examples = @ExampleObject("""
+                [
+                  {
+                    "id": "achieve-123",
+                    "name": "Marathon Runner",
+                    "description": "Complete 100 tasks",
+                    "criteria": {"tasksCompleted": 100},
+                    "metadata": {"difficulty": "medium"},
+                    "earned": false,
+                    "earnedAt": null
+                  }
+                ]""")
+        )
+    )
     public ResponseEntity<List<AchievementDTO>> getAllAchievements() {
         List<Achievement> achievements = gamificationFacade.getAllAchievements();
         List<AchievementDTO> dtos = achievements.stream()
