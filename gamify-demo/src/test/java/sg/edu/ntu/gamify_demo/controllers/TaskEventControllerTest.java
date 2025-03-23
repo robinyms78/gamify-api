@@ -1,6 +1,7 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import static org.mockito.ArgumentMatchers.anyLong;
