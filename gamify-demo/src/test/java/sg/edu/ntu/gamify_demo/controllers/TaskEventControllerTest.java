@@ -2,6 +2,7 @@ package sg.edu.ntu.gamify_demo.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -143,7 +144,7 @@ public class TaskEventControllerTest {
         
         // Perform request and verify response
         mockMvc.perform(post("/tasks/events")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
@@ -212,7 +213,7 @@ public class TaskEventControllerTest {
         requestBody.set("data", data);
 
         mockMvc.perform(post("/tasks/events")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
@@ -223,7 +224,7 @@ public class TaskEventControllerTest {
     @DisplayName("Test invalid JSON payload")
     void testInvalidJsonPayload() throws Exception {
         mockMvc.perform(post("/tasks/events")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{invalid-json}"))
                 .andExpect(status().isBadRequest());
