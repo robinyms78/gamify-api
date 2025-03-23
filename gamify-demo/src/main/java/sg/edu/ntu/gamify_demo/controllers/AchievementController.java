@@ -74,8 +74,23 @@ public class AchievementController {
      */
     @GetMapping
     @Operation(summary = "Get all achievements", description = "Retrieves a list of all available achievements")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved achievements list",
-               content = @Content(array = @ArraySchema(schema = @Schema(implementation = Achievement.class))))
+    @ApiResponse(responseCode = "200", description = "Success",
+               content = @Content(array = @ArraySchema(schema = @Schema(implementation = Achievement.class)),
+               examples = @ExampleObject("""
+                   [
+                     {
+                       "id": "achieve-123",
+                       "name": "Marathon Runner",
+                       "description": "Complete 100 tasks",
+                       "criteria": {"tasksCompleted": 100}
+                     },
+                     {
+                       "id": "achieve-456", 
+                       "name": "Speed Demon",
+                       "description": "Complete 5 tasks in 1 hour",
+                       "criteria": {"tasksInHour": 5}
+                     }
+                   ]""")))
     public ResponseEntity<List<Achievement>> getAllAchievements() {
         List<Achievement> achievements = gamificationFacade.getAllAchievements();
         return ResponseEntity.ok(achievements);
@@ -211,12 +226,18 @@ public class AchievementController {
     @GetMapping("/{achievementId}/check/{userId}")
     @Operation(summary = "Check achievement progress", 
               description = "Checks if a user has earned a specific achievement")
+    @Parameter(name = "achievementId", example = "achieve-1122", 
+              schema = @Schema(pattern = "^achieve-[a-zA-Z0-9]{8}$"))
+    @Parameter(name = "userId", example = "user-3344",
+              schema = @Schema(pattern = "^user-[a-zA-Z0-9]{8}$"))
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Check completed",
-                    content = @Content(schema = @Schema(implementation = ObjectNode.class, example = """
-                        {
-                            "hasAchievement": true
-                        }"""))),
+                    content = @Content(examples = {
+                        @ExampleObject(name = "HasAchievement", value = """
+                            {"hasAchievement": true}"""),
+                        @ExampleObject(name = "NoAchievement", value = """
+                            {"hasAchievement": false}""")
+                    })),
         @ApiResponse(responseCode = "404", description = "User or achievement not found")
     })
     public ResponseEntity<ObjectNode> checkUserAchievement(
@@ -250,6 +271,28 @@ public class AchievementController {
     @PostMapping("/process/{userId}")
     @Operation(summary = "Process achievement event", 
               description = "Handles events that might trigger achievement unlocks")
+    @Parameter(name = "userId", example = "user-5566",
+              schema = @Schema(pattern = "^user-[a-zA-Z0-9]{8}$"))
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        content = @Content(examples = {
+            @ExampleObject(name = "Task Completed", value = """
+                {
+                  "eventType": "TASK_COMPLETED",
+                  "eventDetails": {
+                    "taskId": "task-7788",
+                    "category": "DEVELOPMENT",
+                    "pointsAwarded": 50
+                  }
+                }"""),
+            @ExampleObject(name = "Milestone Reached", value = """
+                {
+                  "eventType": "MILESTONE",
+                  "eventDetails": {
+                    "milestoneType": "STREAK",
+                    "daysConsecutive": 30
+                  }
+                }""")
+        }))
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Event processed successfully",
                     content = @Content(schema = @Schema(implementation = ObjectNode.class))),
@@ -306,8 +349,19 @@ public class AchievementController {
     @Operation(summary = "Award achievement to user", 
               description = "Manually awards an achievement to a user")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Achievement awarded successfully",
-                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
+        @ApiResponse(responseCode = "200", description = "Awarded",
+                   content = @Content(schema = @Schema(example = """
+                       {
+                         "success": true,
+                         "message": "Achievement awarded",
+                         "awardDate": "2024-03-20T14:30:00Z"
+                       }"""))),
+        @ApiResponse(responseCode = "409", description = "Already awarded",
+                   content = @Content(schema = @Schema(example = """
+                       {
+                         "error": "Conflict",
+                         "message": "User already has this achievement"
+                       }"""))),
         @ApiResponse(responseCode = "404", description = "User or achievement not found")
     })
     public ResponseEntity<ObjectNode> awardAchievement(
