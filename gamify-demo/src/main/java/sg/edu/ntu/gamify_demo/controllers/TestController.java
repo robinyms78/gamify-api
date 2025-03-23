@@ -14,7 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
-import sg.edu.ntu.gamify_demo.dtos.RewardRedemptionRequest;
+import sg.edu.ntu.gamify_demo.dtos.RewardRedemptionRequestDTO;
 import sg.edu.ntu.gamify_demo.interfaces.RewardRedemptionService;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;

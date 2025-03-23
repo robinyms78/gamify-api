@@ -1,11 +1,12 @@
 package sg.edu.ntu.gamify_demo.mappers;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.stereotype.Component;
-
 import sg.edu.ntu.gamify_demo.dtos.TaskEventDTO;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 
 @Component
+@MapperScan("sg.edu.ntu.gamify_demo.mappers")
 public class TaskEventMapperImpl implements TaskEventMapper {
 
     @Override

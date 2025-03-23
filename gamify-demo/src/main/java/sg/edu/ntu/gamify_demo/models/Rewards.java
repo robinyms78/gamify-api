@@ -8,6 +8,9 @@ import jakarta.persistence.OneToMany;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.*;
 
 @Entity
@@ -42,6 +45,7 @@ public class Rewards {
     private ZonedDateTime updatedAt;
 
     @OneToMany(mappedBy = "reward")
+    @JsonManagedReference("reward-redemptions")
     private List<RewardRedemption> redemptions;
 
     /**

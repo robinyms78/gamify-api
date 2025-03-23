@@ -11,7 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RewardRedemptionRequest {
+public class RewardRedemptionRequestDTO {
     private String userId;
     private String rewardId;
+    private String status;
 }

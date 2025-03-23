@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -43,12 +42,12 @@ public class RewardRedemption {
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
-    @JsonBackReference
+    @JsonBackReference("user-redemptions")
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @JsonIgnoreProperties("redemption")
+    @JsonBackReference("reward-redemptions")
     @ManyToOne(optional = false)
     @JoinColumn(name = "reward_id", referencedColumnName = "id")
     private Rewards reward;
