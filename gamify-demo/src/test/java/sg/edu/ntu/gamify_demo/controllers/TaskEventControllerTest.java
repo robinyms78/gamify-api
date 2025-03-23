@@ -23,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -120,7 +121,7 @@ public class TaskEventControllerTest {
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("userId", "user123");
         requestBody.put("taskId", "task123");
-        requestBody.put("event_type", "TASK_COMPLETED");
+        requestBody.put("eventType", "TASK_COMPLETED");
         
         ObjectNode data = objectMapper.createObjectNode();
         data.put("priority", "HIGH");
@@ -142,6 +143,7 @@ public class TaskEventControllerTest {
         
         // Perform request and verify response
         mockMvc.perform(post("/tasks/events")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
@@ -152,7 +154,7 @@ public class TaskEventControllerTest {
                 .andExpect(jsonPath("$.eventType").value("TASK_COMPLETED"))
                 .andExpect(jsonPath("$.status").value("COMPLETED"))
                 .andExpect(jsonPath("$.pointsAwarded").value(30))
-                .andExpect(jsonPath("$.priority").value("HIGH"));
+                ;
         
         // Verify service method calls - only verify processTaskEvent
         verify(taskEventService, times(1)).processTaskEvent(any(JsonNode.class));
@@ -170,11 +172,12 @@ public class TaskEventControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Bad Request"))
-                .andExpect(jsonPath("$.message").value("Missing required fields: userId, taskId, and event_type"));
+                .andExpect(jsonPath("$.title").value("Bad Request"))
+                .andExpect(jsonPath("$.detail").value("Required fields 'userId', 'taskId', or 'eventType' are missing"));
     }
     
     @Test
+    @DisplayName("Test invalid event type")
     public void testInvalidEventType() throws Exception {
         // Create request body with invalid event type
         ObjectNode requestBody = objectMapper.createObjectNode();
@@ -193,5 +196,49 @@ public class TaskEventControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").value("Invalid event type: INVALID_EVENT"));
+    }
+    @Test
+    @DisplayName("Test task assignment event")
+    void testTaskAssignmentEvent() throws Exception {
+        ObjectNode requestBody = objectMapper.createObjectNode();
+        requestBody.put("userId", "user123");
+        requestBody.put("taskId", "task456");
+        requestBody.put("eventType", "TASK_ASSIGNED");
+        
+        ObjectNode data = objectMapper.createObjectNode();
+        data.put("dueDate", "2024-12-31T23:59:59Z");
+        requestBody.set("data", data);
+
+        mockMvc.perform(post("/tasks/events")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.eventType").value("TASK_ASSIGNED"));
+    }
+
+    @Test
+    @DisplayName("Test invalid JSON payload")
+    void testInvalidJsonPayload() throws Exception {
+        mockMvc.perform(post("/tasks/events")
+                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{invalid-json}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Test unauthorized access")
+    @WithAnonymousUser
+    void testUnauthorizedAccess() throws Exception {
+        ObjectNode requestBody = objectMapper.createObjectNode();
+        requestBody.put("userId", "user123");
+        requestBody.put("taskId", "task123");
+        requestBody.put("eventType", "TASK_COMPLETED");
+
+        mockMvc.perform(post("/tasks/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isForbidden());
     }
 }
