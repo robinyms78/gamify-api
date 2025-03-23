@@ -67,8 +67,6 @@ public class TaskEventControllerTest {
     @MockBean
     private TaskEventMapper taskEventMapper;
     
-    @InjectMocks
-    private TaskEventController taskEventController;
     
     private User testUser;
     private TaskEvent testTaskEvent;
@@ -171,6 +169,7 @@ public class TaskEventControllerTest {
         
         // Perform request and verify response
         mockMvc.perform(post("/tasks/events")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isBadRequest())
@@ -185,7 +184,7 @@ public class TaskEventControllerTest {
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("userId", "user123");
         requestBody.put("taskId", "task123");
-        requestBody.put("event_type", "INVALID_EVENT");
+        requestBody.put("eventType", "INVALID_EVENT");
         
         // Mock service to throw exception for invalid event type
         when(taskEventService.processTaskEvent(any(JsonNode.class)))
@@ -193,6 +192,7 @@ public class TaskEventControllerTest {
         
         // Perform request and verify response
         mockMvc.perform(post("/tasks/events")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isBadRequest())
