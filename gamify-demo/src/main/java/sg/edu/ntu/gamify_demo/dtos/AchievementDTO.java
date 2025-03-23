@@ -46,6 +46,10 @@ public class AchievementDTO {
            example = "{\"difficulty\": \"hard\", \"category\": \"coding\"}")
     private JsonNode metadata;
     
+    @Schema(description = "Achievement criteria in JSON format", 
+           example = "{\"tasksCompleted\": 100}")
+    private JsonNode criteria;
+    
     @Schema(description = "Whether the achievement has been earned", 
            example = "true")
     private boolean earned;

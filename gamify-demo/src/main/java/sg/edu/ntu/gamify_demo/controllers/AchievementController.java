@@ -83,18 +83,29 @@ public class AchievementController {
                        "id": "achieve-123",
                        "name": "Marathon Runner",
                        "description": "Complete 100 tasks",
-                       "criteria": {"tasksCompleted": 100}
+                       "criteria": {"tasksCompleted": 100},
+                       "earned": false
                      },
                      {
                        "id": "achieve-456", 
                        "name": "Speed Demon",
                        "description": "Complete 5 tasks in 1 hour",
-                       "criteria": {"tasksInHour": 5}
+                       "criteria": {"tasksInHour": 5},
+                       "earned": true,
+                       "earnedAt": "2024-03-20T14:30:00Z"
                      }
                    ]""")))
-    public ResponseEntity<List<Achievement>> getAllAchievements() {
+    public ResponseEntity<List<AchievementDTO>> getAllAchievements() {
         List<Achievement> achievements = gamificationFacade.getAllAchievements();
-        return ResponseEntity.ok(achievements);
+        List<AchievementDTO> dtos = achievements.stream()
+            .map(achievement -> AchievementDTO.builder()
+                .id(achievement.getId())
+                .name(achievement.getName())
+                .description(achievement.getDescription())
+                .criteria(achievement.getCriteria())
+                .build())
+            .toList();
+        return ResponseEntity.ok(dtos);
     }
     
     /**
