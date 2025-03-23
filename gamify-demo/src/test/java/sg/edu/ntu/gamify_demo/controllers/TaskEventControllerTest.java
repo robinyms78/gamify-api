@@ -74,6 +74,8 @@ public class TaskEventControllerTest {
     
     @BeforeEach
     public void setup() {
+        reset(taskEventService); // Clear previous mock states
+        
         // Create a test user
         testUser = new User();
         testUser.setId("user123");
@@ -204,6 +206,15 @@ public class TaskEventControllerTest {
     @Test
     @DisplayName("Test task assignment event")
     void testTaskAssignmentEvent() throws Exception {
+        // Mock specific assignment response
+        ObjectNode assignmentResponse = objectMapper.createObjectNode();
+        assignmentResponse.put("success", true);
+        assignmentResponse.put("eventType", "TASK_ASSIGNED");
+        assignmentResponse.put("status", "ASSIGNED");
+        
+        when(taskEventService.processTaskEvent(any(JsonNode.class)))
+            .thenReturn(assignmentResponse);
+
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("userId", "user123");
         requestBody.put("taskId", "task456");
@@ -218,7 +229,8 @@ public class TaskEventControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.eventType").value("TASK_ASSIGNED"));
+                .andExpect(jsonPath("$.eventType").value("TASK_ASSIGNED"))
+                .andExpect(jsonPath("$.status").value("ASSIGNED"));
     }
 
     @Test
@@ -228,7 +240,9 @@ public class TaskEventControllerTest {
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{invalid-json}"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.message").exists());
     }
 
     @Test
@@ -238,7 +252,7 @@ public class TaskEventControllerTest {
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("userId", "user123");
         requestBody.put("taskId", "task123");
-        requestBody.put("eventType", "TASK_COMPLETED");
+        requestBody.put("event_type", "TASK_COMPLETED");
 
         mockMvc.perform(post("/tasks/events")
                 .contentType(MediaType.APPLICATION_JSON)
