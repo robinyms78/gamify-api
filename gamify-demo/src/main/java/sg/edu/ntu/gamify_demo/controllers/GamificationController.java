@@ -20,7 +20,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.links.Link;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.interfaces.AchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
@@ -36,6 +43,7 @@ import sg.edu.ntu.gamify_demo.services.LadderService;
 @RestController
 @RequestMapping("/api/gamification")
 @Tag(name = "Gamification", description = "Points and achievements management")
+@SecurityRequirement(name = "bearerAuth")
 public class GamificationController {
     
     @Autowired
@@ -83,6 +91,18 @@ public class GamificationController {
      * @return The user's new total points.
      */
     @PostMapping("/users/{userId}/points/award")
+    @Operation(summary = "Award points to user", 
+        description = "Add points to user's balance and trigger achievement checks")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Points awarded successfully",
+            content = @Content(schema = @Schema(implementation = ObjectNode.class),
+            links = @Link(name = "ladder-update", operationId = "updateUserLadderStatus")),
+        @ApiResponse(responseCode = "404", description = "User not found",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid points value",
+            content = @Content(schema = @Schema(example = """
+                {"error": "Bad Request", "message": "Points value must be positive"}""")))
+    })
     public ResponseEntity<ObjectNode> awardPoints(
             @PathVariable String userId,
             @RequestBody JsonNode pointsData) {
@@ -112,6 +132,16 @@ public class GamificationController {
      * @return Success or failure message.
      */
     @PostMapping("/users/{userId}/points/spend")
+    @Operation(summary = "Deduct user points", 
+        description = "Spend points from available balance for rewards/features")
+    @Parameter(name = "userId", example = "user-5678", required = true)
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        content = @Content(examples = @ExampleObject("""
+            {
+              "points": 200,
+              "eventType": "REWARD_REDEMPTION",
+              "eventData": {"rewardId": "reward-789"}
+            }""")))
     public ResponseEntity<ObjectNode> spendPoints(
             @PathVariable String userId,
             @RequestBody JsonNode pointsData) {
@@ -143,6 +173,10 @@ public class GamificationController {
      * @return A list of newly awarded achievements.
      */
     @PostMapping("/users/{userId}/achievements/process")
+    @Operation(summary = "Check for achievements", 
+        description = "Evaluate achievements based on specific events")
+    @ApiResponse(responseCode = "200", description = "List of new achievements earned",
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = Achievement.class))))
     public ResponseEntity<List<Achievement>> processAchievements(
             @PathVariable String userId,
             @RequestBody JsonNode eventData) {
@@ -172,6 +206,9 @@ public class GamificationController {
      * @return Error response.
      */
     @org.springframework.web.bind.annotation.ExceptionHandler(UserNotFoundException.class)
+    @ApiResponse(responseCode = "404", description = "User not found",
+        content = @Content(schema = @Schema(example = """
+            {"error": "Not Found", "message": "User uuid-1234 not found"}""")))
     public ResponseEntity<ObjectNode> handleUserNotFoundException(UserNotFoundException ex) {
         ObjectNode errorJson = objectMapper.createObjectNode();
         errorJson.put("error", "User not found");
