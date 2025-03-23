@@ -95,7 +95,7 @@ public class User {
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
-    @JsonManagedReference
+    @JsonManagedReference("user-redemptions")
     private List<RewardRedemption> redemptions = new ArrayList<>();
 
     /**

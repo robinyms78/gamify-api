@@ -1,8 +1,8 @@
 package sg.edu.ntu.gamify_demo.interfaces;
 
 import java.util.List;
-
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
+import sg.edu.ntu.gamify_demo.dtos.RewardRedemptionRequestDTO;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 
 /**
@@ -19,12 +19,12 @@ public interface RewardRedemptionService {
     List<RewardRedemption> getAllRedemptions();
 
     /**
-     * Saves a redemption.
+     * Creates a redemption.
      * 
-     * @param redemption The redemption to save
+     * @param requestDTO The redemption to save
      * @return The saved redemption
      */
-    RewardRedemption saveRedemption(RewardRedemption redemption);
+    RewardRedemption createRedemption(RewardRedemptionRequestDTO requestDTO);
 
     /**
      * Gets a redemption by ID.

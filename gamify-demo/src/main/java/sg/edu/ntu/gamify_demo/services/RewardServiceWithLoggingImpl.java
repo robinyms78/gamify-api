@@ -2,6 +2,7 @@ package sg.edu.ntu.gamify_demo.services;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,13 +16,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import sg.edu.ntu.gamify_demo.commands.RedeemRewardCommand;
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
+import sg.edu.ntu.gamify_demo.dtos.RewardRedemptionRequestDTO;
 import sg.edu.ntu.gamify_demo.factories.RedemptionFactory;
 import sg.edu.ntu.gamify_demo.interfaces.RewardRedemptionService;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 import sg.edu.ntu.gamify_demo.models.Rewards;
-
+import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.observers.RedemptionObserver;
 import sg.edu.ntu.gamify_demo.repositories.RewardRedemptionRepository;
 import sg.edu.ntu.gamify_demo.repositories.RewardRepository;
@@ -37,7 +39,6 @@ import sg.edu.ntu.gamify_demo.states.RedemptionStateFactory;
 @RequiredArgsConstructor
 public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemptionService {
 
-    private final UserService userService;
     private final UserRepository userRepository;
     private final RewardRepository rewardRepository;
     private final RewardRedemptionRepository rewardRedemptionRepository;
@@ -105,12 +106,22 @@ public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemp
         return allRedemptions;
     }
 
-    // Save reward redemptions
+    // Create reward redemptions
     @Override
-    public RewardRedemption saveRedemption(RewardRedemption redemption) {
-        RewardRedemption newRedemption = rewardRedemptionRepository.save(redemption);
-        logger.info("🟢 RewardServiceWithLoggingImpl.saveRedemption() called");
-        return newRedemption;
+    public RewardRedemption createRedemption(RewardRedemptionRequestDTO requestDTO) {
+        // Fetch User and Reward
+        Optional<User> userOpt = userRepository.findById(requestDTO.getUserId());
+        Optional<Rewards> rewardOpt = rewardRepository.findById(requestDTO.getRewardId());
+
+        if (userOpt.isEmpty() || rewardOpt.isEmpty()) {
+            throw new RuntimeException("User or Reward not found!");
+        }
+
+        // Create new redemption
+        RewardRedemption redemption = new RewardRedemption(userOpt.get(), rewardOpt.get(), requestDTO.getStatus());
+
+        // Save to database
+        return rewardRedemptionRepository.save(redemption);
     }
 
     // Get reward redemption by id
@@ -134,10 +145,21 @@ public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemp
     }
 
     // Delete reward redemption
+    // @Override
+    // public void deleteRedemption(String rewardId) {
+    //     rewardRedemptionRepository.deleteById(rewardId);
+    //     logger.info("🟢 RewardServiceWithLoggingImpl.deleteRedemption() called");
+    // }
+
     @Override
     public void deleteRedemption(String rewardId) {
+        Optional<RewardRedemption> redemptions = rewardRedemptionRepository.findById(rewardId);
+
+        if (!redemptions.isEmpty()) {
+            throw new RuntimeException("Cannot delete reward: It is still referenced in redemptions.");
+        }
+
         rewardRedemptionRepository.deleteById(rewardId);
-        logger.info("🟢 RewardServiceWithLoggingImpl.deleteRedemption() called");
     }
 
     /**
@@ -189,6 +211,10 @@ public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemp
      * @return A RedemptionResult containing the result of the operation
      */
     @Transactional
+
+
+
+    
     public RedemptionResult completeRedemption(String redemptionId) {
         logger.info("🟢 RewardServiceWithLoggingImpl.completeRedemption() called for redemption {}", redemptionId);
         

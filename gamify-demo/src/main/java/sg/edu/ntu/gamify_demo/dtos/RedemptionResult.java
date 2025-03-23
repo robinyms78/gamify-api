@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.dtos;
 
 import java.time.ZonedDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
