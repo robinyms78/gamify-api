@@ -37,6 +37,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 /**
  * REST controller for ladder-related endpoints.
@@ -44,6 +45,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/ladder")
 @Tag(name = "Ladder System", description = "Manage user rankings and level progression")
+@SecurityRequirement(name = "bearerAuth")
 public class LadderController {
     
     @Autowired
@@ -65,8 +67,14 @@ public class LadderController {
      */
     @GetMapping("/levels")
     @Operation(summary = "Get all levels", 
-              description = "Retrieve all ladder levels with their point requirements")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved levels listing")
+              description = "Retrieve all ladder levels with point requirements")
+    @ApiResponse(responseCode = "200", description = "Success",
+                content = @Content(schema = @Schema(example = """
+                    {
+                      "1": 100,
+                      "2": 300,
+                      "3": 600
+                    }""")))
     public ResponseEntity<Map<Long, Long>> getLadderLevels() {
         Map<Long, Long> levels = ladderService.getLadderLevels();
         return ResponseEntity.ok(levels);
@@ -80,12 +88,14 @@ public class LadderController {
      */
     @GetMapping("/users/{userId}")
     @Operation(summary = "Get user's ladder status", 
-              description = "Retrieve a user's current ladder position and progress")
+              description = "Retrieve detailed level progression information")
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved user status",
+        @ApiResponse(responseCode = "200", description = "Success",
                     content = @Content(schema = @Schema(implementation = LadderStatusDTO.class))),
-        @ApiResponse(responseCode = "404", description = "User not found"),
-        @ApiResponse(responseCode = "500", description = "Server error")
+        @ApiResponse(responseCode = "404", description = "User not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<?> getUserLadderStatus(
         @Parameter(description = "User ID to retrieve status for", required = true, example = "user-123")
@@ -227,9 +237,16 @@ public class LadderController {
     @Operation(summary = "Create new level", 
               description = "Add a new level to the ladder system")
     @ApiResponses({
-        @ApiResponse(responseCode = "201", description = "Level created successfully",
-                    content = @Content(schema = @Schema(implementation = LadderLevel.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid level data")
+        @ApiResponse(responseCode = "201", description = "Created",
+                    content = @Content(schema = @Schema(implementation = LadderLevel.class,
+                        example = """
+                            {
+                              "level": 5,
+                              "label": "Master Explorer",
+                              "pointsRequired": 1000
+                            }"""))),
+        @ApiResponse(responseCode = "400", description = "Invalid data",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<LadderLevel> createLadderLevel(
         @Parameter(description = "Level data in JSON format", required = true,
@@ -261,13 +278,25 @@ public class LadderController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Level updated successfully",
                     content = @Content(schema = @Schema(implementation = LadderLevel.class))),
-        @ApiResponse(responseCode = "404", description = "Level not found"),
-        @ApiResponse(responseCode = "400", description = "Invalid update data")
+        @ApiResponse(responseCode = "404", description = "Level not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid update data",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<LadderLevel> updateLadderLevel(
-        @Parameter(description = "Level number to update", required = true, example = "3")
+        @Parameter(description = "Level number to update", 
+                   example = "3",
+                   required = true)
         @PathVariable int level,
-        @RequestBody JsonNode levelData) {
+        @RequestBody 
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Level update data",
+            content = @Content(examples = @ExampleObject("""
+                {
+                  "label": "Advanced Explorer",
+                  "pointsRequired": 800
+                }""")))
+        JsonNode levelData) {
         
         String label = levelData.get("label").asText();
         int pointsRequired = levelData.get("pointsRequired").asInt();
