@@ -75,7 +75,8 @@ public class AchievementController {
     @GetMapping
     @Operation(summary = "Get all achievements", description = "Retrieves a list of all available achievements")
     @ApiResponse(responseCode = "200", description = "Success",
-               content = @Content(array = @ArraySchema(schema = @Schema(implementation = Achievement.class)),
+               content = @Content(array = @ArraySchema(
+                   schema = @Schema(implementation = AchievementDTO.class))),
                examples = @ExampleObject("""
                    [
                      {
@@ -232,15 +233,17 @@ public class AchievementController {
               schema = @Schema(pattern = "^user-[a-zA-Z0-9]{8}$"))
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Check completed",
-                    content = @Content(examples = {
-                        @ExampleObject(name = "HasAchievement", value = """
-                            {"hasAchievement": true}"""),
-                        @ExampleObject(name = "NoAchievement", value = """
-                            {"hasAchievement": false}""")
-                    })),
+                    content = @Content(schema = @Schema(
+                        implementation = AchievementCheckResponse.class,
+                        example = """
+                            {
+                              "hasAchievement": true,
+                              "progress": 0.85,
+                              "requirementsMissing": ["tasksCompleted"]
+                            }"""))),
         @ApiResponse(responseCode = "404", description = "User or achievement not found")
     })
-    public ResponseEntity<ObjectNode> checkUserAchievement(
+    public ResponseEntity<AchievementCheckResponse> checkUserAchievement(
         @Parameter(description = "ID of the achievement to check", example = "achieve-123")
         @PathVariable String achievementId,
         @Parameter(description = "ID of the user to check", example = "user-456")
@@ -294,8 +297,13 @@ public class AchievementController {
                 }""")
         }))
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Event processed successfully",
-                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
+        @ApiResponse(responseCode = "200", description = "Event processed",
+                   content = @Content(schema = @Schema(example = """
+                       {
+                         "success": true,
+                         "newAchievements": ["achieve-123", "achieve-456"],
+                         "totalAchievements": 5
+                       }"""))),
         @ApiResponse(responseCode = "404", description = "User not found"),
         @ApiResponse(responseCode = "400", description = "Invalid event data")
     })
