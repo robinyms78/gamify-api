@@ -45,8 +45,10 @@ import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;
 
 
 @WebMvcTest(TaskEventController.class)
-@Import(TestSecurityConfig.class)
 public class TaskEventControllerTest {
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private MockMvc mockMvc;
@@ -61,9 +63,6 @@ public class TaskEventControllerTest {
     private UserService userService;
     
     @MockBean
-    private GamificationService gamificationService;
-    
-    @MockBean
     private LadderService ladderService;
     
     @MockBean
@@ -75,6 +74,11 @@ public class TaskEventControllerTest {
     
     @BeforeEach
     public void setup() {
+        mockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .apply(springSecurity())
+            .build();
+            
         reset(taskEventService); // Clear previous mock states
         
         // Create a test user
@@ -248,7 +252,6 @@ public class TaskEventControllerTest {
 
     @Test
     @DisplayName("Test unauthorized access")
-    @WithAnonymousUser
     void testUnauthorizedAccess() throws Exception {
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("userId", "user123");
@@ -258,6 +261,6 @@ public class TaskEventControllerTest {
         mockMvc.perform(post("/tasks/events")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }
