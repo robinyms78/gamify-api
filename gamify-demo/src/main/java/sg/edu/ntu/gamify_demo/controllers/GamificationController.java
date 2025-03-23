@@ -103,7 +103,6 @@ public class GamificationController {
             content = @Content(schema = @Schema(example = """
                 {"error": "Bad Request", "message": "Points value must be positive"}""")))
     })
-    })
     public ResponseEntity<ObjectNode> awardPoints(
             @PathVariable String userId,
             @RequestBody JsonNode pointsData) {
