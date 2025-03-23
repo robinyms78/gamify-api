@@ -122,7 +122,7 @@ public class TaskEventControllerTest {
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("userId", "user123");
         requestBody.put("taskId", "task123");
-        requestBody.put("eventType", "TASK_COMPLETED");
+        requestBody.put("event_type", "TASK_COMPLETED");
         
         ObjectNode data = objectMapper.createObjectNode();
         data.put("priority", "HIGH");
@@ -155,6 +155,7 @@ public class TaskEventControllerTest {
                 .andExpect(jsonPath("$.eventType").value("TASK_COMPLETED"))
                 .andExpect(jsonPath("$.status").value("COMPLETED"))
                 .andExpect(jsonPath("$.pointsAwarded").value(30))
+                .andExpect(jsonPath("$.priority").value("HIGH"))
                 ;
         
         // Verify service method calls - only verify processTaskEvent
@@ -174,8 +175,8 @@ public class TaskEventControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.title").value("Bad Request"))
-                .andExpect(jsonPath("$.detail").value("Required fields 'userId', 'taskId', or 'eventType' are missing"));
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Missing required fields: userId, taskId, and event_type"));
     }
     
     @Test
@@ -185,7 +186,7 @@ public class TaskEventControllerTest {
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("userId", "user123");
         requestBody.put("taskId", "task123");
-        requestBody.put("eventType", "INVALID_EVENT");
+        requestBody.put("event_type", "INVALID_EVENT");
         
         // Mock service to throw exception for invalid event type
         when(taskEventService.processTaskEvent(any(JsonNode.class)))
@@ -206,7 +207,7 @@ public class TaskEventControllerTest {
         ObjectNode requestBody = objectMapper.createObjectNode();
         requestBody.put("userId", "user123");
         requestBody.put("taskId", "task456");
-        requestBody.put("eventType", "TASK_ASSIGNED");
+        requestBody.put("event_type", "TASK_ASSIGNED");
         
         ObjectNode data = objectMapper.createObjectNode();
         data.put("dueDate", "2024-12-31T23:59:59Z");
