@@ -60,6 +60,9 @@ public class TaskEventControllerTest {
     private ObjectMapper objectMapper;
     
     @MockBean
+    private GamificationService gamificationService;
+
+    @MockBean
     private TaskEventService taskEventService;
     
     @MockBean
@@ -122,8 +125,6 @@ public class TaskEventControllerTest {
         taskData.put("priority", "HIGH");
         when(taskEventService.calculatePointsForTask(anyString(), any(JsonNode.class)))
             .thenReturn(30); // High priority task
-        when(gamificationService.awardPoints(anyString(), anyLong(), anyString(), any(JsonNode.class)))
-            .thenReturn(testUser.getEarnedPoints() + 30);
     }
     
     @Test
