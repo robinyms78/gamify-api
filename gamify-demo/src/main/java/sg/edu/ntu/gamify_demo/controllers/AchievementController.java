@@ -75,7 +75,7 @@ public class AchievementController {
     @GetMapping
     @Operation(summary = "Get all achievements", description = "Retrieves a list of all available achievements")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved achievements list",
-               content = @Content(schema = @Schema(implementation = List.class)))
+               content = @Content(array = @ArraySchema(schema = @Schema(implementation = Achievement.class))))
     public ResponseEntity<List<Achievement>> getAllAchievements() {
         List<Achievement> achievements = gamificationFacade.getAllAchievements();
         return ResponseEntity.ok(achievements);
@@ -213,7 +213,10 @@ public class AchievementController {
               description = "Checks if a user has earned a specific achievement")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Check completed",
-                    content = @Content(schema = @Schema(implementation = ObjectNode.class))),
+                    content = @Content(schema = @Schema(implementation = ObjectNode.class, example = """
+                        {
+                            "hasAchievement": true
+                        }"""))),
         @ApiResponse(responseCode = "404", description = "User or achievement not found")
     })
     public ResponseEntity<ObjectNode> checkUserAchievement(
@@ -308,12 +311,18 @@ public class AchievementController {
         @ApiResponse(responseCode = "404", description = "User or achievement not found")
     })
     public ResponseEntity<ObjectNode> awardAchievement(
-        @Parameter(description = "ID of the achievement to award", required = true)
+        @Parameter(description = "ID of the achievement to award", example = "achieve-123", required = true)
         @PathVariable String achievementId,
-        @Parameter(description = "ID of the user to award the achievement to", required = true)
+        @Parameter(description = "ID of the user to award the achievement to", example = "user-456", required = true)
         @PathVariable String userId,
         @Parameter(description = "Additional metadata about the achievement award")
-        @RequestBody(required = false) JsonNode metadata) {
+        @RequestBody(required = false) 
+        @Schema(example = """
+            {
+                "manualReason": "Special promotion",
+                "awardedBy": "admin@example.com"
+            }""")
+        JsonNode metadata) {
         
         User user = userService.getUserById(userId);
         if (user == null) {
@@ -363,7 +372,7 @@ public class AchievementController {
               description = "Retrieves all users who have earned a specific achievement")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Successfully retrieved users",
-                    content = @Content(schema = @Schema(implementation = List.class))),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = User.class)))),
         @ApiResponse(responseCode = "404", description = "Achievement not found")
     })
     public ResponseEntity<List<User>> getAchievementUsers(
