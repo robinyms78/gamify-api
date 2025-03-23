@@ -1,9 +1,17 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import sg.edu.ntu.gamify_demo.dtos.AchievementDTO;
+import sg.edu.ntu.gamify_demo.dtos.AchievementCheckResponse;
+import sg.edu.ntu.gamify_demo.dtos.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,9 +76,38 @@ public class GamificationController {
      * @return The user's points.
      */
     @GetMapping("/users/{userId}/points")
-    @Operation(summary = "Get user points", description = "Retrieves total points for a user")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved points")
-    @ApiResponse(responseCode = "404", description = "User not found")
+    @Operation(
+        summary = "Get user points", 
+        description = "Retrieves total points for a user",
+        operationId = "getUserPoints"
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Successfully retrieved points",
+            content = @Content(
+                schema = @Schema(implementation = ObjectNode.class),
+                examples = @ExampleObject("""
+                    {
+                      "userId": "user-123",
+                      "points": 1500
+                    }""")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "User not found",
+            content = @Content(
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject("""
+                    {
+                      "error": "Not Found",
+                      "message": "User user-123 not found",
+                      "timestamp": "2024-03-20T14:30:00Z"
+                    }""")
+            )
+        )
+    })
     public ResponseEntity<ObjectNode> getUserPoints(
         @Parameter(description = "User ID", example = "uuid-1234") 
         @PathVariable String userId) {
@@ -91,19 +128,52 @@ public class GamificationController {
      * @return The user's new total points.
      */
     @PostMapping("/users/{userId}/points/award")
-    @Operation(summary = "Award points to user", 
-        description = "Add points to user's balance and trigger achievement checks")
+    @Operation(
+        summary = "Award points to user", 
+        description = "Add points to user's balance and trigger achievement checks",
+        operationId = "awardPoints"
+    )
     @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Points awarded successfully",
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Points awarded successfully",
             content = @Content(
                 schema = @Schema(implementation = ObjectNode.class),
+                examples = @ExampleObject("""
+                    {
+                      "userId": "user-123",
+                      "pointsAwarded": 100,
+                      "newTotal": 1600
+                    }"""),
                 links = {@Link(name = "ladder-update", operationId = "updateUserLadderStatus")}
-            )),
-        @ApiResponse(responseCode = "404", description = "User not found",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid points value",
-            content = @Content(schema = @Schema(example = """
-                {"error": "Bad Request", "message": "Points value must be positive"}""")))
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "User not found",
+            content = @Content(
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject("""
+                    {
+                      "error": "Not Found",
+                      "message": "User user-123 not found",
+                      "timestamp": "2024-03-20T14:30:00Z"
+                    }""")
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Invalid points value",
+            content = @Content(
+                schema = @Schema(implementation = ErrorResponse.class),
+                examples = @ExampleObject("""
+                    {
+                      "error": "Bad Request",
+                      "message": "Points value must be positive",
+                      "timestamp": "2024-03-20T14:30:00Z"
+                    }""")
+            )
+        )
     })
     public ResponseEntity<ObjectNode> awardPoints(
             @PathVariable String userId,

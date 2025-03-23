@@ -24,4 +24,12 @@ public class AchievementCheckResponse {
     @Schema(description = "Missing criteria requirements", 
            example = "[\"tasksCompleted\", \"minimumRating\"]")
     private List<String> requirementsMissing;
+    
+    @Schema(description = "Current progress values", 
+           example = "{\"tasksCompleted\": 75, \"minimumRating\": 4.5}")
+    private Map<String, Object> currentProgress;
+    
+    @Schema(description = "Total required values", 
+           example = "{\"tasksCompleted\": 100, \"minimumRating\": 5.0}")
+    private Map<String, Object> requiredValues;
 }
