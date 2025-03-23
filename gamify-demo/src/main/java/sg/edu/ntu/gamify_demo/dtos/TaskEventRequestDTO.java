@@ -22,8 +22,19 @@ public class TaskEventRequestDTO {
     private String eventType;
 
     @Schema(
-        description = "Additional event-specific data",
-        example = "{ \"priority\": \"HIGH\", \"points\": 100, \"details\": \"Task completed ahead of schedule\" }"
+        description = "Additional event-specific data that varies based on event type",
+        example = """
+            {
+              "priority": "HIGH",
+              "points": 100,
+              "details": "Task completed ahead of schedule",
+              "metadata": {
+                "completedBy": "John Doe",
+                "verifiedBy": "Jane Smith"
+              }
+            }
+            """,
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED
     )
     private JsonNode data;
 }

@@ -6,6 +6,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -24,6 +25,7 @@ import lombok.Setter;
  * The UserLadderStatus class represents a user's current status in the ladder system.
  * It tracks the user's current level, earned points, and points needed for the next level.
  */
+@Schema(name = "UserLadderStatus", description = "Represents a user's current status in the ladder system")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,30 +34,37 @@ import lombok.Setter;
 @Entity
 @Table(name = "user_ladder_status")
 public class UserLadderStatus {
-@Id
-@Column(name = "id")
-private String id;
+    @Id
+    @Column(name = "id")
+    @Schema(description = "Unique identifier for the ladder status record", example = "user-12345", requiredMode = Schema.RequiredMode.REQUIRED)
+    private String id;
 
-@OneToOne(fetch = FetchType.EAGER)
-@JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-@JsonBackReference
-private User user;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JsonBackReference
+    @Schema(description = "User associated with this ladder status", requiredMode = Schema.RequiredMode.REQUIRED)
+    private User user;
     
     @ManyToOne
     @JoinColumn(name = "current_level", nullable = false)
+    @Schema(description = "User's current level in the ladder system", requiredMode = Schema.RequiredMode.REQUIRED)
     private LadderLevel currentLevel;
     
     @Column(name = "earned_points", nullable = false)
+    @Schema(description = "Total points earned by the user", example = "750", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long earnedPoints;
     
     @Column(name = "points_to_next_level", nullable = false)
+    @Schema(description = "Points needed to reach the next level", example = "250", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long pointsToNextLevel;
     
     @Column(name = "achievements")
+    @Schema(description = "Serialized list of user achievements", example = "achievement1,achievement2")
     private String achievements;
     
     @UpdateTimestamp
     @Column(name = "updated_at")
+    @Schema(description = "Timestamp when this status was last updated", example = "2024-03-15T14:30:45Z")
     private ZonedDateTime updatedAt;
     
     /**

@@ -108,11 +108,13 @@ public class TaskEventController {
             ErrorResponseDTO errorResponse = new ErrorResponseDTO();
             errorResponse.setError("Bad Request");
             errorResponse.setMessage(e.getMessage());
+            // timestamp is automatically set by the DTO
             return ResponseEntity.badRequest().body(errorResponse);
         } catch (Exception e) {
             ErrorResponseDTO errorResponse = new ErrorResponseDTO();
             errorResponse.setError("Internal Server Error");
             errorResponse.setMessage("An unexpected error occurred: " + e.getMessage());
+            // timestamp is automatically set by the DTO
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
@@ -140,6 +142,7 @@ public class TaskEventController {
             ErrorResponseDTO errorResponse = new ErrorResponseDTO();
             errorResponse.setError("Not Found");
             errorResponse.setMessage("Task event with ID " + eventId + " not found");
+            // timestamp is automatically set by the DTO
             return ResponseEntity.status(404).body(errorResponse);
         }
         TaskEventDTO taskEventDTO = taskEventMapper.toDTO(taskEvent);

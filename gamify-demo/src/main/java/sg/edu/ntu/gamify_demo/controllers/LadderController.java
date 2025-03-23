@@ -40,6 +40,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import sg.edu.ntu.gamify_demo.dtos.ErrorResponse;
+import sg.edu.ntu.gamify_demo.dtos.ErrorResponseDTO;
 
 /**
  * REST controller for ladder-related endpoints.
@@ -95,9 +96,9 @@ public class LadderController {
         @ApiResponse(responseCode = "200", description = "Success",
                     content = @Content(schema = @Schema(implementation = LadderStatusDTO.class))),
         @ApiResponse(responseCode = "404", description = "User not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
         @ApiResponse(responseCode = "500", description = "Server error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public ResponseEntity<?> getUserLadderStatus(
         @Parameter(description = "User ID to retrieve status for", required = true, example = "user-123")
@@ -134,18 +135,18 @@ public class LadderController {
             System.err.println("LadderController: Database error getting ladder status: " + e.getMessage());
             e.printStackTrace();
             
-            ObjectNode errorJson = objectMapper.createObjectNode();
-            errorJson.put("error", "Database error");
-            errorJson.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorJson);
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO();
+            errorResponse.setError("Database error");
+            errorResponse.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         } catch (Exception e) {
             System.err.println("LadderController: Unexpected error getting ladder status: " + e.getMessage());
             e.printStackTrace();
             
-            ObjectNode errorJson = objectMapper.createObjectNode();
-            errorJson.put("error", "Server error");
-            errorJson.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorJson);
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO();
+            errorResponse.setError("Server error");
+            errorResponse.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
     
@@ -248,7 +249,7 @@ public class LadderController {
                               "pointsRequired": 1000
                             }"""))),
         @ApiResponse(responseCode = "400", description = "Invalid data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public ResponseEntity<LadderLevel> createLadderLevel(
         @Parameter(description = "Level data in JSON format", required = true,
@@ -281,9 +282,9 @@ public class LadderController {
         @ApiResponse(responseCode = "200", description = "Level updated successfully",
                     content = @Content(schema = @Schema(implementation = LadderLevel.class))),
         @ApiResponse(responseCode = "404", description = "Level not found",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
         @ApiResponse(responseCode = "400", description = "Invalid update data",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class)))
     })
     public ResponseEntity<LadderLevel> updateLadderLevel(
         @Parameter(description = "Level number to update", 
@@ -326,7 +327,7 @@ public class LadderController {
         @ApiResponse(responseCode = "404", description = "Level not found"),
         @ApiResponse(responseCode = "409", description = "Level cannot be deleted (active users)")
     })
-    public ResponseEntity<ObjectNode> deleteLadderLevel(
+    public ResponseEntity<?> deleteLadderLevel(
         @Parameter(description = "Level number to delete", required = true, example = "2")
         @PathVariable int level) {
         boolean deleted = ladderService.deleteLadderLevel(level);
@@ -334,11 +335,11 @@ public class LadderController {
         if (deleted) {
             return ResponseEntity.noContent().build();
         } else {
-            ObjectNode errorJson = objectMapper.createObjectNode();
-            errorJson.put("error", "Cannot delete level");
-            errorJson.put("message", "The level does not exist or users are currently at this level");
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO();
+            errorResponse.setError("Cannot delete level");
+            errorResponse.setMessage("The level does not exist or users are currently at this level");
             
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorJson);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
         }
     }
     
@@ -349,11 +350,11 @@ public class LadderController {
      * @return Error response.
      */
     @org.springframework.web.bind.annotation.ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ObjectNode> handleUserNotFoundException(UserNotFoundException ex) {
-        ObjectNode errorJson = objectMapper.createObjectNode();
-        errorJson.put("error", "User not found");
-        errorJson.put("message", ex.getMessage());
+    public ResponseEntity<ErrorResponseDTO> handleUserNotFoundException(UserNotFoundException ex) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO();
+        errorResponse.setError("User not found");
+        errorResponse.setMessage(ex.getMessage());
         
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorJson);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 }
