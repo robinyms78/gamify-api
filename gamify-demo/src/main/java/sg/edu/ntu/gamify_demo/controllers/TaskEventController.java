@@ -18,11 +18,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventDTO;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventResponseDTO;
+import sg.edu.ntu.gamify_demo.dtos.TaskEventRequestDTO;
+import sg.edu.ntu.gamify_demo.dtos.ErrorResponseDTO;
+
+import javax.validation.Valid;
 import sg.edu.ntu.gamify_demo.mappers.TaskEventMapper;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 
@@ -63,49 +66,28 @@ public class TaskEventController {
         @ApiResponse(responseCode = "400", description = "Invalid request format/missing fields"),
         @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    public ResponseEntity<ObjectNode> processTaskEvent(
+    public ResponseEntity<?> processTaskEvent(
         @Parameter(description = "Event data in JSON format", required = true,
-                  content = @Content(schema = @Schema(example = """
-                      {
-                          "userId": "123e4567-e89b-12d3-a456-426614174000",
-                          "taskId": "task-789",
-                          "event_type": "COMPLETION",
-                          "data": {
-                              "priority": "HIGH",
-                              "details": "Additional event information"
-                          }
-                      }""")))
-        @RequestBody JsonNode eventData) {
+                  content = @Content(schema = @Schema(implementation = TaskEventRequestDTO.class)))
+        @RequestBody @Valid TaskEventRequestDTO eventRequest) {
         try {
-            // Validate required fields
-            if (!eventData.has("userId") || !eventData.has("taskId") || !eventData.has("event_type")) {
-                ObjectNode errorResponse = objectMapper.createObjectNode();
-                errorResponse.put("error", "Bad Request");
-                errorResponse.put("message", "Missing required fields: userId, taskId, and event_type");
-                return ResponseEntity.badRequest().body(errorResponse);
-            }
-            
-            // Sanitize the event data to remove any control characters
-            String sanitizedJson = eventData.toString().replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
-            JsonNode sanitizedEventData = objectMapper.readTree(sanitizedJson);
-            
-            ObjectNode response = taskEventService.processTaskEvent(sanitizedEventData);
+            TaskEventResponseDTO response = taskEventService.processTaskEvent(eventRequest);
             
             // Add priority to response if available
-            if (sanitizedEventData.has("data") && sanitizedEventData.get("data").has("priority")) {
-                response.put("priority", sanitizedEventData.get("data").get("priority").asText());
+            if (eventRequest.getData() != null && eventRequest.getData().has("priority")) {
+                response.setPriority(eventRequest.getData().get("priority").asText());
             }
             
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            ObjectNode errorResponse = objectMapper.createObjectNode();
-            errorResponse.put("error", "Bad Request");
-            errorResponse.put("message", e.getMessage());
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO();
+            errorResponse.setError("Bad Request");
+            errorResponse.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(errorResponse);
         } catch (Exception e) {
-            ObjectNode errorResponse = objectMapper.createObjectNode();
-            errorResponse.put("error", "Internal Server Error");
-            errorResponse.put("message", "An unexpected error occurred: " + e.getMessage());
+            ErrorResponseDTO errorResponse = new ErrorResponseDTO();
+            errorResponse.setError("Internal Server Error");
+            errorResponse.setMessage("An unexpected error occurred: " + e.getMessage());
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
