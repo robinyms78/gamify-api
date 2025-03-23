@@ -1,6 +1,12 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -14,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,6 +30,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,8 +48,10 @@ import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;
 
 
 @WebMvcTest(TaskEventController.class)
-@Import(TestSecurityConfig.class)
 public class TaskEventControllerTest {
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,13 +60,13 @@ public class TaskEventControllerTest {
     private ObjectMapper objectMapper;
     
     @MockBean
+    private GamificationService gamificationService;
+
+    @MockBean
     private TaskEventService taskEventService;
     
     @MockBean
     private UserService userService;
-    
-    @MockBean
-    private GamificationService gamificationService;
     
     @MockBean
     private LadderService ladderService;
@@ -64,14 +74,19 @@ public class TaskEventControllerTest {
     @MockBean
     private TaskEventMapper taskEventMapper;
     
-    @InjectMocks
-    private TaskEventController taskEventController;
     
     private User testUser;
     private TaskEvent testTaskEvent;
     
     @BeforeEach
     public void setup() {
+        mockMvc = MockMvcBuilders
+            .webAppContextSetup(context)
+            .apply(springSecurity())
+            .build();
+            
+        reset(taskEventService); // Clear previous mock states
+        
         // Create a test user
         testUser = new User();
         testUser.setId("user123");
@@ -110,8 +125,6 @@ public class TaskEventControllerTest {
         taskData.put("priority", "HIGH");
         when(taskEventService.calculatePointsForTask(anyString(), any(JsonNode.class)))
             .thenReturn(30); // High priority task
-        when(gamificationService.awardPoints(anyString(), anyLong(), anyString(), any(JsonNode.class)))
-            .thenReturn(testUser.getEarnedPoints() + 30);
     }
     
     @Test
@@ -142,6 +155,7 @@ public class TaskEventControllerTest {
         
         // Perform request and verify response
         mockMvc.perform(post("/tasks/events")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk())
@@ -152,7 +166,8 @@ public class TaskEventControllerTest {
                 .andExpect(jsonPath("$.eventType").value("TASK_COMPLETED"))
                 .andExpect(jsonPath("$.status").value("COMPLETED"))
                 .andExpect(jsonPath("$.pointsAwarded").value(30))
-                .andExpect(jsonPath("$.priority").value("HIGH"));
+                .andExpect(jsonPath("$.priority").value("HIGH"))
+                ;
         
         // Verify service method calls - only verify processTaskEvent
         verify(taskEventService, times(1)).processTaskEvent(any(JsonNode.class));
@@ -167,6 +182,7 @@ public class TaskEventControllerTest {
         
         // Perform request and verify response
         mockMvc.perform(post("/tasks/events")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isBadRequest())
@@ -175,6 +191,7 @@ public class TaskEventControllerTest {
     }
     
     @Test
+    @DisplayName("Test invalid event type")
     public void testInvalidEventType() throws Exception {
         // Create request body with invalid event type
         ObjectNode requestBody = objectMapper.createObjectNode();
@@ -188,10 +205,66 @@ public class TaskEventControllerTest {
         
         // Perform request and verify response
         mockMvc.perform(post("/tasks/events")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").value("Invalid event type: INVALID_EVENT"));
+    }
+    @Test
+    @DisplayName("Test task assignment event")
+    void testTaskAssignmentEvent() throws Exception {
+        // Mock specific assignment response
+        ObjectNode assignmentResponse = objectMapper.createObjectNode();
+        assignmentResponse.put("success", true);
+        assignmentResponse.put("eventType", "TASK_ASSIGNED");
+        assignmentResponse.put("status", "ASSIGNED");
+        
+        when(taskEventService.processTaskEvent(any(JsonNode.class)))
+            .thenReturn(assignmentResponse);
+
+        ObjectNode requestBody = objectMapper.createObjectNode();
+        requestBody.put("userId", "user123");
+        requestBody.put("taskId", "task456");
+        requestBody.put("event_type", "TASK_ASSIGNED");
+        
+        ObjectNode data = objectMapper.createObjectNode();
+        data.put("dueDate", "2024-12-31T23:59:59Z");
+        requestBody.set("data", data);
+
+        mockMvc.perform(post("/tasks/events")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.eventType").value("TASK_ASSIGNED"))
+                .andExpect(jsonPath("$.status").value("ASSIGNED"));
+    }
+
+    @Test
+    @DisplayName("Test invalid JSON payload")
+    void testInvalidJsonPayload() throws Exception {
+        mockMvc.perform(post("/tasks/events")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{invalid-json}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.message").exists());
+    }
+
+    @Test
+    @DisplayName("Test unauthorized access")
+    void testUnauthorizedAccess() throws Exception {
+        ObjectNode requestBody = objectMapper.createObjectNode();
+        requestBody.put("userId", "user123");
+        requestBody.put("taskId", "task123");
+        requestBody.put("event_type", "TASK_COMPLETED");
+
+        mockMvc.perform(post("/tasks/events")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isUnauthorized());
     }
 }

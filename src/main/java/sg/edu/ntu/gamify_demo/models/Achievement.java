@@ -37,7 +37,7 @@ public class Achievement {
     @Schema(description = "The unique identifier of the achievement", example = "a1b2c3d4-e5f6-7890-1234-567890abcdef")
     private String achievementId;
     
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     @Schema(description = "The name of the achievement", example = "Task Master")
     private String name;
     

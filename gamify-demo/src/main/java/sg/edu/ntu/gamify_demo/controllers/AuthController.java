@@ -1,7 +1,12 @@
 package sg.edu.ntu.gamify_demo.controllers;
 import java.util.Optional;
+import java.net.URI;
 import java.util.UUID;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -75,7 +80,7 @@ public class AuthController {
             @Parameter(description = "Registration request containing user details",
                 required = true,
                 content = @Content(schema = @Schema(implementation = RegistrationRequest.class)))
-            @RequestBody RegistrationRequest request) {
+            @Valid @RequestBody RegistrationRequest request) {
         // Check if username already exists
         if (userRepository.existsByUsername(request.username())) {
             throw new DuplicateUserException("Username already exists");
@@ -101,12 +106,15 @@ public class AuthController {
         // Save user to database
         User savedUser = userRepository.save(newUser);
 
-        // Return success response
-        RegistrationResponse response = new RegistrationResponse(
-                "User registered successfully", 
-                savedUser.getId());
-        
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        // Build location URI with full context path
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/users/{id}")
+                .buildAndExpand(savedUser.getId())
+                .toUri();
+
+        return ResponseEntity.created(location)
+                .body(new RegistrationResponse("User registered successfully", savedUser.getId()));
     }
 
     /**
@@ -149,9 +157,11 @@ public class AuthController {
         // Generate JWT token
         String token = authService.generateToken(user);
 
-        // Return token and user details
+        // Return token and user details with header
         AuthResponse response = new AuthResponse(token, user);
         
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+            .body(response);
     }
 }
