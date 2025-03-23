@@ -96,12 +96,13 @@ public class GamificationController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Points awarded successfully",
             content = @Content(schema = @Schema(implementation = ObjectNode.class),
-            links = @Link(name = "ladder-update", operationId = "updateUserLadderStatus")),
+            links = @Link(name = "ladder-update", operationId = "updateUserLadderStatus"))),
         @ApiResponse(responseCode = "404", description = "User not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "400", description = "Invalid points value",
             content = @Content(schema = @Schema(example = """
                 {"error": "Bad Request", "message": "Points value must be positive"}""")))
+    })
     })
     public ResponseEntity<ObjectNode> awardPoints(
             @PathVariable String userId,
