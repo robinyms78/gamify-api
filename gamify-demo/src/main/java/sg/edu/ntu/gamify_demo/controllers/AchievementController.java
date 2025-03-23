@@ -84,13 +84,16 @@ public class AchievementController {
                        "name": "Marathon Runner",
                        "description": "Complete 100 tasks",
                        "criteria": {"tasksCompleted": 100},
-                       "earned": false
+                       "metadata": {"difficulty": "medium"},
+                       "earned": false,
+                       "earnedAt": null
                      },
                      {
                        "id": "achieve-456", 
                        "name": "Speed Demon",
                        "description": "Complete 5 tasks in 1 hour",
                        "criteria": {"tasksInHour": 5},
+                       "metadata": {"difficulty": "hard"},
                        "earned": true,
                        "earnedAt": "2024-03-20T14:30:00Z"
                      }
