@@ -129,6 +129,13 @@ public class RewardControllerWithLoggingImpl {
 
     // Update reward redemption
     @PutMapping("/redemption/{redemptionId}")
+    @Operation(summary = "Update reward redemption by redemption Id", 
+    description = "Update reward redemption by redemption Id")
+    @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully updated reward redemption",
+                content = @Content(schema = @Schema(implementation = RedemptionResult.class))),
+    @ApiResponse(responseCode = "404", description = "Reward redemption not found")
+                })
     public ResponseEntity<RewardRedemption> updateRedemption(@PathVariable String redemptionId, @RequestBody RewardRedemption redemption) {
         RewardRedemption updateRedemption = rewardRedemptionService.updateRedemption(redemptionId, redemption);
         return new ResponseEntity<>(updateRedemption, HttpStatus.OK);
