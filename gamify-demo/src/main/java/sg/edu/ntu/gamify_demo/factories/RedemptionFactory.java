@@ -2,9 +2,7 @@ package sg.edu.ntu.gamify_demo.factories;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
-
 import org.springframework.stereotype.Component;
-
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 import sg.edu.ntu.gamify_demo.models.Rewards;
 import sg.edu.ntu.gamify_demo.models.User;

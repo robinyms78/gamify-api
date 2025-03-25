@@ -2,9 +2,7 @@ package sg.edu.ntu.gamify_demo.mappers;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
-
 import sg.edu.ntu.gamify_demo.dtos.AchievementDTO;
 import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.models.Achievement;

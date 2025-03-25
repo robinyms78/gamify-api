@@ -2,14 +2,11 @@ package sg.edu.ntu.gamify_demo.services;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.factories.UserAchievementFactory;

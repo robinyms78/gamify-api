@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.interfaces;
 
 import java.util.List;
-
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
 import sg.edu.ntu.gamify_demo.models.User;

@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.events.domain;
 
 import java.time.LocalDateTime;
-
 import sg.edu.ntu.gamify_demo.models.User;
 
 /**

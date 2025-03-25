@@ -7,12 +7,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import sg.edu.ntu.gamify_demo.exceptions.AuthenticationException;
 import sg.edu.ntu.gamify_demo.exceptions.DuplicateUserException;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;

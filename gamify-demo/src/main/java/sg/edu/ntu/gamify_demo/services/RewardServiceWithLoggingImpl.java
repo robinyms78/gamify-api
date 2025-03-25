@@ -3,16 +3,12 @@ package sg.edu.ntu.gamify_demo.services;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.RequiredArgsConstructor;
 import sg.edu.ntu.gamify_demo.commands.RedeemRewardCommand;
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
@@ -20,7 +16,6 @@ import sg.edu.ntu.gamify_demo.dtos.RewardRedemptionRequestDTO;
 import sg.edu.ntu.gamify_demo.factories.RedemptionFactory;
 import sg.edu.ntu.gamify_demo.interfaces.RewardRedemptionService;
 import sg.edu.ntu.gamify_demo.interfaces.RewardService;
-import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 import sg.edu.ntu.gamify_demo.models.Rewards;
 import sg.edu.ntu.gamify_demo.models.User;

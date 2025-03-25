@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.config;
 
 import org.springframework.context.annotation.Configuration;
-
 import jakarta.annotation.PostConstruct;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.subscribers.LadderStatusSubscriber;

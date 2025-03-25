@@ -2,9 +2,7 @@ package sg.edu.ntu.gamify_demo.strategies.task;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**

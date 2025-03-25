@@ -3,11 +3,9 @@ package sg.edu.ntu.gamify_demo.services;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.interfaces.LadderStatusService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;

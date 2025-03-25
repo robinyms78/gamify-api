@@ -3,14 +3,11 @@ package sg.edu.ntu.gamify_demo.services;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import lombok.RequiredArgsConstructor;
 import sg.edu.ntu.gamify_demo.models.PointsTransaction;
 import sg.edu.ntu.gamify_demo.models.User;

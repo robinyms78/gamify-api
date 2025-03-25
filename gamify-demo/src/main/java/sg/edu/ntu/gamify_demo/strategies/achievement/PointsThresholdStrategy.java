@@ -1,9 +1,7 @@
 package sg.edu.ntu.gamify_demo.strategies.achievement;
 
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import sg.edu.ntu.gamify_demo.models.User;
 
 /**

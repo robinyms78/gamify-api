@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.services;
 
 import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**

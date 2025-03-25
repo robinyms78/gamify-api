@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import sg.edu.ntu.gamify_demo.models.User;
 
 /**

@@ -1,9 +1,7 @@
 package sg.edu.ntu.gamify_demo.commands;
 
 import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 import sg.edu.ntu.gamify_demo.models.User;
 

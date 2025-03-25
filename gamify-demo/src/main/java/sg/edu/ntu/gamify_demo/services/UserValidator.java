@@ -1,6 +1,6 @@
 package sg.edu.ntu.gamify_demo.services;
-import org.springframework.stereotype.Component;
 
+import org.springframework.stereotype.Component;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
 import sg.edu.ntu.gamify_demo.models.User;
 

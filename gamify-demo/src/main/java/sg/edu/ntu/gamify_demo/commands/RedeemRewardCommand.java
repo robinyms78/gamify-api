@@ -1,12 +1,9 @@
 package sg.edu.ntu.gamify_demo.commands;
 
 import java.time.ZonedDateTime;
-
 import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import lombok.Builder;
 import sg.edu.ntu.gamify_demo.dtos.RedemptionResult;
 import sg.edu.ntu.gamify_demo.factories.RedemptionFactory;

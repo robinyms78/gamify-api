@@ -1,10 +1,8 @@
 package sg.edu.ntu.gamify_demo.repositories;
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
 
 /**

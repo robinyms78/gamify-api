@@ -3,7 +3,6 @@ package sg.edu.ntu.gamify_demo.models;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
