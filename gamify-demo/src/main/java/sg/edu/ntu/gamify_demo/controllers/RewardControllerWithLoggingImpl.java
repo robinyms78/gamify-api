@@ -194,7 +194,7 @@ public class RewardControllerWithLoggingImpl {
         @ApiResponse(responseCode = "400", description = "Redemption complete failed",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> completeRedemption(@PathVariable("id") String redemptionId) {
+    public ResponseEntity<?> completeRedemption(@PathVariable String redemptionId, RewardRedemptionRequestDTO requestDTO) {
         RedemptionResult result = rewardRedemptionService.completeRedemption(redemptionId);
         if (result.isSuccess()) {
             return ResponseEntity.ok(result);
@@ -217,7 +217,7 @@ public class RewardControllerWithLoggingImpl {
         @ApiResponse(responseCode = "400", description = "Redemption cancelled failed",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> cancelRedemption(@PathVariable("id") String redemptionId) {
+    public ResponseEntity<?> cancelRedemption(@PathVariable String redemptionId, RewardRedemptionRequestDTO requestDTO) {
         RedemptionResult result = rewardRedemptionService.cancelRedemption(redemptionId);
         if (result.isSuccess()) {
             return ResponseEntity.ok(result);
