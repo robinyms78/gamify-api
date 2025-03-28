@@ -31,11 +31,11 @@ public class DataLoader {
         rewardRepository.deleteAll();
 
         // load user repository data
-        userRepository.save(User.builder().username("Tom").email("tom@gmail.com").department("IT").role(UserRole.EMPLOYEE).passwordHash("12345678").earnedPoints(100L).availablePoints(500L).build());
-        userRepository.save(User.builder().username("Jack").email("jack@gmail.com").department("IT").role(UserRole.EMPLOYEE).passwordHash("12345677").earnedPoints(100L).availablePoints(0L).build());
+        userRepository.save(User.builder().username("Tom").email("tom@gmail.com").department("IT").role(UserRole.HR_ADMIN).passwordHash("12345678").earnedPoints(100L).availablePoints(500L).build());
+        userRepository.save(User.builder().username("Jack").email("jack@gmail.com").department("IT").role(UserRole.HR_ADMIN).passwordHash("12345677").earnedPoints(100L).availablePoints(0L).build());
         userRepository.save(User.builder().username("Susan").email("susan@gmail.com").department("IT").role(UserRole.HR_ADMIN).passwordHash("12345676").earnedPoints(0L).availablePoints(500L).build());
-        userRepository.save(User.builder().username("Terry").email("terry@gmail.com").department("IT").role(UserRole.MANAGER).passwordHash("12345675").earnedPoints(300L).availablePoints(500L).build());
-        userRepository.save(User.builder().username("Emily").email("emily@gmail.com").department("IT").role(UserRole.EMPLOYEE).passwordHash("12345674").earnedPoints(400L).availablePoints(500L).build());
+        userRepository.save(User.builder().username("Terry").email("terry@gmail.com").department("IT").role(UserRole.HR_ADMIN).passwordHash("12345675").earnedPoints(300L).availablePoints(500L).build());
+        userRepository.save(User.builder().username("Emily").email("emily@gmail.com").department("IT").role(UserRole.HR_ADMIN).passwordHash("12345674").earnedPoints(400L).availablePoints(500L).build());
 
         // load reward repository data
         rewardRepository.save(Rewards.builder().name("iphone").description("electronics").costInPoints(1000L).available(true).createdAt(ZonedDateTime.now()).updatedAt(ZonedDateTime.now()).build());

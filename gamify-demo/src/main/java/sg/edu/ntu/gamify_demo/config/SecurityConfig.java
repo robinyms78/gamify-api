@@ -76,6 +76,7 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())  // If CSRF is enabled, make sure the request includes a CSRF token
                 .authorizeHttpRequests(auth -> auth
+                                .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()  
                                 .requestMatchers(HttpMethod.POST, "/api/user").permitAll()                  // User management 
                                 .requestMatchers(HttpMethod.POST, "/api/gamification/users").permitAll()    // Gamification
                                 .requestMatchers(HttpMethod.POST, "/tasks/events").permitAll()              // Tasks events
