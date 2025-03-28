@@ -1,5 +1,6 @@
 package sg.edu.ntu.gamify_demo.dtos;
 
+import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -12,4 +13,12 @@ public class TaskEventDTO {
     private String eventType;
     private TaskStatus status;
     private LocalDateTime completionTime;
+    
+    public void setUserId(User user) {
+        if (user != null && user.getId() != null) {
+            this.userId = user.getId(); // Assuming `userId` is a field in this class
+        } else {
+            throw new IllegalArgumentException("User or user ID is null");
+        }
+    }
 }

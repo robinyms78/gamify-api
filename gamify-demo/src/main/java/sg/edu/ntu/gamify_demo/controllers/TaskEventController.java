@@ -128,7 +128,14 @@ public class TaskEventController {
         if (taskEvent == null) {
             return ResponseEntity.notFound().build();
         }
-        TaskEventDTO taskEventDTO = taskEventMapper.toDTO(taskEvent);
+
+        TaskEventDTO taskEventDTO = new TaskEventDTO();
+        taskEventDTO.setEventId(taskEvent.getEventId());
+        taskEventDTO.setEventType(taskEvent.getEventType());
+        taskEventDTO.setStatus(taskEvent.getStatus());
+        taskEventDTO.setTaskId(taskEvent.getTaskId());
+        taskEventDTO.setUserId(taskEvent.getUser());
+
         return ResponseEntity.ok(taskEventDTO);
     }
 }
