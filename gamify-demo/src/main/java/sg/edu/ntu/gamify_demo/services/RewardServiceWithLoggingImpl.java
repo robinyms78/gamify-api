@@ -128,33 +128,56 @@ public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemp
     }
 
     // Update reward redemption
-    @Override
-    public RewardRedemption updateRedemption(String rewardId, RewardRedemption redemption) {
-        RewardRedemption redemptionToUpdate = rewardRedemptionRepository.findById(rewardId).get();
-        redemptionToUpdate.setId(redemption.getId());
-        redemptionToUpdate.setStatus(redemption.getStatus());
-        redemptionToUpdate.setCreatedAt(redemption.getCreatedAt());
-        redemptionToUpdate.setUpdatedAt(redemption.getUpdatedAt());
-        logger.info("🟢 RewardServiceWithLoggingImpl.updateRedemption() called");
-        return rewardRedemptionRepository.save(redemptionToUpdate);
-    }
+    public RewardRedemption updateRedemption(String redemptionId, RewardRedemptionRequestDTO requestDTO) {
+        // Fetch existing redemption
+        Optional<RewardRedemption> redemptionOpt = rewardRedemptionRepository.findById(redemptionId);
+   
+        if (redemptionOpt.isEmpty()) {
+           throw new RuntimeException("Redemption not found!");
+       }
+   
+       RewardRedemption redemption = redemptionOpt.get();
 
-    // Delete reward redemption
-    // @Override
-    // public void deleteRedemption(String rewardId) {
-    //     rewardRedemptionRepository.deleteById(rewardId);
-    //     logger.info("🟢 RewardServiceWithLoggingImpl.deleteRedemption() called");
-    // }
+       // Update user and reward if provided
+       if (requestDTO.getUserId() != null) {
+           Optional<User> userOpt = userRepository.findById(requestDTO.getUserId());
+           if (userOpt.isPresent()) {
+               redemption.setUser(userOpt.get());
+           } else {
+               throw new RuntimeException("User not found!");
+           }
+       }
+
+       if (requestDTO.getRewardId() != null) {
+           Optional<Rewards> rewardOpt = rewardRepository.findById(requestDTO.getRewardId());
+           if (rewardOpt.isPresent()) {
+               redemption.setReward(rewardOpt.get());
+           } else {
+               throw new RuntimeException("Reward not found!");
+           }
+       }
+
+       // Update status if provided
+       if (requestDTO.getStatus() != null) {
+           redemption.setStatus(requestDTO.getStatus());
+       }
+
+       // Save and return updated redemption
+       logger.info("🟢 RewardServiceWithLoggingImpl.updateRedemption() called");
+       return rewardRedemptionRepository.save(redemption);
+   }
 
     @Override
     public void deleteRedemption(String rewardId) {
         Optional<RewardRedemption> redemptions = rewardRedemptionRepository.findById(rewardId);
 
-        if (!redemptions.isEmpty()) {
-            throw new RuntimeException("Cannot delete reward: It is still referenced in redemptions.");
+        if (redemptions.isEmpty()) {
+            throw new RuntimeException("Redemption not found!");
         }
 
+        rewardRedemptionRepository.updateRewardToNull(rewardId);
         rewardRedemptionRepository.deleteById(rewardId);
+        logger.info("🟢 RewardServiceWithLoggingImpl.deleteRedemption() called");
     }
 
     /**
@@ -206,10 +229,6 @@ public class RewardServiceWithLoggingImpl implements RewardService, RewardRedemp
      * @return A RedemptionResult containing the result of the operation
      */
     @Transactional
-
-
-
-    
     public RedemptionResult completeRedemption(String redemptionId) {
         logger.info("🟢 RewardServiceWithLoggingImpl.completeRedemption() called for redemption {}", redemptionId);
         

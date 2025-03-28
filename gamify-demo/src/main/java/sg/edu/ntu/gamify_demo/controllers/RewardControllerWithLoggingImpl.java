@@ -136,8 +136,8 @@ public class RewardControllerWithLoggingImpl {
                 content = @Content(schema = @Schema(implementation = RedemptionResult.class))),
     @ApiResponse(responseCode = "404", description = "Reward redemption not found")
                 })
-    public ResponseEntity<RewardRedemption> updateRedemption(@PathVariable String redemptionId, @RequestBody RewardRedemption redemption) {
-        RewardRedemption updateRedemption = rewardRedemptionService.updateRedemption(redemptionId, redemption);
+    public ResponseEntity<RewardRedemption> updateRedemption(@PathVariable String redemptionId, @RequestBody RewardRedemptionRequestDTO requestDTO) {
+        RewardRedemption updateRedemption = rewardRedemptionService.updateRedemption(redemptionId, requestDTO);
         return new ResponseEntity<>(updateRedemption, HttpStatus.OK);
     }
 
