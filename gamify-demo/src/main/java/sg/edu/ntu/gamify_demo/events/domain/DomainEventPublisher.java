@@ -3,17 +3,12 @@ package sg.edu.ntu.gamify_demo.events.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import java.util.Arrays;
-
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
 
 

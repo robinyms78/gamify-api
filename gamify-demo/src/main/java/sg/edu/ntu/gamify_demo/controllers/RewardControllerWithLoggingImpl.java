@@ -129,8 +129,15 @@ public class RewardControllerWithLoggingImpl {
 
     // Update reward redemption
     @PutMapping("/redemption/{redemptionId}")
-    public ResponseEntity<RewardRedemption> updateRedemption(@PathVariable String redemptionId, @RequestBody RewardRedemption redemption) {
-        RewardRedemption updateRedemption = rewardRedemptionService.updateRedemption(redemptionId, redemption);
+    @Operation(summary = "Update reward redemption by redemption Id", 
+    description = "Update reward redemption by redemption Id")
+    @ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Successfully updated reward redemption",
+                content = @Content(schema = @Schema(implementation = RedemptionResult.class))),
+    @ApiResponse(responseCode = "404", description = "Reward redemption not found")
+                })
+    public ResponseEntity<RewardRedemption> updateRedemption(@PathVariable String redemptionId, @RequestBody RewardRedemptionRequestDTO requestDTO) {
+        RewardRedemption updateRedemption = rewardRedemptionService.updateRedemption(redemptionId, requestDTO);
         return new ResponseEntity<>(updateRedemption, HttpStatus.OK);
     }
 
@@ -187,7 +194,7 @@ public class RewardControllerWithLoggingImpl {
         @ApiResponse(responseCode = "400", description = "Redemption complete failed",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> completeRedemption(@PathVariable("id") String redemptionId) {
+    public ResponseEntity<?> completeRedemption(@PathVariable String redemptionId, RewardRedemptionRequestDTO requestDTO) {
         RedemptionResult result = rewardRedemptionService.completeRedemption(redemptionId);
         if (result.isSuccess()) {
             return ResponseEntity.ok(result);
@@ -210,7 +217,7 @@ public class RewardControllerWithLoggingImpl {
         @ApiResponse(responseCode = "400", description = "Redemption cancelled failed",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> cancelRedemption(@PathVariable("id") String redemptionId) {
+    public ResponseEntity<?> cancelRedemption(@PathVariable String redemptionId, RewardRedemptionRequestDTO requestDTO) {
         RedemptionResult result = rewardRedemptionService.cancelRedemption(redemptionId);
         if (result.isSuccess()) {
             return ResponseEntity.ok(result);

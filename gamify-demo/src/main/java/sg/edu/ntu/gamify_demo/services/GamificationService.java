@@ -1,15 +1,12 @@
 package sg.edu.ntu.gamify_demo.services;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import sg.edu.ntu.gamify_demo.interfaces.AchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserAchievementService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;

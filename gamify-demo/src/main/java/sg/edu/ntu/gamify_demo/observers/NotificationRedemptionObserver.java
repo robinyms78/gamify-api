@@ -1,10 +1,8 @@
 package sg.edu.ntu.gamify_demo.observers;
 
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import lombok.RequiredArgsConstructor;
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 import sg.edu.ntu.gamify_demo.services.MessageBrokerService;

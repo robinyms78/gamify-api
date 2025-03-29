@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,11 +14,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import sg.edu.ntu.gamify_demo.services.TaskEventService;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventDTO;
 import sg.edu.ntu.gamify_demo.dtos.TaskEventResponseDTO;
@@ -131,7 +128,14 @@ public class TaskEventController {
         if (taskEvent == null) {
             return ResponseEntity.notFound().build();
         }
-        TaskEventDTO taskEventDTO = taskEventMapper.toDTO(taskEvent);
+
+        TaskEventDTO taskEventDTO = new TaskEventDTO();
+        taskEventDTO.setEventId(taskEvent.getEventId());
+        taskEventDTO.setEventType(taskEvent.getEventType());
+        taskEventDTO.setStatus(taskEvent.getStatus());
+        taskEventDTO.setTaskId(taskEvent.getTaskId());
+        taskEventDTO.setUserId(taskEvent.getUser());
+
         return ResponseEntity.ok(taskEventDTO);
     }
 }

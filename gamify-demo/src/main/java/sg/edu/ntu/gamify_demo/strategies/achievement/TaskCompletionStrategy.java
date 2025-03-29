@@ -2,12 +2,8 @@ package sg.edu.ntu.gamify_demo.strategies.achievement;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.TaskStatus;

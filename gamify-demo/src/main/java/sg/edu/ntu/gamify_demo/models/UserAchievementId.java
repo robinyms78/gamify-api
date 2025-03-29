@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.models;
 
 import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

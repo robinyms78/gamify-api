@@ -1,9 +1,7 @@
 package sg.edu.ntu.gamify_demo.interfaces;
 
 import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import sg.edu.ntu.gamify_demo.dtos.UserAchievementDTO;
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;

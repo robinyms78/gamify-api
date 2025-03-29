@@ -2,10 +2,8 @@ package sg.edu.ntu.gamify_demo.states;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 import sg.edu.ntu.gamify_demo.models.enums.RedemptionStatus;
 import sg.edu.ntu.gamify_demo.observers.RedemptionObserver;

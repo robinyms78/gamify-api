@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.strategies;
 
 import org.springframework.stereotype.Component;
-
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
 
 /**

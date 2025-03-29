@@ -1,13 +1,10 @@
 package sg.edu.ntu.gamify_demo.services;
 
 import java.time.ZonedDateTime;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;

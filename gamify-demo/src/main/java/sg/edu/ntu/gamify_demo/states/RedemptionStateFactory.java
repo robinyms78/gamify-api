@@ -2,7 +2,6 @@ package sg.edu.ntu.gamify_demo.states;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import sg.edu.ntu.gamify_demo.models.RewardRedemption;
 import sg.edu.ntu.gamify_demo.models.enums.RedemptionStatus;
 

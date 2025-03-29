@@ -41,7 +41,7 @@ public interface RewardRedemptionService {
      * @param redemption The updated redemption data
      * @return The updated redemption
      */
-    RewardRedemption updateRedemption(String redemptionId, RewardRedemption redemption);
+    RewardRedemption updateRedemption(String redemptionId, RewardRedemptionRequestDTO requestDTO);
     
     /**
      * Deletes a redemption.

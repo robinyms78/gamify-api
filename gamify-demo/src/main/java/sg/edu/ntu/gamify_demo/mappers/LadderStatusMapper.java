@@ -7,7 +7,7 @@ import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
 import sg.edu.ntu.gamify_demo.models.UserLadderStatus;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface LadderStatusMapper {
     LadderStatusMapper INSTANCE = Mappers.getMapper(LadderStatusMapper.class);
 

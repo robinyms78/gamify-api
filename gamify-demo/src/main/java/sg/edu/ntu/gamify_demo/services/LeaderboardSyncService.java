@@ -2,7 +2,6 @@ package sg.edu.ntu.gamify_demo.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import sg.edu.ntu.gamify_demo.models.Leaderboard;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.repositories.LeaderboardRepository;

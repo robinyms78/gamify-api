@@ -1,9 +1,7 @@
 package sg.edu.ntu.gamify_demo.models;
 
 import java.time.ZonedDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

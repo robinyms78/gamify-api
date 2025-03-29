@@ -1,11 +1,10 @@
 package sg.edu.ntu.gamify_demo.controllers;
+
 import java.util.Optional;
 import java.net.URI;
 import java.util.UUID;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import jakarta.validation.Valid;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,7 +22,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import sg.edu.ntu.gamify_demo.dtos.AuthResponse;
 import sg.edu.ntu.gamify_demo.dtos.LoginRequest;
 import sg.edu.ntu.gamify_demo.dtos.RegistrationRequest;

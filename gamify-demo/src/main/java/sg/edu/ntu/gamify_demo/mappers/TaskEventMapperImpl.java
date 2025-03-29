@@ -16,7 +16,6 @@ public class TaskEventMapperImpl implements TaskEventMapper {
         }
 
         TaskEventDTO taskEventDTO = new TaskEventDTO();
-        
         taskEventDTO.setEventId(taskEvent.getEventId());
         taskEventDTO.setUserId(taskEvent.getUser() != null ? taskEvent.getUser().getId() : null);
         taskEventDTO.setTaskId(taskEvent.getTaskId());

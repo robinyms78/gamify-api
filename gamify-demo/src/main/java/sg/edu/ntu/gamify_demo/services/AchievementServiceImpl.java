@@ -1,11 +1,8 @@
 package sg.edu.ntu.gamify_demo.services;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import sg.edu.ntu.gamify_demo.exceptions.AchievementNotFoundException;
 import sg.edu.ntu.gamify_demo.factories.AchievementFactory;
 import sg.edu.ntu.gamify_demo.interfaces.AchievementService;

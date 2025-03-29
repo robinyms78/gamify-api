@@ -1,11 +1,8 @@
 package sg.edu.ntu.gamify_demo.factories;
 
 import java.time.ZonedDateTime;
-
 import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import sg.edu.ntu.gamify_demo.models.Achievement;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.UserAchievement;

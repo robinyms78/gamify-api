@@ -2,11 +2,9 @@ package sg.edu.ntu.gamify_demo.repositories;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
 import sg.edu.ntu.gamify_demo.models.Leaderboard;
 import sg.edu.ntu.gamify_demo.models.User;
 

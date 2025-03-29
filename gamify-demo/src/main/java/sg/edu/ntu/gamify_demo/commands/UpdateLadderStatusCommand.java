@@ -1,4 +1,5 @@
 package sg.edu.ntu.gamify_demo.commands;
+
 import sg.edu.ntu.gamify_demo.interfaces.LadderStatusService;
 import sg.edu.ntu.gamify_demo.models.TaskEvent;
 import sg.edu.ntu.gamify_demo.models.User;
