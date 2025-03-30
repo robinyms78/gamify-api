@@ -1,7 +1,6 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,9 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import sg.edu.ntu.gamify_demo.services.AuthenticationService;
 import sg.edu.ntu.gamify_demo.config.TestSecurityConfig;
 import sg.edu.ntu.gamify_demo.dtos.LoginRequest;
