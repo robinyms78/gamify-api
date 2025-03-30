@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import sg.edu.ntu.gamify_demo.interfaces.LadderStatusService;
+import sg.edu.ntu.gamify_demo.interfaces.LeaderboardService;
 import sg.edu.ntu.gamify_demo.events.EventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;
@@ -42,6 +43,7 @@ public class PointsServiceTest {
     private DomainEventPublisher domainEventPublisher;
     private ObjectMapper objectMapper;
     private LadderStatusService ladderService;
+    private LeaderboardService leaderboardService;
     private User testUser;
     private JsonNode testMetadata;
 
@@ -54,6 +56,7 @@ public class PointsServiceTest {
         domainEventPublisher = mock(DomainEventPublisher.class);
         objectMapper = new ObjectMapper();
         ladderService = mock(LadderStatusService.class);
+        leaderboardService = mock(LeaderboardService.class);
 
         // Create test user
         testUser = new User();
@@ -78,7 +81,8 @@ public class PointsServiceTest {
                 eventPublisher,
                 domainEventPublisher,
                 objectMapper,
-                ladderService);
+                ladderService,
+                leaderboardService);
     }
 
     @Test
@@ -110,6 +114,9 @@ public class PointsServiceTest {
         // Verify ladder status was updated
         verify(ladderService, times(1)).updateUserLadderStatus("user123");
         
+        // Verify leaderboard entry was updated
+        verify(leaderboardService, times(1)).updateLeaderboardEntry("user123");
+        
         // Verify transaction was saved
         verify(pointsTransactionRepository, times(1)).save(any(PointsTransaction.class));
     }
@@ -139,6 +146,9 @@ public class PointsServiceTest {
         
         // Verify user was updated
         verify(userService, times(1)).updateUser(eq("user123"), any(User.class));
+        
+        // Verify leaderboard entry was updated
+        verify(leaderboardService, times(1)).updateLeaderboardEntry("user123");
         
         // Verify transaction was saved
         verify(pointsTransactionRepository, times(1)).save(any(PointsTransaction.class));

@@ -33,21 +33,21 @@ import lombok.Setter;
 @IdClass(UserAchievementId.class)
 @Table(name = "user_achievements")
 public class UserAchievement {
-    @Id
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id")
-    private User user;
+@Id
+@ManyToOne(fetch = FetchType.EAGER)
+@JoinColumn(name = "user_id", nullable = false, referencedColumnName = "id", insertable = true, updatable = false)
+private User user;
+
+@Id
+@ManyToOne(fetch = FetchType.EAGER)
+@JoinColumn(name = "achievement_id", nullable = false, referencedColumnName = "achievement_id", insertable = true, updatable = false)
+private Achievement achievement;
     
-    @Id
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "achievement_id", nullable = false, referencedColumnName = "achievement_id")
-    private Achievement achievement;
-    
-    @Column(name = "earned_at")
+    @Column(name = "earned_at", nullable = false)
     private ZonedDateTime earnedAt;
     
     @Type(JsonType.class)
-    @Column(name = "metadata", columnDefinition = "json")
+    @Column(name = "metadata", columnDefinition = "jsonb")
     private JsonNode metadata;
     
     /**

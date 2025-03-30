@@ -220,7 +220,7 @@ public class LadderController {
     })
     public ResponseEntity<ObjectNode> getLevelLabel(
         @Parameter(description = "Level number to query", required = true, example = "5")
-        @PathVariable int level) {
+        @PathVariable Long level) {
         String label = ladderService.getLevelLabel(level);
         
         ObjectNode result = objectMapper.createObjectNode();
@@ -260,9 +260,9 @@ public class LadderController {
                           "pointsRequired": 1000
                       }""")))
         @RequestBody JsonNode levelData) {
-        int level = levelData.get("level").asInt();
+        Long level = levelData.get("level").asLong();
         String label = levelData.get("label").asText();
-        int pointsRequired = levelData.get("pointsRequired").asInt();
+        Long pointsRequired = levelData.get("pointsRequired").asLong();
         
         LadderLevel ladderLevel = ladderService.createLadderLevel(level, label, pointsRequired);
         return new ResponseEntity<>(ladderLevel, HttpStatus.CREATED);
@@ -290,7 +290,7 @@ public class LadderController {
         @Parameter(description = "Level number to update", 
                    example = "3",
                    required = true)
-        @PathVariable int level,
+        @PathVariable Long level,
         @RequestBody 
         @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Level update data",
@@ -302,7 +302,7 @@ public class LadderController {
         JsonNode levelData) {
         
         String label = levelData.get("label").asText();
-        int pointsRequired = levelData.get("pointsRequired").asInt();
+        Long pointsRequired = levelData.get("pointsRequired").asLong();
         
         LadderLevel ladderLevel = ladderService.updateLadderLevel(level, label, pointsRequired);
         
@@ -329,7 +329,7 @@ public class LadderController {
     })
     public ResponseEntity<?> deleteLadderLevel(
         @Parameter(description = "Level number to delete", required = true, example = "2")
-        @PathVariable int level) {
+        @PathVariable Long level) {
         boolean deleted = ladderService.deleteLadderLevel(level);
         
         if (deleted) {

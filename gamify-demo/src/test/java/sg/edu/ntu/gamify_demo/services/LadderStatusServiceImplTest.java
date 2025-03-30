@@ -112,7 +112,7 @@ public class LadderStatusServiceImplTest {
         // Arrange
         when(userLadderStatusRepository.findById(anyString())).thenReturn(Optional.empty());
         when(userService.getUserById(anyString())).thenReturn(testUser);
-        when(ladderLevelRepository.findByLevel(1)).thenReturn(level1);
+        when(ladderLevelRepository.findByLevel(1L)).thenReturn(level1);
         when(ladderLevelRepository.findAllByOrderByLevelAsc()).thenReturn(Arrays.asList(level1, level2));
         when(pointsCalculationStrategy.calculatePointsToNextLevel(anyLong(), any(), any())).thenReturn(100L);
         when(userLadderStatusRepository.save(any(UserLadderStatus.class))).thenReturn(userLadderStatus);

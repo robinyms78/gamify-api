@@ -2,6 +2,5 @@
 
 | Test Class                   | Coverage Focus            | Last Updated |
 |------------------------------|---------------------------|--------------|
-| [DomainEventPublisherTest](DomainEventPublisherTest.md) | Event System Core         | ${DATE}      |
-| ${OTHER_TEST_CLASSES}        | ${COVERAGE_FOCUS}         |              |
-```
+| [DomainEventPublisherTest](DomainEventPublisherTest.md) | Event System Core         | 2025-03-28   |
+| [LeaderboardTestSuite](LeaderboardTestSuite.md)         | Leaderboard Functionality | 2025-03-28   |

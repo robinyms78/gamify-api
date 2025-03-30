@@ -13,6 +13,7 @@ import sg.edu.ntu.gamify_demo.events.domain.DomainEventPublisher;
 import sg.edu.ntu.gamify_demo.events.domain.PointsEarnedEvent;
 import sg.edu.ntu.gamify_demo.events.domain.PointsSpentEvent;
 import sg.edu.ntu.gamify_demo.interfaces.LadderStatusService;
+import sg.edu.ntu.gamify_demo.interfaces.LeaderboardService;
 import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.PointsTransaction;
 import sg.edu.ntu.gamify_demo.models.User;
@@ -31,6 +32,7 @@ public class PointsService {
     private final DomainEventPublisher domainEventPublisher;
     private final ObjectMapper objectMapper;
     private final LadderStatusService ladderService;
+    private final LeaderboardService leaderboardService;
     
     /**
      * Constructor for dependency injection.
@@ -41,13 +43,15 @@ public class PointsService {
             EventPublisher eventPublisher,
             DomainEventPublisher domainEventPublisher,
             ObjectMapper objectMapper,
-            LadderStatusService ladderService) {
+            LadderStatusService ladderService,
+            LeaderboardService leaderboardService) {
         this.userService = userService;
         this.pointsTransactionRepository = pointsTransactionRepository;
         this.eventPublisher = eventPublisher;
         this.domainEventPublisher = domainEventPublisher;
         this.objectMapper = objectMapper;
         this.ladderService = ladderService;
+        this.leaderboardService = leaderboardService;
     }
     
     /**
@@ -93,6 +97,9 @@ public class PointsService {
         // Update the user's ladder status
         ladderService.updateUserLadderStatus(user.getId());
         
+        // Update the user's leaderboard entry
+        leaderboardService.updateLeaderboardEntry(user.getId());
+        
         // Publish points earned event using domain events
         if (domainEventPublisher != null) {
             PointsEarnedEvent event = new PointsEarnedEvent(user, points.intValue(), newPoints.intValue(), source, metadata);
@@ -134,6 +141,9 @@ public class PointsService {
         PointsTransaction transaction = new PointsTransaction(user, source, -points, metadata);
         transaction.setCreatedAt(ZonedDateTime.now());
         pointsTransactionRepository.save(transaction);
+        
+        // Update the user's leaderboard entry
+        leaderboardService.updateLeaderboardEntry(user.getId());
         
         // Publish points spent event using domain events
         if (domainEventPublisher != null) {

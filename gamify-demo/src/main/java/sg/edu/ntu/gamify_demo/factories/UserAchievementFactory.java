@@ -26,13 +26,13 @@ public class UserAchievementFactory {
      * @return The created UserAchievement.
      */
     public UserAchievement createUserAchievement(User user, Achievement achievement, JsonNode metadata) {
-        UserAchievement userAchievement = new UserAchievement();
-        userAchievement.setUser(user);
-        userAchievement.setAchievement(achievement);
-        userAchievement.setEarnedAt(ZonedDateTime.now());
-        userAchievement.setMetadata(metadata);
-        
-        return userAchievement;
+        // Use the builder pattern to ensure all fields are properly set
+        return UserAchievement.builder()
+            .user(user)
+            .achievement(achievement)
+            .earnedAt(ZonedDateTime.now())
+            .metadata(metadata)
+            .build();
     }
     
     /**
@@ -45,12 +45,12 @@ public class UserAchievementFactory {
      * @return The created UserAchievement.
      */
     public UserAchievement createUserAchievementWithTime(User user, Achievement achievement, ZonedDateTime earnedAt, JsonNode metadata) {
-        UserAchievement userAchievement = new UserAchievement();
-        userAchievement.setUser(user);
-        userAchievement.setAchievement(achievement);
-        userAchievement.setEarnedAt(earnedAt);
-        userAchievement.setMetadata(metadata);
-        
-        return userAchievement;
+        // Use the builder pattern to ensure all fields are properly set
+        return UserAchievement.builder()
+            .user(user)
+            .achievement(achievement)
+            .earnedAt(earnedAt)
+            .metadata(metadata)
+            .build();
     }
 }

@@ -1,38 +1,30 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import sg.edu.ntu.gamify_demo.config.SecurityConfig;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.exceptions.UserValidationException;
@@ -40,37 +32,41 @@ import sg.edu.ntu.gamify_demo.interfaces.UserService;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.enums.UserRole;
 
-/**
- * Test class for UserController.
- * Uses @WebMvcTest which focuses only on the web layer.
- */
-@WebMvcTest(UserController.class)
-@WithMockUser(username = "testuser", roles = {"EMPLOYEE"})
+@ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
+    @Mock
     private UserService userService;
-
-    @MockBean
-    private PasswordEncoder passwordEncoder;
-
-    @MockBean(name = "securityConfig")
-    private SecurityConfig securityConfig;
-
+    
+    @InjectMocks
+    private UserController userController;
+    
+    private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
+    
+    // Test data
     private User testUser1;
     private User testUser2;
-
+    private String testUserId1;
+    private String testUserId2;
+    
     @BeforeEach
     void setUp() {
-        // Create test users
+        // Setup MockMvc
+        mockMvc = MockMvcBuilders.standaloneSetup(userController)
+                .setControllerAdvice(new GlobalExceptionHandler())
+                .build();
+        
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        
+        // Initialize test data
+        testUserId1 = UUID.randomUUID().toString();
+        testUserId2 = UUID.randomUUID().toString();
+        
         testUser1 = User.builder()
-                .id("user1")
+                .id(testUserId1)
                 .username("testuser1")
                 .email("test1@example.com")
                 .passwordHash("hashedpassword1")
@@ -78,10 +74,12 @@ public class UserControllerTest {
                 .department("Engineering")
                 .earnedPoints(100L)
                 .availablePoints(100L)
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .build();
-
+        
         testUser2 = User.builder()
-                .id("user2")
+                .id(testUserId2)
                 .username("testuser2")
                 .email("test2@example.com")
                 .passwordHash("hashedpassword2")
@@ -89,187 +87,194 @@ public class UserControllerTest {
                 .department("Marketing")
                 .earnedPoints(200L)
                 .availablePoints(150L)
+                .createdAt(ZonedDateTime.now())
+                .updatedAt(ZonedDateTime.now())
                 .build();
     }
-
+    
     @Test
-    @DisplayName("Test create user - Success scenario")
-    void testCreateUser_Success() throws Exception {
-        // Create request without server-generated fields
-        User createRequest = User.builder()
-                .username("testuser1")
-                .email("test1@example.com")
-                .passwordHash("hashedpassword1")
-                .role(UserRole.EMPLOYEE)
-                .department("Engineering")
-                .build();
-
+    @DisplayName("Create user should return 201 Created and the created user")
+    void createUser_ShouldReturnCreatedUser() throws Exception {
+        // Arrange
         when(userService.createUser(any(User.class))).thenReturn(testUser1);
-
+        
+        // Act & Assert
         mockMvc.perform(post("/api/users")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createRequest))) // Use cleaned request
+                .content(objectMapper.writeValueAsString(testUser1)))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON)) // Tolerate charset
-                .andExpect(jsonPath("$.id", is(testUser1.getId())))
-                .andExpect(jsonPath("$.username", is(testUser1.getUsername())))
-                .andExpect(jsonPath("$.email", is(testUser1.getEmail())))
-                .andExpect(jsonPath("$.department", is(testUser1.getDepartment())))
-                .andExpect(jsonPath("$.earnedPoints", is(testUser1.getEarnedPoints().intValue())))
-                .andExpect(jsonPath("$.availablePoints", is(testUser1.getAvailablePoints().intValue())));
+                .andExpect(jsonPath("$.id").value(testUserId1))
+                .andExpect(jsonPath("$.username").value("testuser1"))
+                .andExpect(jsonPath("$.email").value("test1@example.com"))
+                .andExpect(jsonPath("$.role").value("EMPLOYEE"))
+                .andExpect(jsonPath("$.department").value("Engineering"))
+                .andExpect(jsonPath("$.earnedPoints").value(100))
+                .andExpect(jsonPath("$.availablePoints").value(100));
+        
+        verify(userService).createUser(any(User.class));
     }
-
+    
     @Test
-    @DisplayName("Test create user - Validation failure")
-    void testCreateUser_ValidationFailure() throws Exception {
-        // Mock service to throw validation exception
-        UserValidationException exception = new UserValidationException("Validation failed");
-        when(userService.createUser(any(User.class))).thenThrow(exception);
-
-        // Perform POST request
+    @DisplayName("Create user should handle validation exception")
+    void createUser_ShouldHandleValidationException() throws Exception {
+        // Arrange
+        when(userService.createUser(any(User.class)))
+                .thenThrow(new UserValidationException("Invalid user data"));
+        
+        // Act & Assert
         mockMvc.perform(post("/api/users")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser1)))
                 .andExpect(status().isBadRequest());
+        
+        verify(userService).createUser(any(User.class));
     }
-
+    
     @Test
-    @DisplayName("Test get user by ID - Success scenario")
-    void testGetUserById_Success() throws Exception {
-        // Mock service to return the user
-        when(userService.getUserById(testUser1.getId())).thenReturn(testUser1);
-
-        // Perform GET request
-        mockMvc.perform(get("/api/users/{id}", testUser1.getId())
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+    @DisplayName("Get user by ID should return the user when found")
+    void getUser_ShouldReturnUserWhenFound() throws Exception {
+        // Arrange
+        when(userService.getUserById(testUserId1)).thenReturn(testUser1);
+        
+        // Act & Assert
+        mockMvc.perform(get("/api/users/{id}", testUserId1)
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(testUser1.getId())))
-                .andExpect(jsonPath("$.username", is(testUser1.getUsername())))
-                .andExpect(jsonPath("$.email", is(testUser1.getEmail())))
-                .andExpect(jsonPath("$.role", is(testUser1.getRole().toString())));
+                .andExpect(jsonPath("$.id").value(testUserId1))
+                .andExpect(jsonPath("$.username").value("testuser1"))
+                .andExpect(jsonPath("$.email").value("test1@example.com"))
+                .andExpect(jsonPath("$.role").value("EMPLOYEE"))
+                .andExpect(jsonPath("$.department").value("Engineering"))
+                .andExpect(jsonPath("$.earnedPoints").value(100))
+                .andExpect(jsonPath("$.availablePoints").value(100));
+        
+        verify(userService).getUserById(testUserId1);
     }
-
+    
     @Test
-    @DisplayName("Test get user by ID - User not found")
-    void testGetUserById_UserNotFound() throws Exception {
-        // Mock service to throw not found exception
-        UserNotFoundException exception = new UserNotFoundException("User not found");
-        when(userService.getUserById(anyString())).thenThrow(exception);
-
-        // Perform GET request
-        mockMvc.perform(get("/api/users/{id}", "nonexistentid")
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+    @DisplayName("Get user by ID should return 404 when user not found")
+    void getUser_ShouldReturn404WhenUserNotFound() throws Exception {
+        // Arrange
+        when(userService.getUserById("nonexistent"))
+                .thenThrow(new UserNotFoundException("User not found with id: nonexistent"));
+        
+        // Act & Assert
+        mockMvc.perform(get("/api/users/{id}", "nonexistent")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+        
+        verify(userService).getUserById("nonexistent");
     }
-
+    
     @Test
-    @DisplayName("Test get all users")
-    void testGetAllUsers() throws Exception {
+    @DisplayName("Get all users should return a list of users")
+    void getAllUsers_ShouldReturnListOfUsers() throws Exception {
+        // Arrange
         List<User> users = Arrays.asList(testUser1, testUser2);
         when(userService.getAllUsers()).thenReturn(users);
-
+        
+        // Act & Assert
         mockMvc.perform(get("/api/users")
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()", is(2)))
-                .andExpect(jsonPath("$[0].department", is("Engineering"))) // New checks
-                .andExpect(jsonPath("$[1].role", is("MANAGER")));
+                .andExpect(jsonPath("$[0].id").value(testUserId1))
+                .andExpect(jsonPath("$[0].username").value("testuser1"))
+                .andExpect(jsonPath("$[1].id").value(testUserId2))
+                .andExpect(jsonPath("$[1].username").value("testuser2"));
+        
+        verify(userService).getAllUsers();
     }
-
+    
     @Test
-    @DisplayName("Test update user - Success scenario")
-    void testUpdateUser_Success() throws Exception {
-        // Request body without ID
-        User updateRequest = User.builder()
-                .username(testUser1.getUsername())
-                .email(testUser1.getEmail())
-                .passwordHash(testUser1.getPasswordHash())
-                .role(testUser1.getRole())
-                .department("Research") 
-                .earnedPoints(150L) 
-                .availablePoints(120L) 
-                .build();
-
+    @DisplayName("Update user should return the updated user")
+    void updateUser_ShouldReturnUpdatedUser() throws Exception {
+        // Arrange
         User updatedUser = User.builder()
-                .id(testUser1.getId())
-                .username(testUser1.getUsername())
-                .email(testUser1.getEmail())
-                .passwordHash(testUser1.getPasswordHash())
-                .role(testUser1.getRole())
-                .department("Research")
+                .id(testUserId1)
+                .username("testuser1updated")
+                .email("test1updated@example.com")
+                .passwordHash("hashedpassword1")
+                .role(UserRole.EMPLOYEE)
+                .department("QA")
                 .earnedPoints(150L)
-                .availablePoints(120L)
+                .availablePoints(150L)
                 .build();
-
-        when(userService.updateUser(eq(testUser1.getId()), any(User.class))).thenReturn(updatedUser);
-
-        mockMvc.perform(put("/api/users/{id}", testUser1.getId())
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+        
+        when(userService.updateUser(eq(testUserId1), any(User.class))).thenReturn(updatedUser);
+        
+        // Act & Assert
+        mockMvc.perform(put("/api/users/{id}", testUserId1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequest))) // No ID in body
+                .content(objectMapper.writeValueAsString(updatedUser)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.department", is("Research")))
-                .andExpect(jsonPath("$.earnedPoints", is(150)))
-                .andExpect(jsonPath("$.availablePoints", is(120)));
+                .andExpect(jsonPath("$.id").value(testUserId1))
+                .andExpect(jsonPath("$.username").value("testuser1updated"))
+                .andExpect(jsonPath("$.email").value("test1updated@example.com"))
+                .andExpect(jsonPath("$.department").value("QA"))
+                .andExpect(jsonPath("$.earnedPoints").value(150))
+                .andExpect(jsonPath("$.availablePoints").value(150));
+        
+        verify(userService).updateUser(eq(testUserId1), any(User.class));
     }
-
+    
     @Test
-    @DisplayName("Test update user - User not found")
-    void testUpdateUser_UserNotFound() throws Exception {
-        // Mock service to throw not found exception
-        UserNotFoundException exception = new UserNotFoundException("User not found");
-        when(userService.updateUser(anyString(), any(User.class))).thenThrow(exception);
-
-        // Perform PUT request
-        mockMvc.perform(put("/api/users/{id}", "nonexistentid")
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+    @DisplayName("Update user should return 404 when user not found")
+    void updateUser_ShouldReturn404WhenUserNotFound() throws Exception {
+        // Arrange
+        when(userService.updateUser(eq("nonexistent"), any(User.class)))
+                .thenThrow(new UserNotFoundException("User not found with id: nonexistent"));
+        
+        // Act & Assert
+        mockMvc.perform(put("/api/users/{id}", "nonexistent")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser1)))
                 .andExpect(status().isNotFound());
+        
+        verify(userService).updateUser(eq("nonexistent"), any(User.class));
     }
-
+    
     @Test
-    @DisplayName("Test update user - Validation failure")
-    void testUpdateUser_ValidationFailure() throws Exception {
-        // Mock service to throw validation exception
-        UserValidationException exception = new UserValidationException("Validation failed");
-        when(userService.updateUser(anyString(), any(User.class))).thenThrow(exception);
-
-        // Perform PUT request
-        mockMvc.perform(put("/api/users/{id}", testUser1.getId())
-                .with(SecurityMockMvcRequestPostProcessors.csrf())
+    @DisplayName("Update user should handle validation exception")
+    void updateUser_ShouldHandleValidationException() throws Exception {
+        // Arrange
+        when(userService.updateUser(eq(testUserId1), any(User.class)))
+                .thenThrow(new UserValidationException("Invalid user data"));
+        
+        // Act & Assert
+        mockMvc.perform(put("/api/users/{id}", testUserId1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser1)))
                 .andExpect(status().isBadRequest());
+        
+        verify(userService).updateUser(eq(testUserId1), any(User.class));
     }
-
+    
     @Test
-    @DisplayName("Test delete user - Success scenario")
-    void testDeleteUser_Success() throws Exception {
-        // Mock service to do nothing (delete successful)
-        doNothing().when(userService).deleteUser(testUser1.getId());
-
-        // Perform DELETE request
-        mockMvc.perform(delete("/api/users/{id}", testUser1.getId())
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+    @DisplayName("Delete user should return 204 No Content")
+    void deleteUser_ShouldReturn204NoContent() throws Exception {
+        // Arrange
+        doNothing().when(userService).deleteUser(testUserId1);
+        
+        // Act & Assert
+        mockMvc.perform(delete("/api/users/{id}", testUserId1)
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+        
+        verify(userService).deleteUser(testUserId1);
     }
-
+    
     @Test
-    @DisplayName("Test delete user - User not found")
-    void testDeleteUser_UserNotFound() throws Exception {
-        // Mock service to throw not found exception
-        UserNotFoundException exception = new UserNotFoundException("User not found");
-        doThrow(exception).when(userService).deleteUser(anyString());
-
-        // Perform DELETE request
-        mockMvc.perform(delete("/api/users/{id}", "nonexistentid")
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+    @DisplayName("Delete user should return 404 when user not found")
+    void deleteUser_ShouldReturn404WhenUserNotFound() throws Exception {
+        // Arrange
+        doThrow(new UserNotFoundException("User not found with id: nonexistent"))
+                .when(userService).deleteUser("nonexistent");
+        
+        // Act & Assert
+        mockMvc.perform(delete("/api/users/{id}", "nonexistent")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+        
+        verify(userService).deleteUser("nonexistent");
     }
 }

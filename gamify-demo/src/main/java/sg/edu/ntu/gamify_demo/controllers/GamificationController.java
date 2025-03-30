@@ -1,7 +1,7 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
 import java.util.List;
-import java.util.Map;
+//import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import sg.edu.ntu.gamify_demo.dtos.AchievementDTO;
-import sg.edu.ntu.gamify_demo.dtos.AchievementCheckResponse;
+//import sg.edu.ntu.gamify_demo.dtos.AchievementDTO;
+//import sg.edu.ntu.gamify_demo.dtos.AchievementCheckResponse;
 import sg.edu.ntu.gamify_demo.dtos.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

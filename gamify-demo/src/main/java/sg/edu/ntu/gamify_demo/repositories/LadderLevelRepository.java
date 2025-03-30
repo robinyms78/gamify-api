@@ -20,7 +20,7 @@ public interface LadderLevelRepository extends JpaRepository<LadderLevel, Long> 
      * @param level The level number.
      * @return The LadderLevel if found, null otherwise.
      */
-    LadderLevel findByLevel(int level);
+    LadderLevel findByLevel(Long level);
     
     /**
      * Find all ladder levels ordered by level in ascending order.

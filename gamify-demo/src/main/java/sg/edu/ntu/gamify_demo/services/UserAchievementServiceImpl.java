@@ -75,7 +75,16 @@ public class UserAchievementServiceImpl implements UserAchievementService {
             return null;
         }
         
-        UserAchievement userAchievement = userAchievementFactory.createUserAchievement(user, achievement, metadata);
+        // Ensure we're using a managed Achievement entity
+        Achievement managedAchievement = achievementService.getAchievementById(achievement.getAchievementId());
+        
+        // Ensure we're using a managed User entity to prevent duplicate inserts
+        User managedUser = userService.getUserById(user.getId());
+        if (managedUser == null) {
+            throw new IllegalArgumentException("User with ID " + user.getId() + " not found");
+        }
+        
+        UserAchievement userAchievement = userAchievementFactory.createUserAchievement(managedUser, managedAchievement, metadata);
         return userAchievementRepository.save(userAchievement);
     }
 

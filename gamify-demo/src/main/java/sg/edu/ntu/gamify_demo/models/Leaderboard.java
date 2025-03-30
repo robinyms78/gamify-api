@@ -8,10 +8,10 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -34,11 +34,10 @@ import lombok.Setter;
 public class Leaderboard {
 @Id
 @Column(name = "user_id")
-private String id;
+private String userId;
 
-@OneToOne
-@MapsId
-@JoinColumn(name = "user_id")
+@OneToOne(fetch = FetchType.EAGER)
+@JoinColumn(name = "user_id", insertable = false, updatable = false)
 @JsonBackReference
 private User user;
     
@@ -72,12 +71,33 @@ private User user;
      */
     public Leaderboard(User user, Long earnedPoints, LadderLevel currentLevel, Long rank) {
         this.user = user;
-        this.id = user.getId(); // Set the ID from the user
+        this.userId = user.getId(); // Set the ID from the user
         this.username = user.getUsername();
         this.department = user.getDepartment();
         this.earnedPoints = earnedPoints;
         this.currentLevel = currentLevel;
         this.rank = rank;
+    }
+    
+    /**
+     * Ensures the userId is set from the user.
+     * This method is called before persisting the entity.
+     */
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        if (this.userId == null && this.user != null) {
+            this.userId = this.user.getId();
+        }
+    }
+    
+    /**
+     * Additional check before update to ensure userId is always set.
+     */
+    @jakarta.persistence.PreUpdate
+    protected void onUpdate() {
+        if (this.userId == null && this.user != null) {
+            this.userId = this.user.getId();
+        }
     }
     
     /**

@@ -94,8 +94,8 @@ public class LadderStatusServiceImpl implements LadderStatusService {
         LadderLevel nextLevel = findNextLevel(levels, newLevel);
         
         // Calculate points to next level using the strategy
-        Long pointsToNextLevel = (long) pointsCalculationStrategy.calculatePointsToNextLevel(
-                user.getEarnedPoints().intValue(), newLevel, nextLevel);
+        Long pointsToNextLevel = pointsCalculationStrategy.calculatePointsToNextLevel(
+                user.getEarnedPoints(), newLevel, nextLevel);
         
         status.setPointsToNextLevel(pointsToNextLevel);
         status.setUpdatedAt(ZonedDateTime.now());
@@ -148,7 +148,7 @@ public class LadderStatusServiceImpl implements LadderStatusService {
             }
             
             // Get the first ladder level
-            LadderLevel firstLevel = ladderLevelRepository.findByLevel(1);
+            LadderLevel firstLevel = ladderLevelRepository.findByLevel(1L);
             
             if (firstLevel == null) {
                 // Create a default first level if none exists
@@ -164,7 +164,7 @@ public class LadderStatusServiceImpl implements LadderStatusService {
                     System.out.println("LadderStatusServiceImpl: Created default ladder level: " + firstLevel.getLevel());
                     
                     // Verify the level was saved correctly
-                    LadderLevel verifyLevel = ladderLevelRepository.findByLevel(1);
+                    LadderLevel verifyLevel = ladderLevelRepository.findByLevel(1L);
                     if (verifyLevel == null) {
                         System.err.println("LadderStatusServiceImpl: ERROR: Failed to save default ladder level!");
                     } else {
@@ -196,8 +196,8 @@ public class LadderStatusServiceImpl implements LadderStatusService {
             
             // Calculate points to next level using the strategy
             if (nextLevel != null) {
-                Long pointsToNextLevel = (long) pointsCalculationStrategy.calculatePointsToNextLevel(
-                        user.getEarnedPoints() != null ? user.getEarnedPoints().intValue() : 0, 
+                Long pointsToNextLevel = pointsCalculationStrategy.calculatePointsToNextLevel(
+                        user.getEarnedPoints() != null ? user.getEarnedPoints() : 0L, 
                         firstLevel, 
                         nextLevel);
                 status.setPointsToNextLevel(pointsToNextLevel);
@@ -254,7 +254,7 @@ public class LadderStatusServiceImpl implements LadderStatusService {
      * @return The default ladder level.
      */
     private LadderLevel ensureDefaultLevelExists() {
-        LadderLevel defaultLevel = ladderLevelRepository.findByLevel(1);
+        LadderLevel defaultLevel = ladderLevelRepository.findByLevel(1L);
         if (defaultLevel == null) {
             defaultLevel = new LadderLevel();
             defaultLevel.setLevel(1L);

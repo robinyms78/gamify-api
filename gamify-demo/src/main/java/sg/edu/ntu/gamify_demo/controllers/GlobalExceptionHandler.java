@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    // Add a logger
+    private static final System.Logger logger = System.getLogger(GlobalExceptionHandler.class.getName());
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(
@@ -79,9 +82,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ObjectNode> handleGeneralException(Exception ex) {
+        // Log the exception for debugging
+        logger.log(System.Logger.Level.ERROR, "Unhandled exception: " + ex.getMessage(), ex);
+        ex.printStackTrace();
+        
         ObjectNode errorResponse = objectMapper.createObjectNode();
         errorResponse.put("error", "Server error");
         errorResponse.put("message", ex.getMessage());
+        errorResponse.put("exception_type", ex.getClass().getName());
+        
+        // Add stack trace for debugging
+        StringBuilder stackTrace = new StringBuilder();
+        for (StackTraceElement element : ex.getStackTrace()) {
+            stackTrace.append(element.toString()).append("\n");
+        }
+        errorResponse.put("stack_trace", stackTrace.toString());
+        
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

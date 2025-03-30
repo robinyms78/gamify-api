@@ -31,6 +31,7 @@ import sg.edu.ntu.gamify_demo.dtos.RegistrationRequest;
 import sg.edu.ntu.gamify_demo.dtos.RegistrationResponse;
 import sg.edu.ntu.gamify_demo.exceptions.AuthenticationException;
 import sg.edu.ntu.gamify_demo.exceptions.DuplicateUserException;
+import sg.edu.ntu.gamify_demo.interfaces.LeaderboardService;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.repositories.UserRepository;
 import sg.edu.ntu.gamify_demo.services.AuthenticationService;
@@ -48,12 +49,14 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationService authService;
+    private final LeaderboardService leaderboardService;
 
     public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, 
-                          AuthenticationService authService) {
+                          AuthenticationService authService, LeaderboardService leaderboardService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authService = authService;
+        this.leaderboardService = leaderboardService;
     }
 
     /**
@@ -105,6 +108,15 @@ public class AuthController {
 
         // Save user to database
         User savedUser = userRepository.save(newUser);
+        
+        try {
+            // Create leaderboard entry for the new user
+            leaderboardService.createLeaderboardEntry(savedUser);
+        } catch (Exception e) {
+            // Log the error but continue with user registration
+            System.err.println("Error creating leaderboard entry: " + e.getMessage());
+            // The leaderboard entry will be created later when the user interacts with the system
+        }
 
         // Build location URI with full context path
         URI location = ServletUriComponentsBuilder

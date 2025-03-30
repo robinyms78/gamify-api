@@ -3,6 +3,8 @@ package sg.edu.ntu.gamify_demo.repositories;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -46,6 +48,16 @@ public interface LeaderboardRepository extends JpaRepository<Leaderboard, String
      * @param limit The number of top users to retrieve.
      * @return A list of the top N leaderboard entries.
      */
-    @Query(value = "SELECT l FROM Leaderboard l ORDER BY l.rank ASC LIMIT ?1")
-    List<Leaderboard> findTopUsers(int limit);
+    @Query(value = "SELECT l FROM Leaderboard l ORDER BY l.rank ASC")
+    List<Leaderboard> findTopN(Pageable pageable);
+    
+    /**
+     * Finds the top N users on the leaderboard.
+     * 
+     * @param limit The number of top users to retrieve.
+     * @return A list of the top N leaderboard entries.
+     */
+    default List<Leaderboard> findTopUsers(int limit) {
+        return findTopN(PageRequest.of(0, limit));
+    }
 }

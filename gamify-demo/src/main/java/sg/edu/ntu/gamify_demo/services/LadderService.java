@@ -95,7 +95,7 @@ public class LadderService {
             }
             
             // Get the first ladder level
-            LadderLevel firstLevel = ladderLevelRepository.findByLevel(1);
+            LadderLevel firstLevel = ladderLevelRepository.findByLevel(1L);
             
             if (firstLevel == null) {
                 // Create a default first level if none exists
@@ -111,7 +111,7 @@ public class LadderService {
                     System.out.println("Created default ladder level: " + firstLevel.getLevel());
                     
                     // Verify the level was saved correctly
-                    LadderLevel verifyLevel = ladderLevelRepository.findByLevel(1);
+                    LadderLevel verifyLevel = ladderLevelRepository.findByLevel(1L);
                     if (verifyLevel == null) {
                         System.err.println("ERROR: Failed to save default ladder level!");
                     } else {
@@ -138,7 +138,7 @@ public class LadderService {
             status.setPointsToNextLevel(100L); // Default points to next level
             
             // Calculate points to next level
-            LadderLevel nextLevel = ladderLevelRepository.findByLevel(firstLevel.getLevel().intValue() + 1);
+            LadderLevel nextLevel = ladderLevelRepository.findByLevel(firstLevel.getLevel() + 1L);
             if (nextLevel != null) {
                 Long pointsToNextLevel = nextLevel.getPointsRequired() - 
                     (user.getEarnedPoints() != null ? user.getEarnedPoints() : 0L);
@@ -173,7 +173,7 @@ public class LadderService {
             }
             
             // Get or create a default level
-            LadderLevel defaultLevel = ladderLevelRepository.findByLevel(1);
+            LadderLevel defaultLevel = ladderLevelRepository.findByLevel(1L);
             if (defaultLevel == null) {
                 defaultLevel = new LadderLevel();
                 defaultLevel.setLevel(1L);
@@ -270,7 +270,7 @@ public class LadderService {
      * @param level The level number.
      * @return The label for the level.
      */
-    public String getLevelLabel(int level) {
+    public String getLevelLabel(Long level) {
         LadderLevel ladderLevel = ladderLevelRepository.findByLevel(level);
         return ladderLevel != null ? ladderLevel.getLabel() : "Unknown";
     }
@@ -284,11 +284,11 @@ public class LadderService {
      * @return The created ladder level.
      */
     @Transactional
-    public LadderLevel createLadderLevel(int level, String label, int pointsRequired) {
+    public LadderLevel createLadderLevel(Long level, String label, Long pointsRequired) {
         LadderLevel ladderLevel = new LadderLevel();
-        ladderLevel.setLevel((long)level);
+        ladderLevel.setLevel(level);
         ladderLevel.setLabel(label);
-        ladderLevel.setPointsRequired((long)pointsRequired);
+        ladderLevel.setPointsRequired(pointsRequired);
         ladderLevel.setCreatedAt(ZonedDateTime.now());
         
         return ladderLevelRepository.save(ladderLevel);
@@ -303,7 +303,7 @@ public class LadderService {
      * @return The updated ladder level.
      */
     @Transactional
-    public LadderLevel updateLadderLevel(int level, String label, int pointsRequired) {
+    public LadderLevel updateLadderLevel(Long level, String label, Long pointsRequired) {
         LadderLevel ladderLevel = ladderLevelRepository.findByLevel(level);
         
         if (ladderLevel == null) {
@@ -311,7 +311,7 @@ public class LadderService {
         }
         
         ladderLevel.setLabel(label);
-        ladderLevel.setPointsRequired((long)pointsRequired);
+        ladderLevel.setPointsRequired(pointsRequired);
         
         return ladderLevelRepository.save(ladderLevel);
     }
@@ -323,7 +323,7 @@ public class LadderService {
      * @return True if the level was deleted, false otherwise.
      */
     @Transactional
-    public boolean deleteLadderLevel(int level) {
+    public boolean deleteLadderLevel(Long level) {
         LadderLevel ladderLevel = ladderLevelRepository.findByLevel(level);
         
         if (ladderLevel == null) {

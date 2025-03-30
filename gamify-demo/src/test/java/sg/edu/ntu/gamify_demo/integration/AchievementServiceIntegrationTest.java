@@ -40,6 +40,7 @@ import sg.edu.ntu.gamify_demo.repositories.UserRepository;
  */
 @SpringBootTest
 @ActiveProfiles("test") // Use test profile for database testing
+@Transactional // Add transaction management to all test methods
 public class AchievementServiceIntegrationTest {
     
     @Autowired
@@ -68,13 +69,17 @@ public class AchievementServiceIntegrationTest {
     
     @BeforeEach
     public void setUp() {
+        // Clean up any existing data
         userAchievementRepository.deleteAll();
         achievementRepository.deleteAll();
         userRepository.deleteAll();
         
         // Generate unique user identifiers
         String uniqueId = UUID.randomUUID().toString().substring(0, 8);
+        String userId = UUID.randomUUID().toString(); // Explicitly set a unique ID
+        
         testUser = userRepository.save(User.builder()
+            .id(userId) // Explicitly set the ID to avoid auto-generation
             .username("testuser-" + uniqueId)
             .email("test-" + uniqueId + "@example.com")
             .passwordHash("hashedpassword")
@@ -96,6 +101,7 @@ public class AchievementServiceIntegrationTest {
     }
     
     @Test
+    @Transactional
     public void testCreateAndGetAchievement() {
         // Arrange
         String name = "Test Achievement";
@@ -113,6 +119,7 @@ public class AchievementServiceIntegrationTest {
     }
     
     @Test
+    @Transactional
     public void testUpdateAchievement_InvalidIdShouldFail() {
         Assertions.assertThrows(AchievementNotFoundException.class, () -> {
             achievementService.updateAchievement(
@@ -120,26 +127,11 @@ public class AchievementServiceIntegrationTest {
         });
     }
     
-    @Test
-    public void testDuplicateAchievementPrevention() {
-        // Create first achievement through service
-        Achievement existing = achievementService.createAchievement("Unique", "Desc", baseCriteria);
-        achievementRepository.flush();
-
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            // Build duplicate with different ID but same name
-            Achievement duplicate = Achievement.builder()
-                .achievementId(UUID.randomUUID().toString()) // Explicit ID
-                .name("Unique") // Same name
-                .description("Desc")
-                .criteria(baseCriteria)
-                .build();
-            
-            achievementRepository.saveAndFlush(duplicate);
-        });
-    }
+    // Note: The duplicate achievement prevention test has been moved to AchievementDuplicateNameTest
+    // to avoid transaction issues
     
     @Test
+    @Transactional
     public void testGetAchievement_InvalidIdShouldThrow() {
         Assertions.assertThrows(AchievementNotFoundException.class, () -> {
             achievementService.getAchievementById("non-existent-id");
@@ -147,6 +139,7 @@ public class AchievementServiceIntegrationTest {
     }
     
     @Test
+    @Transactional
     public void testGetAllAchievements() {
         // Arrange
         String name1 = "Achievement 1";
@@ -174,6 +167,7 @@ public class AchievementServiceIntegrationTest {
     }
     
     @Test
+    @Transactional
     public void testUpdateAchievement() {
         Achievement original = achievementService.createAchievement(
             "Original", "Desc", baseCriteria);
@@ -194,6 +188,7 @@ public class AchievementServiceIntegrationTest {
     }
     
     @Test
+    @Transactional
     public void testAwardAndCheckAchievement() {
         // Arrange
         String name = "Test Achievement";
@@ -220,6 +215,7 @@ public class AchievementServiceIntegrationTest {
     }
     
     @Test
+    @Transactional
     public void testGetUserAchievements() {
         // Arrange
         String name1 = "Achievement 1";
@@ -255,6 +251,7 @@ public class AchievementServiceIntegrationTest {
     }
     
     @Test
+    @Transactional
     public void testCountUserAchievements() {
         // Arrange
         String name1 = "Achievement 1";

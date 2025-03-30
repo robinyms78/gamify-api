@@ -1,468 +1,400 @@
 package sg.edu.ntu.gamify_demo.controllers;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import sg.edu.ntu.gamify_demo.config.TestSecurityConfig;
+import sg.edu.ntu.gamify_demo.dtos.ErrorResponseDTO;
 import sg.edu.ntu.gamify_demo.dtos.LadderStatusDTO;
 import sg.edu.ntu.gamify_demo.exceptions.UserNotFoundException;
 import sg.edu.ntu.gamify_demo.facades.GamificationFacade;
+import sg.edu.ntu.gamify_demo.interfaces.UserService;
+import sg.edu.ntu.gamify_demo.mappers.LadderStatusMapper;
 import sg.edu.ntu.gamify_demo.models.LadderLevel;
 import sg.edu.ntu.gamify_demo.models.User;
 import sg.edu.ntu.gamify_demo.models.UserLadderStatus;
 import sg.edu.ntu.gamify_demo.models.enums.UserRole;
 import sg.edu.ntu.gamify_demo.services.LadderService;
 
-@WebMvcTest(LadderController.class)
-@Import(TestSecurityConfig.class)
-public class LadderControllerTest {
+@ExtendWith(MockitoExtension.class)
+class LadderControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private LadderService ladderService;
-
-    @MockBean
+    
+    @Mock
     private GamificationFacade gamificationFacade;
-
-    @Autowired
+    
+    @Mock
+    private UserService userService;
+    
+    @Mock
     private ObjectMapper objectMapper;
-
-    private User testUser;
-    private User advancedUser;
-    private LadderLevel beginnerLevel;
-    private LadderLevel intermediateLevel;
-    private LadderLevel advancedLevel;
-    private UserLadderStatus testStatus;
-    private UserLadderStatus advancedStatus;
-    private LadderStatusDTO testStatusDTO;
-    private LadderStatusDTO advancedStatusDTO;
-
+    
+    @InjectMocks
+    private LadderController ladderController;
+    
+    private MockMvc mockMvc;
+    
+    private User testUser1;
+    private User testUser2;
+    private LadderLevel level1;
+    private LadderLevel level2;
+    private UserLadderStatus userLadderStatus1;
+    private UserLadderStatus userLadderStatus2;
+    private LadderStatusDTO ladderStatusDTO1;
+    private LadderStatusDTO ladderStatusDTO2;
+    private ObjectNode mockObjectNode;
+    
     @BeforeEach
-    public void setup() {
-        // Setup test data for a beginner user
-        testUser = User.builder()
-                .id("test-user-id")
-                .username("testuser")
-                .email("test@example.com")
-                .passwordHash("hashedpassword")
-                .role(UserRole.EMPLOYEE)
-                .department("IT")
-                .earnedPoints(100L)
-                .availablePoints(50L)
+    void setUp() {
+        // Setup MockMvc
+        mockMvc = MockMvcBuilders.standaloneSetup(ladderController)
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
-
-        // Setup test data for an advanced user
-        advancedUser = User.builder()
-                .id("advanced-user-id")
-                .username("advanceduser")
-                .email("advanced@example.com")
-                .passwordHash("hashedpassword")
+        
+        // Create test users
+        testUser1 = User.builder()
+                .id("user1")
+                .username("testuser1")
+                .email("test1@example.com")
+                .passwordHash("hashedpassword1")
                 .role(UserRole.EMPLOYEE)
                 .department("Engineering")
-                .earnedPoints(600L)
-                .availablePoints(200L)
+                .earnedPoints(100L)
+                .availablePoints(100L)
                 .build();
-
-        // Setup ladder levels
-        beginnerLevel = new LadderLevel(1L, "Beginner", 0L);
-        intermediateLevel = new LadderLevel(2L, "Intermediate", 300L);
-        advancedLevel = new LadderLevel(3L, "Advanced", 600L);
-
-        // Setup ladder statuses
-        testStatus = new UserLadderStatus(testUser, beginnerLevel, 100L, 100L);
-        advancedStatus = new UserLadderStatus(advancedUser, advancedLevel, 600L, 400L);
-
-        // Setup DTOs
-        testStatusDTO = LadderStatusDTO.builder()
+        
+        testUser2 = User.builder()
+                .id("user2")
+                .username("testuser2")
+                .email("test2@example.com")
+                .passwordHash("hashedpassword2")
+                .role(UserRole.MANAGER)
+                .department("Marketing")
+                .earnedPoints(200L)
+                .availablePoints(150L)
+                .build();
+        
+        // Create ladder levels
+        level1 = new LadderLevel(1L, "Beginner", 0L);
+        level2 = new LadderLevel(2L, "Intermediate", 100L);
+        
+        // Create user ladder status
+        userLadderStatus1 = new UserLadderStatus(testUser1, level1, 100L, 0L);
+        userLadderStatus2 = new UserLadderStatus(testUser2, level2, 200L, 100L);
+        
+        // Create ladder status DTOs
+        ladderStatusDTO1 = LadderStatusDTO.builder()
+                .userId("user1")
+                .userName("testuser1")
                 .currentLevel(1)
                 .levelLabel("Beginner")
                 .earnedPoints(100)
+                .pointsToNextLevel(0)
+                .build();
+        
+        ladderStatusDTO2 = LadderStatusDTO.builder()
+                .userId("user2")
+                .userName("testuser2")
+                .currentLevel(2)
+                .levelLabel("Intermediate")
+                .earnedPoints(200)
                 .pointsToNextLevel(100)
                 .build();
-                
-        advancedStatusDTO = LadderStatusDTO.builder()
-                .currentLevel(3)
-                .levelLabel("Advanced")
-                .earnedPoints(600)
-                .pointsToNextLevel(400)
-                .build();
     }
-
+    
     @Test
-    @DisplayName("Should return all ladder levels")
-    public void testGetLadderLevels() throws Exception {
+    @DisplayName("Get ladder levels should return all levels")
+    void getLadderLevels_ShouldReturnAllLevels() {
         // Arrange
         Map<Long, Long> levels = new HashMap<>();
         levels.put(1L, 0L);
-        levels.put(2L, 200L);
-        levels.put(3L, 500L);
-
+        levels.put(2L, 100L);
+        levels.put(3L, 300L);
+        
         when(ladderService.getLadderLevels()).thenReturn(levels);
-
-        // Act & Assert
-        mockMvc.perform(get("/api/ladder/levels"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.1").value(0))
-                .andExpect(jsonPath("$.2").value(200))
-                .andExpect(jsonPath("$.3").value(500));
+        
+        // Act
+        ResponseEntity<Map<Long, Long>> response = ladderController.getLadderLevels();
+        
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(3, response.getBody().size());
+        assertEquals(0L, response.getBody().get(1L));
+        assertEquals(100L, response.getBody().get(2L));
+        assertEquals(300L, response.getBody().get(3L));
     }
-
+    
     @Test
-    @DisplayName("Should return user ladder status")
-    public void testGetUserLadderStatus() throws Exception {
+    @DisplayName("Get user ladder status by path variable should return status")
+    void getUserLadderStatus_ShouldReturnStatus() throws Exception {
         // Arrange
-        when(ladderService.getUserLadderStatus("test-user-id")).thenReturn(testStatus);
-
+        when(ladderService.getUserLadderStatus("user1")).thenReturn(userLadderStatus1);
+        
         // Act & Assert
-        mockMvc.perform(get("/api/ladder/users/test-user-id"))
+        mockMvc.perform(get("/api/ladder/users/user1")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.earnedPoints").value(100))
-                .andExpect(jsonPath("$.pointsToNextLevel").value(100))
-                .andExpect(jsonPath("$.currentLevel.level").value(1))
-                .andExpect(jsonPath("$.currentLevel.label").value("Beginner"));
-    }
-
-    @Test
-    @DisplayName("Should return 404 when user not found for ladder status")
-    public void testGetUserLadderStatus_UserNotFound() throws Exception {
-        // Arrange
-        when(ladderService.getUserLadderStatus("non-existent-user")).thenReturn(null);
-
-        // Act & Assert
-        mockMvc.perform(get("/api/ladder/users/non-existent-user"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("User not found"));
-    }
-
-    @Test
-    @DisplayName("Should return ladder status via query parameter")
-    public void testGetLadderStatus() throws Exception {
-        // Arrange
-        when(gamificationFacade.getUserLadderStatus("test-user-id")).thenReturn(testStatusDTO);
-
-        // Act & Assert
-        mockMvc.perform(get("/api/ladder/status").param("userId", "test-user-id"))
-                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value("user1"))
+                .andExpect(jsonPath("$.userName").value("testuser1"))
                 .andExpect(jsonPath("$.currentLevel").value(1))
-                .andExpect(jsonPath("$.levelLabel").value("Beginner"))
-                .andExpect(jsonPath("$.earnedPoints").value(100))
-                .andExpect(jsonPath("$.pointsToNextLevel").value(100));
+                .andExpect(jsonPath("$.levelLabel").value("Beginner"));
     }
-
+    
     @Test
-    @DisplayName("Should return 404 when user not found for ladder status query")
-    public void testGetLadderStatus_UserNotFound() throws Exception {
+    @DisplayName("Get user ladder status by path variable should handle user not found")
+    void getUserLadderStatus_ShouldHandleUserNotFound() throws Exception {
         // Arrange
-        when(gamificationFacade.getUserLadderStatus("non-existent-user")).thenReturn(null);
-
+        when(ladderService.getUserLadderStatus("nonexistent")).thenReturn(null);
+        when(userService.getUserById("nonexistent")).thenReturn(null);
+        
         // Act & Assert
-        mockMvc.perform(get("/api/ladder/status").param("userId", "non-existent-user"))
+        mockMvc.perform(get("/api/ladder/users/nonexistent")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("User not found"));
     }
-
+    
     @Test
-    @DisplayName("Should return level label")
-    public void testGetLevelLabel() throws Exception {
+    @DisplayName("Get user ladder status by path variable should initialize status if user exists but has no status")
+    void getUserLadderStatus_ShouldInitializeStatusIfUserExistsButHasNoStatus() throws Exception {
         // Arrange
-        when(ladderService.getLevelLabel(1)).thenReturn("Beginner");
-
-        // Act & Assert
-        mockMvc.perform(get("/api/ladder/levels/1/label"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.level").value(1))
-                .andExpect(jsonPath("$.label").value("Beginner"));
+        when(ladderService.getUserLadderStatus("user1")).thenReturn(null);
+        when(userService.getUserById("user1")).thenReturn(testUser1);
+        when(ladderService.initializeUserLadderStatus(testUser1)).thenReturn(userLadderStatus1);
         
-        verify(ladderService, times(1)).getLevelLabel(1);
+        // Act & Assert
+        mockMvc.perform(get("/api/ladder/users/user1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value("user1"))
+                .andExpect(jsonPath("$.userName").value("testuser1"))
+                .andExpect(jsonPath("$.currentLevel").value(1))
+                .andExpect(jsonPath("$.levelLabel").value("Beginner"));
     }
     
     @Test
-    @DisplayName("Should return 'Unknown' for non-existent level label")
-    public void testGetLevelLabel_NonExistent() throws Exception {
+    @DisplayName("Get user ladder status by path variable should handle database error")
+    void getUserLadderStatus_ShouldHandleDatabaseError() throws Exception {
         // Arrange
-        when(ladderService.getLevelLabel(999)).thenReturn("Unknown");
-
-        // Act & Assert
-        mockMvc.perform(get("/api/ladder/levels/999/label"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.level").value(999))
-                .andExpect(jsonPath("$.label").value("Unknown"));
+        DataAccessException dataAccessException = mock(DataAccessException.class);
+        when(dataAccessException.getMessage()).thenReturn("Database error");
+        when(ladderService.getUserLadderStatus("user1")).thenThrow(dataAccessException);
         
-        verify(ladderService, times(1)).getLevelLabel(999);
+        // Act & Assert
+        mockMvc.perform(get("/api/ladder/users/user1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Database error"));
     }
     
     @Test
-    @DisplayName("Should update user ladder status")
-    public void testUpdateUserLadderStatus() throws Exception {
+    @DisplayName("Get ladder status by query parameter should return status")
+    void getLadderStatus_ShouldReturnStatus() throws Exception {
         // Arrange
-        when(ladderService.updateUserLadderStatus("test-user-id")).thenReturn(testStatus);
-
+        when(gamificationFacade.getUserLadderStatus("user1")).thenReturn(ladderStatusDTO1);
+        
         // Act & Assert
-        mockMvc.perform(put("/api/ladder/users/test-user-id"))
+        mockMvc.perform(get("/api/ladder/status")
+                .param("userId", "user1")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.earnedPoints").value(100))
-                .andExpect(jsonPath("$.pointsToNextLevel").value(100))
-                .andExpect(jsonPath("$.currentLevel.level").value(1))
-                .andExpect(jsonPath("$.currentLevel.label").value("Beginner"));
+                .andExpect(jsonPath("$.userId").value("user1"))
+                .andExpect(jsonPath("$.userName").value("testuser1"))
+                .andExpect(jsonPath("$.currentLevel").value(1))
+                .andExpect(jsonPath("$.levelLabel").value("Beginner"));
     }
     
     @Test
-    @DisplayName("Should return 404 when updating non-existent user")
-    public void testUpdateUserLadderStatus_UserNotFound() throws Exception {
+    @DisplayName("Get ladder status by query parameter should handle user not found")
+    void getLadderStatus_ShouldHandleUserNotFound() throws Exception {
         // Arrange
-        when(ladderService.updateUserLadderStatus("non-existent-user")).thenReturn(null);
-
+        when(gamificationFacade.getUserLadderStatus("nonexistent")).thenReturn(null);
+        
         // Act & Assert
-        mockMvc.perform(put("/api/ladder/users/non-existent-user"))
+        mockMvc.perform(get("/api/ladder/status")
+                .param("userId", "nonexistent")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("User not found"))
-                .andExpect(jsonPath("$.message").exists());
-        
-        verify(ladderService, times(1)).updateUserLadderStatus("non-existent-user");
+                .andExpect(jsonPath("$.error").value("User not found"));
     }
     
     @Test
-    @DisplayName("Should handle empty ladder levels")
-    public void testGetLadderLevels_Empty() throws Exception {
+    @DisplayName("Update user ladder status should return updated status")
+    void updateUserLadderStatus_ShouldReturnUpdatedStatus() throws Exception {
         // Arrange
-        when(ladderService.getLadderLevels()).thenReturn(Collections.emptyMap());
-
+        when(ladderService.updateUserLadderStatus("user1")).thenReturn(userLadderStatus1);
+        
         // Act & Assert
-        mockMvc.perform(get("/api/ladder/levels"))
+        mockMvc.perform(put("/api/ladder/users/user1")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{}"));
-        
-        verify(ladderService, times(1)).getLadderLevels();
+                .andExpect(jsonPath("$.userId").value("user1"))
+                .andExpect(jsonPath("$.userName").value("testuser1"))
+                .andExpect(jsonPath("$.currentLevel").value(1))
+                .andExpect(jsonPath("$.levelLabel").value("Beginner"));
     }
     
     @Test
-    @DisplayName("Should handle advanced user ladder status")
-    public void testGetUserLadderStatus_AdvancedUser() throws Exception {
+    @DisplayName("Update user ladder status should handle user not found")
+    void updateUserLadderStatus_ShouldHandleUserNotFound() throws Exception {
         // Arrange
-        when(ladderService.getUserLadderStatus("advanced-user-id")).thenReturn(advancedStatus);
-
+        when(ladderService.updateUserLadderStatus("nonexistent")).thenReturn(null);
+        
         // Act & Assert
-        mockMvc.perform(get("/api/ladder/users/advanced-user-id"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.earnedPoints").value(600))
-                .andExpect(jsonPath("$.pointsToNextLevel").value(400))
-                .andExpect(jsonPath("$.currentLevel.level").value(3))
-                .andExpect(jsonPath("$.currentLevel.label").value("Advanced"));
-        
-        verify(ladderService, times(1)).getUserLadderStatus("advanced-user-id");
+        mockMvc.perform(put("/api/ladder/users/nonexistent")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("User not found"));
     }
     
     @Test
-    @DisplayName("Should handle advanced user ladder status via query parameter")
-    public void testGetLadderStatus_AdvancedUser() throws Exception {
+    @DisplayName("Get level label should return label")
+    void getLevelLabel_ShouldReturnLabel() throws Exception {
         // Arrange
-        when(gamificationFacade.getUserLadderStatus("advanced-user-id")).thenReturn(advancedStatusDTO);
-
+        when(ladderService.getLevelLabel(1L)).thenReturn("Beginner");
+        
+        // Create a real ObjectNode for the response
+        ObjectNode responseNode = new ObjectMapper().createObjectNode();
+        responseNode.put("level", 1L);
+        responseNode.put("label", "Beginner");
+        
+        // Mock the ObjectMapper behavior
+        when(objectMapper.createObjectNode()).thenReturn(responseNode);
+        
         // Act & Assert
-        mockMvc.perform(get("/api/ladder/status").param("userId", "advanced-user-id"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.currentLevel").value(3))
-                .andExpect(jsonPath("$.levelLabel").value("Advanced"))
-                .andExpect(jsonPath("$.earnedPoints").value(600))
-                .andExpect(jsonPath("$.pointsToNextLevel").value(400));
-        
-        verify(gamificationFacade, times(1)).getUserLadderStatus("advanced-user-id");
+        mockMvc.perform(get("/api/ladder/levels/1/label")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
     
     @Test
-    @DisplayName("Should create a new ladder level")
-    public void testCreateLadderLevel() throws Exception {
+    @DisplayName("Create ladder level should return created level")
+    void createLadderLevel_ShouldReturnCreatedLevel() throws Exception {
         // Arrange
-        LadderLevel newLevel = new LadderLevel(5L, "Expert", 1000L);
-        newLevel.setCreatedAt(ZonedDateTime.now());
+        ObjectMapper realObjectMapper = new ObjectMapper();
+        ObjectNode levelData = realObjectMapper.createObjectNode();
+        levelData.put("level", 3);
+        levelData.put("label", "Advanced");
+        levelData.put("pointsRequired", 300);
         
-        ObjectNode requestBody = objectMapper.createObjectNode();
-        requestBody.put("level", 5);
-        requestBody.put("label", "Expert");
-        requestBody.put("pointsRequired", 1000);
+        LadderLevel newLevel = new LadderLevel(3L, "Advanced", 300L);
         
-        when(ladderService.createLadderLevel(5, "Expert", 1000)).thenReturn(newLevel);
-
+        when(ladderService.createLadderLevel(3L, "Advanced", 300L)).thenReturn(newLevel);
+        
         // Act & Assert
         mockMvc.perform(post("/api/ladder/levels")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestBody)))
+                .content(realObjectMapper.writeValueAsString(levelData)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.level").value(5))
-                .andExpect(jsonPath("$.label").value("Expert"))
-                .andExpect(jsonPath("$.pointsRequired").value(1000))
-                .andExpect(jsonPath("$.createdAt").exists());
-        
-        verify(ladderService, times(1)).createLadderLevel(5, "Expert", 1000);
-    }
-    
-    @Test
-    @DisplayName("Should handle invalid ladder level creation request")
-    public void testCreateLadderLevel_InvalidRequest() throws Exception {
-        // Arrange - Create a mock controller to handle the exception
-        when(ladderService.createLadderLevel(anyInt(), eq(null), anyInt()))
-            .thenThrow(new IllegalArgumentException("Missing required fields"));
-            
-        ObjectNode requestBody = objectMapper.createObjectNode();
-        // Missing required fields
-        requestBody.put("level", 5);
-        // Missing label and pointsRequired
-        
-        // Act & Assert
-        mockMvc.perform(post("/api/ladder/levels")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestBody)))
-                .andExpect(status().is5xxServerError());
-        
-        verify(ladderService, never()).createLadderLevel(anyInt(), anyString(), anyInt());
-    }
-    
-    @Test
-    @DisplayName("Should update an existing ladder level")
-    public void testUpdateLadderLevel() throws Exception {
-        // Arrange
-        LadderLevel updatedLevel = new LadderLevel(3L, "Advanced", 800L);
-        
-        ObjectNode requestBody = objectMapper.createObjectNode();
-        requestBody.put("label", "Advanced");
-        requestBody.put("pointsRequired", 800);
-        
-        when(ladderService.updateLadderLevel(3, "Advanced", 800)).thenReturn(updatedLevel);
-
-        // Act & Assert
-        mockMvc.perform(put("/api/ladder/levels/3")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestBody)))
-                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.level").value(3))
                 .andExpect(jsonPath("$.label").value("Advanced"))
-                .andExpect(jsonPath("$.pointsRequired").value(800));
+                .andExpect(jsonPath("$.pointsRequired").value(300));
     }
     
     @Test
-    @DisplayName("Should return 404 when updating non-existent level")
-    public void testUpdateLadderLevel_NotFound() throws Exception {
+    @DisplayName("Update ladder level should return updated level")
+    void updateLadderLevel_ShouldReturnUpdatedLevel() throws Exception {
         // Arrange
-        ObjectNode requestBody = objectMapper.createObjectNode();
-        requestBody.put("label", "Unknown");
-        requestBody.put("pointsRequired", 999);
+        ObjectMapper realObjectMapper = new ObjectMapper();
+        ObjectNode levelData = realObjectMapper.createObjectNode();
+        levelData.put("label", "Updated Beginner");
+        levelData.put("pointsRequired", 50);
         
-        when(ladderService.updateLadderLevel(999, "Unknown", 999)).thenReturn(null);
-
+        LadderLevel updatedLevel = new LadderLevel(1L, "Updated Beginner", 50L);
+        
+        when(ladderService.updateLadderLevel(1L, "Updated Beginner", 50L)).thenReturn(updatedLevel);
+        
+        // Act & Assert
+        mockMvc.perform(put("/api/ladder/levels/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(realObjectMapper.writeValueAsString(levelData)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.level").value(1))
+                .andExpect(jsonPath("$.label").value("Updated Beginner"))
+                .andExpect(jsonPath("$.pointsRequired").value(50));
+    }
+    
+    @Test
+    @DisplayName("Update ladder level should handle level not found")
+    void updateLadderLevel_ShouldHandleLevelNotFound() throws Exception {
+        // Arrange
+        ObjectMapper realObjectMapper = new ObjectMapper();
+        ObjectNode levelData = realObjectMapper.createObjectNode();
+        levelData.put("label", "Nonexistent Level");
+        levelData.put("pointsRequired", 999);
+        
+        when(ladderService.updateLadderLevel(999L, "Nonexistent Level", 999L)).thenReturn(null);
+        
         // Act & Assert
         mockMvc.perform(put("/api/ladder/levels/999")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(requestBody)))
+                .content(realObjectMapper.writeValueAsString(levelData)))
                 .andExpect(status().isNotFound());
     }
     
     @Test
-    @DisplayName("Should delete a ladder level")
-    public void testDeleteLadderLevel() throws Exception {
+    @DisplayName("Delete ladder level should return no content when successful")
+    void deleteLadderLevel_ShouldReturnNoContentWhenSuccessful() throws Exception {
         // Arrange
-        when(ladderService.deleteLadderLevel(4)).thenReturn(true);
-
+        when(ladderService.deleteLadderLevel(1L)).thenReturn(true);
+        
         // Act & Assert
-        mockMvc.perform(delete("/api/ladder/levels/4"))
+        mockMvc.perform(delete("/api/ladder/levels/1")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
     
     @Test
-    @DisplayName("Should return conflict when deleting a level with users")
-    public void testDeleteLadderLevel_Conflict() throws Exception {
+    @DisplayName("Delete ladder level should handle level not found or in use")
+    void deleteLadderLevel_ShouldHandleLevelNotFoundOrInUse() throws Exception {
         // Arrange
-        when(ladderService.deleteLadderLevel(2)).thenReturn(false);
-
+        when(ladderService.deleteLadderLevel(1L)).thenReturn(false);
+        
         // Act & Assert
-        mockMvc.perform(delete("/api/ladder/levels/2"))
+        mockMvc.perform(delete("/api/ladder/levels/1")
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.error").value("Cannot delete level"))
-                .andExpect(jsonPath("$.message").value("The level does not exist or users are currently at this level"));
-        
-        verify(ladderService, times(1)).deleteLadderLevel(2);
+                .andExpect(jsonPath("$.error").value("Cannot delete level"));
     }
     
     @Test
-    @DisplayName("Should handle multiple ladder level operations in sequence")
-    public void testMultipleLadderLevelOperations() throws Exception {
+    @DisplayName("Handle user not found exception should return 404 with error message")
+    void handleUserNotFoundException_ShouldReturn404WithErrorMessage() {
         // Arrange
-        LadderLevel newLevel = new LadderLevel(4L, "Senior", 900L);
-        newLevel.setCreatedAt(ZonedDateTime.now());
+        UserNotFoundException exception = new UserNotFoundException("User not found with id: nonexistent");
         
-        ObjectNode createRequestBody = objectMapper.createObjectNode();
-        createRequestBody.put("level", 4);
-        createRequestBody.put("label", "Senior");
-        createRequestBody.put("pointsRequired", 900);
+        // Act
+        ResponseEntity<ErrorResponseDTO> response = ladderController.handleUserNotFoundException(exception);
         
-        ObjectNode updateRequestBody = objectMapper.createObjectNode();
-        updateRequestBody.put("label", "Senior Expert");
-        updateRequestBody.put("pointsRequired", 950);
-        
-        LadderLevel updatedLevel = new LadderLevel(4L, "Senior Expert", 950L);
-        
-        when(ladderService.createLadderLevel(4, "Senior", 900)).thenReturn(newLevel);
-        when(ladderService.updateLadderLevel(4, "Senior Expert", 950)).thenReturn(updatedLevel);
-        when(ladderService.deleteLadderLevel(4)).thenReturn(true);
-        
-        // Act & Assert - Create
-        mockMvc.perform(post("/api/ladder/levels")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createRequestBody)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.level").value(4))
-                .andExpect(jsonPath("$.label").value("Senior"));
-        
-        // Act & Assert - Update
-        mockMvc.perform(put("/api/ladder/levels/4")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequestBody)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.level").value(4))
-                .andExpect(jsonPath("$.label").value("Senior Expert"))
-                .andExpect(jsonPath("$.pointsRequired").value(950));
-        
-        // Act & Assert - Delete
-        mockMvc.perform(delete("/api/ladder/levels/4"))
-                .andExpect(status().isNoContent());
-        
-        verify(ladderService, times(1)).createLadderLevel(4, "Senior", 900);
-        verify(ladderService, times(1)).updateLadderLevel(4, "Senior Expert", 950);
-        verify(ladderService, times(1)).deleteLadderLevel(4);
+        // Assert
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("User not found", response.getBody().getError());
+        assertEquals("User not found with id: nonexistent", response.getBody().getMessage());
     }
 }

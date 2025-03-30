@@ -37,14 +37,14 @@ public class Achievement {
     @Column(name = "achievement_id", updatable = false, nullable = false)
     private String achievementId;
     
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
     
     @Column(name = "description")
     private String description;
     
     @Type(JsonType.class)
-    @Column(name = "criteria", columnDefinition = "json")
+    @Column(name = "criteria", columnDefinition = "jsonb", nullable = false)
     private JsonNode criteria;
     
     @CreationTimestamp

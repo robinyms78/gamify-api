@@ -200,6 +200,7 @@ public class User {
         this.leaderboard = leaderboard;
         if (leaderboard != null && leaderboard.getUser() != this) {
             leaderboard.setUser(this);
+            leaderboard.setUserId(this.getId()); // Ensure ID is set correctly
             leaderboard.syncWithUser(); // Ensure leaderboard data is in sync
         }
     }
